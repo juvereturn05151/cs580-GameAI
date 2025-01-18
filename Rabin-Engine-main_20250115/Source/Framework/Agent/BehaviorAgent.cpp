@@ -51,6 +51,8 @@ bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
 
     const auto currentPos = get_position();
 
+    printf("%f %f %f\n", point.x, point.y, point.z);
+
     auto delta = point - currentPos;
 
     const float length = delta.Length();

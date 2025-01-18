@@ -2,7 +2,7 @@
 #include "PhysicsComponent.h"
 #include "Agent/Agent.h"
 
-#define GRAVITY -9.81
+#define GRAVITY -20
 #define GROUND_HEIGHT 0.0
 #define SKY_HEIGHT 1000.0
 
@@ -13,7 +13,7 @@ PhysicsComponent::PhysicsComponent(Agent& _owner, float _mass) : Component(_owne
 
 void PhysicsComponent::update(float deltaTime)
 {
-	printf("pos Y: %f\n", owner->get_position().y);
+	//printf("pos Y: %f\n", owner->get_position().y);
 	//printf("velocity Y: %f\n", velocity.y);*/
 
 	if (!isActive)
