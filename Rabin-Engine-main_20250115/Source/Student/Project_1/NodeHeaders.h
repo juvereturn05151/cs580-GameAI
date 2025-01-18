@@ -29,6 +29,6 @@
 #include "Leaf/CustomLeaf/L_Jump.h"
 #include "Leaf/CustomLeaf/L_Die.h"
 #include "Leaf/CustomLeaf/L_SpawnAgent.h"
-
+#include "Leaf/CustomLeaf/L_MoveToHut.h"
 
 // Student Leaf Nodes

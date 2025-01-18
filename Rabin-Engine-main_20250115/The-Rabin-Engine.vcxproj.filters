@@ -346,6 +346,9 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnAgent.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToHut.h">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -583,6 +586,9 @@
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnAgent.cpp">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToHut.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
   </ItemGroup>
