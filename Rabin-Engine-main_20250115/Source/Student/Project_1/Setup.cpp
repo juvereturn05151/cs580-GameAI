@@ -26,11 +26,11 @@ void ProjectOne::setup()
     Agent::add_model("Assets\\ball.sdkmesh", Agent::AgentModel::Ball);
     Agent::add_model("Assets\\hut.sdkmesh", Agent::AgentModel::Hut);
     // 3. Create the agent, giving it the correct AgentModel type.
-    auto tree = agents->create_behavior_agent("ExampleAgent2", BehaviorTreeTypes::Example, Agent::AgentModel::Tree);
+    //auto tree = agents->create_behavior_agent("ExampleAgent2", BehaviorTreeTypes::Example, Agent::AgentModel::Tree);
     // 4. (optional) You can also set the pitch of the model, if you want it to be rotated differently
-    tree->set_pitch(PI / 2);
+    //tree->set_pitch(PI / 2);
     // 5. (optional) Set other aspects to make it start out correctly
-    tree->set_color(Vec3(0, 0.5, 0));   // Set the tree to green
+    //tree->set_color(Vec3(0, 0.5, 0));   // Set the tree to green
 
     // You can technically load any map you want, even create your own map file,
     // but behavior agents won't actually avoid walls or anything special, unless you code

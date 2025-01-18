@@ -10,7 +10,7 @@ void L_Jump::on_enter()
     timer = RNG::range(1.0f, 2.0f);
 
     // Trigger the jump action once
-    agent->jump(timer);
+    agent->jump();
 
     BehaviorNode::on_leaf_enter();
 }
@@ -21,7 +21,7 @@ void L_Jump::on_update(float dt)
     timer -= dt;
 
     // Check if the jump is complete
-    if (timer < 0.0f && agent->is_grounded())
+    if (timer < 0.0f)
     {
         on_success();
     }

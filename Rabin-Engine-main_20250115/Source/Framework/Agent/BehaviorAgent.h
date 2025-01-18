@@ -33,23 +33,11 @@ public:
     std::wstringstream& get_debug_text();
     void add_debug_text(const std::wstring& nodeName);
 
-    // Simulate a jump action
-    bool jump(float dt);
-
-    bool is_grounded();
+    void jump();
 
 private:
     BehaviorTree tree;
     Blackboard blackboard;
     std::wstring debugName;
     std::wstringstream debugText;
-
-
-
-    // Jump-related variables
-    bool isJumping = false;
-    float jumpHeight = 5.0f;
-    float jumpDuration = 1.0f;
-    float jumpTimer = 0.0f;
-    Vec3 jumpStartPosition;
 };

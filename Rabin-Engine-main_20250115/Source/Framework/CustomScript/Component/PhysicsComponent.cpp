@@ -2,7 +2,7 @@
 #include "PhysicsComponent.h"
 #include "Agent/Agent.h"
 
-#define GRAVITY 9.81
+#define GRAVITY -9.81
 #define GROUND_HEIGHT 0.0
 
 PhysicsComponent::PhysicsComponent(Agent& _owner, float _mass) : Component(_owner), mass(_mass)
@@ -12,6 +12,9 @@ PhysicsComponent::PhysicsComponent(Agent& _owner, float _mass) : Component(_owne
 
 void PhysicsComponent::update(float deltaTime)
 {
+	printf("pos Y: %f\n", owner->get_position().y);
+	printf("velocity Y: %f\n", velocity.y);
+
 	if (!isActive)
 	{
 		return;
@@ -30,6 +33,7 @@ void PhysicsComponent::update(float deltaTime)
 	Vec3 pos = owner->get_position();
 	pos.x += velocity.x * deltaTime;
 	pos.y += velocity.y * deltaTime;
+	pos.z += velocity.z * deltaTime;
 
 	// Clamp the y position to ensure it doesn't go below 0
 	if (pos.y < GROUND_HEIGHT)

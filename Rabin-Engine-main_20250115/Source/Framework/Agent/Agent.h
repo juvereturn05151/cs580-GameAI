@@ -80,6 +80,12 @@ public:
     void setAgentModel(AgentModel model);
 
     static void add_model(std::string modelPath, AgentModel model);
+
+    // Adds a PhysicsComponent to the GameObject with the specified mass
+    void addPhysicsComponent(float mass);
+
+    // Retrieves the PhysicsComponent attached to this GameObject
+    PhysicsComponent* getPhysicsComp();
 private:
     Vec3 position;
     Vec3 scaling;
@@ -112,9 +118,5 @@ private:
     PhysicsComponent* physicsComp = nullptr;
     std::vector<Component*> components;
 
-    // Adds a PhysicsComponent to the GameObject with the specified mass
-    void addPhysicsComponent(float mass);
 
-    // Retrieves the PhysicsComponent attached to this GameObject
-    PhysicsComponent* getPhysicsComp();
 };

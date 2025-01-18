@@ -41,13 +41,8 @@ BehaviorTree& BehaviorAgent::get_behavior_tree()
 void BehaviorAgent::update(float dt)
 {
     // Update the behavior tree
+    Agent::update(dt);
     tree.update(dt);
-
-    // Handle jump logic
-    if (isJumping)
-    {
-        jump(dt);
-    }
 }
 
 bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
@@ -92,36 +87,9 @@ bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
     return result;
 }
 
-bool BehaviorAgent::jump(float dt)
+void BehaviorAgent::jump()
 {
-    if (!isJumping)
-    {
-        // Start the jump
-        isJumping = true;
-        jumpTimer = 0.0f;
-        jumpStartPosition = get_position();
-    }
-
-    // Update jump progress
-    jumpTimer += dt;
-
-    // Calculate the current height using a parabolic formula
-    float progress = jumpTimer / jumpDuration;
-    if (progress > 10.0f)
-    {
-        progress = 10.0f;
-        isJumping = false;
-    }
-
-    float height = jumpHeight * (1.0f - (progress - 0.5f) * (progress - 0.5f) * 4.0f);
-
-    // Update the position with the new height
-    Vec3 newPosition = jumpStartPosition;
-    newPosition.y += height;
-    set_position(newPosition);
-
-    // Return true if the jump is complete
-    return !isJumping;
+    getPhysicsComp()->applyForce(Vec3(0.0f, 2000.0f, 0.0f));
 }
 
 const std::wstring& BehaviorAgent::get_debug_name() const
@@ -137,9 +105,4 @@ std::wstringstream& BehaviorAgent::get_debug_text()
 void BehaviorAgent::add_debug_text(const std::wstring& nodeName)
 {
     debugText << nodeName << debugTextDelimiter;
-}
-
-bool BehaviorAgent::is_grounded()
-{
-    return (get_position().y <= 0);
 }
