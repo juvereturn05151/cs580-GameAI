@@ -1,2 +1,3 @@
 #include "../Source/Student/Project_1/Trees/Example.bht"
 #include "../Source/Student/Project_1/Trees/Idle.bht"
+#include "../Source/Student/Project_1/Trees/Test1.bht"

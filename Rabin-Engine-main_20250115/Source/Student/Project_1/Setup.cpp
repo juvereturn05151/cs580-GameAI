@@ -5,7 +5,7 @@
 void ProjectOne::setup()
 {
     // Create an agent (using the default "Agent::AgentModel::Man" model)
-    auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::Example);
+    auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::Test1);
 
     // You can change properties here or at runtime from a behavior tree leaf node
     // Look in Agent.h for all of the setters, like these:
