@@ -6,6 +6,9 @@ void ProjectOne::setup()
 {
     // Create an agent (using the default "Agent::AgentModel::Man" model)
     auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::Test1);
+    man->set_position(Vec3(100, 0, 50));
+    man->set_yaw(-180.0);
+
 
     // You can change properties here or at runtime from a behavior tree leaf node
     // Look in Agent.h for all of the setters, like these:
@@ -32,10 +35,14 @@ void ProjectOne::setup()
     // 5. (optional) Set other aspects to make it start out correctly
     //tree->set_color(Vec3(0, 0.5, 0));   // Set the tree to green
 
+    auto hut = agents->create_behavior_agent("hut", BehaviorTreeTypes::Idle, Agent::AgentModel::Hut);
+    hut->set_position(Vec3(120, 0, -50));
+
+
     // You can technically load any map you want, even create your own map file,
     // but behavior agents won't actually avoid walls or anything special, unless you code
     // that yourself (that's the realm of project 2)
-    terrain->goto_map(0);
+    terrain->goto_map(3);
 
     // You can also enable the pathing layer and set grid square colors as you see fit.
     // Works best with map 0, the completely blank map
