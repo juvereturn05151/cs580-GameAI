@@ -89,7 +89,7 @@ bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
 
 void BehaviorAgent::jump()
 {
-    getPhysicsComp()->applyForce(Vec3(0.0f, 2000.0f, 0.0f));
+    getPhysicsComp()->applyForce(Vec3(0.0f, 4000.0f, 0.0f));
 }
 
 const std::wstring& BehaviorAgent::get_debug_name() const
@@ -105,4 +105,24 @@ std::wstringstream& BehaviorAgent::get_debug_text()
 void BehaviorAgent::add_debug_text(const std::wstring& nodeName)
 {
     debugText << nodeName << debugTextDelimiter;
+}
+
+bool BehaviorAgent::is_ground()
+{
+    if (getPhysicsComp() == NULL) 
+    {
+        return false;
+    }
+
+    return getPhysicsComp()->isGround();
+}
+
+bool BehaviorAgent::is_too_high()
+{
+    if (getPhysicsComp() == NULL)
+    {
+        return false;
+    }
+
+    return getPhysicsComp()->isTooHigh();
 }

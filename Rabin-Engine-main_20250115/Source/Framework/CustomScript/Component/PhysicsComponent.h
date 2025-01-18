@@ -20,6 +20,7 @@ private:
     Vec3 velocity;                  // The current velocity of the GameObject
     float mass;                        // The mass of the GameObject, used for force calculations
     Vec3 accumulatedForce;          // The sum of all forces applied during a single frame
+    bool is_ground;
 
 public:
     // Constructor: Initializes the PhysicsComponent with an owner GameObject and its mass.
@@ -45,6 +46,10 @@ public:
 
     // Gets the mass of the object.
     float getMass() const;
+
+    bool isGround();
+
+    bool isTooHigh();
 };
 
 #endif

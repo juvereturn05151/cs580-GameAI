@@ -6,9 +6,6 @@ L_Jump::L_Jump() : timer(0.0f)
 
 void L_Jump::on_enter()
 {
-    // Assign a random jump duration (if needed)
-    timer = RNG::range(1.0f, 2.0f);
-
     // Trigger the jump action once
     agent->jump();
 
@@ -17,12 +14,10 @@ void L_Jump::on_enter()
 
 void L_Jump::on_update(float dt)
 {
-    // Decrement the timer
-    timer -= dt;
-
     // Check if the jump is complete
-    if (timer < 0.0f)
+    if (agent->is_ground())
     {
+        printf("on ground\n");
         on_success();
     }
 
