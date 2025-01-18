@@ -21,29 +21,36 @@ namespace
     const std::wstring debugNameSeparator(L"_");
 }
 
-BehaviorAgent::BehaviorAgent(const char *type, size_t id) : Agent(type, id)
+BehaviorAgent::BehaviorAgent(const char* type, size_t id) : Agent(type, id)
 {
     const std::string temp(type);
     debugName = std::wstring(temp.begin(), temp.end()) + debugNameSeparator + std::to_wstring(id);
     set_movement_speed(10.0f);
 }
 
-Blackboard &BehaviorAgent::get_blackboard()
+Blackboard& BehaviorAgent::get_blackboard()
 {
     return blackboard;
 }
 
-BehaviorTree &BehaviorAgent::get_behavior_tree()
+BehaviorTree& BehaviorAgent::get_behavior_tree()
 {
     return tree;
 }
 
 void BehaviorAgent::update(float dt)
 {
+    // Update the behavior tree
     tree.update(dt);
+
+    // Handle jump logic
+    if (isJumping)
+    {
+        jump(dt);
+    }
 }
 
-bool BehaviorAgent::move_toward_point(const Vec3 &point, float dt)
+bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
 {
     bool result = false;
 
@@ -63,7 +70,7 @@ bool BehaviorAgent::move_toward_point(const Vec3 &point, float dt)
     {
         // determine how far to actually move
         float actualSpeed = get_movement_speed() * dt;
-        
+
         // see if we even need to move the full distance
         if (length < actualSpeed)
         {
@@ -85,17 +92,49 @@ bool BehaviorAgent::move_toward_point(const Vec3 &point, float dt)
     return result;
 }
 
-const std::wstring &BehaviorAgent::get_debug_name() const
+bool BehaviorAgent::jump(float dt)
+{
+    if (!isJumping)
+    {
+        // Start the jump
+        isJumping = true;
+        jumpTimer = 0.0f;
+        jumpStartPosition = get_position();
+    }
+
+    // Update jump progress
+    jumpTimer += dt;
+
+    // Calculate the current height using a parabolic formula
+    float progress = jumpTimer / jumpDuration;
+    if (progress > 1.0f)
+    {
+        progress = 1.0f;
+        isJumping = false;
+    }
+
+    float height = jumpHeight * (1.0f - (progress - 0.5f) * (progress - 0.5f) * 4.0f);
+
+    // Update the position with the new height
+    Vec3 newPosition = jumpStartPosition;
+    newPosition.y += height;
+    set_position(newPosition);
+
+    // Return true if the jump is complete
+    return !isJumping;
+}
+
+const std::wstring& BehaviorAgent::get_debug_name() const
 {
     return debugName;
 }
 
-std::wstringstream &BehaviorAgent::get_debug_text()
+std::wstringstream& BehaviorAgent::get_debug_text()
 {
     return debugText;
 }
 
-void BehaviorAgent::add_debug_text(const std::wstring &nodeName)
+void BehaviorAgent::add_debug_text(const std::wstring& nodeName)
 {
     debugText << nodeName << debugTextDelimiter;
 }

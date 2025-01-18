@@ -74,6 +74,9 @@
     <Filter Include="Assets\Agent">
       <UniqueIdentifier>{13956118-09e6-4387-b4fb-ad187b4b057f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Student\Project_1\Leaf\CustomLeaf">
+      <UniqueIdentifier>{6cc316ab-a8d2-4279-b990-c43e06e9b3ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework\pch.h">
@@ -322,6 +325,9 @@
     <ClInclude Include="Source\Framework\Core\AudioManager.h">
       <Filter>Source\Framework\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.h">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -545,6 +551,9 @@
     </ClCompile>
     <ClCompile Include="Source\Framework\Core\AudioManager.cpp">
       <Filter>Source\Framework\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.cpp">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
