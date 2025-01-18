@@ -107,9 +107,9 @@ bool BehaviorAgent::jump(float dt)
 
     // Calculate the current height using a parabolic formula
     float progress = jumpTimer / jumpDuration;
-    if (progress > 1.0f)
+    if (progress > 10.0f)
     {
-        progress = 1.0f;
+        progress = 10.0f;
         isJumping = false;
     }
 
@@ -137,4 +137,9 @@ std::wstringstream& BehaviorAgent::get_debug_text()
 void BehaviorAgent::add_debug_text(const std::wstring& nodeName)
 {
     debugText << nodeName << debugTextDelimiter;
+}
+
+bool BehaviorAgent::is_grounded()
+{
+    return (get_position().y <= 0);
 }

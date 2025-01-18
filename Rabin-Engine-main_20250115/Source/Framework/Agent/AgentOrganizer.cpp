@@ -196,6 +196,8 @@ void AgentOrganizer::update(float dt)
                 }
             #endif
 
+            agent->cleanComponents();
+
             delete agent;
 
             agentsAll.erase(agentsAll.begin() + *i);

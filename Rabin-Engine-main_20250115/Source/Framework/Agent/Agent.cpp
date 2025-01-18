@@ -27,7 +27,9 @@ std::unordered_map<Agent::AgentModel, size_t> Agent::agentModelMap;
 
 Agent::Agent(const char *type, size_t id) : position(0.0f, 0.0f, 0.0f),
     scaling(3.0f, 3.0f, 3.0f), eulerAngles(0.0f, 0.0f, 0.0f), isDirty(true), color(0.7f, 0.7f, 0.7f), type(type), id(id), movementSpeed(2000.0f / 2.3f)
-{}
+{
+    addPhysicsComponent(1.0f);
+}
 
 #pragma region Getters
 
@@ -156,7 +158,12 @@ void Agent::set_movement_speed(float speed)
 #pragma endregion
 
 void Agent::update(float dt)
-{}
+{
+    for (Component* component : components)
+    {
+        component->update(dt);
+    }
+}
 
 Agent::AgentModel Agent::getAgentModel()
 {
@@ -285,4 +292,32 @@ void Agent::build_transformation()
     const auto rotationMatrix = Mat4::CreateFromQuaternion(rotation);
 
     localToWorld = scalingMatrix * rotationMatrix * translationMatrix;
+}
+
+// Add a physics component to the GameObject, if one doesn't already exist
+void Agent::addPhysicsComponent(float mass)
+{
+    if (physicsComp == NULL)
+    {
+        physicsComp = new PhysicsComponent(*this, mass);
+        components.push_back(physicsComp);
+    }
+}
+
+// Get the physics component
+PhysicsComponent* Agent::getPhysicsComp()
+{
+    return physicsComp;
+}
+
+void Agent::cleanComponents()
+{
+    // Iterate through each component in the vector and delete them
+    for (Component* component : components)
+    {
+        delete component; // Free the dynamically allocated memory for each component
+    }
+
+    // Clear the vector to remove dangling pointers
+    components.clear();
 }

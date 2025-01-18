@@ -36,11 +36,15 @@ public:
     // Simulate a jump action
     bool jump(float dt);
 
+    bool is_grounded();
+
 private:
     BehaviorTree tree;
     Blackboard blackboard;
     std::wstring debugName;
     std::wstringstream debugText;
+
+
 
     // Jump-related variables
     bool isJumping = false;

@@ -77,6 +77,12 @@
     <Filter Include="Source\Student\Project_1\Leaf\CustomLeaf">
       <UniqueIdentifier>{6cc316ab-a8d2-4279-b990-c43e06e9b3ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\CustomScript">
+      <UniqueIdentifier>{48483781-7165-4c45-8ded-3a37cb0a8679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\CustomScript\Component">
+      <UniqueIdentifier>{956335d0-4496-4a30-b554-4c1351616121}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework\pch.h">
@@ -328,6 +334,12 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Framework\CustomScript\Component\Component.h">
+      <Filter>Assets\CustomScript\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Framework\CustomScript\Component\PhysicsComponent.h">
+      <Filter>Assets\CustomScript\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -554,6 +566,12 @@
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Framework\CustomScript\Component\Component.cpp">
+      <Filter>Assets\CustomScript\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Framework\CustomScript\Component\PhysicsComponent.cpp">
+      <Filter>Assets\CustomScript\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

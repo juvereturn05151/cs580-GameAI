@@ -13,6 +13,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 
 #pragma once
 #include "../Misc/NiceTypes.h"
+#include "CustomScript/Component/PhysicsComponent.h"
 
 // forward declarations
 class AgentOrganizer;
@@ -62,6 +63,8 @@ public:
 
     virtual void update(float dt);
 
+    virtual void cleanComponents();
+
     enum class AgentModel
     {
         Man,
@@ -105,4 +108,13 @@ private:
 
     // Additional variables
     AgentModel agentModel;
+
+    PhysicsComponent* physicsComp = nullptr;
+    std::vector<Component*> components;
+
+    // Adds a PhysicsComponent to the GameObject with the specified mass
+    void addPhysicsComponent(float mass);
+
+    // Retrieves the PhysicsComponent attached to this GameObject
+    PhysicsComponent* getPhysicsComp();
 };
