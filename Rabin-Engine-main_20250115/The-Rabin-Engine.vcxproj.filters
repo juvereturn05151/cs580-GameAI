@@ -340,6 +340,9 @@
     <ClInclude Include="Source\Framework\CustomScript\Component\PhysicsComponent.h">
       <Filter>Assets\CustomScript\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.h">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -572,6 +575,9 @@
     </ClCompile>
     <ClCompile Include="Source\Framework\CustomScript\Component\PhysicsComponent.cpp">
       <Filter>Assets\CustomScript\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.cpp">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,9 @@
 #pragma once
 #include "BehaviorNode.h"
-class L_Jump :public BaseNode<L_Jump>
+class L_Die : public BaseNode<L_Die>
 {
 public:
-    L_Jump();
+    L_Die();
 
 protected:
 

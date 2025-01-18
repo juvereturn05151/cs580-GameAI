@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "L_Jump.h"
 
-L_Jump::L_Jump() : timer(0.0f)
+L_Jump::L_Jump()
 {}
 
 void L_Jump::on_enter()
@@ -17,7 +17,6 @@ void L_Jump::on_update(float dt)
     // Check if the jump is complete
     if (agent->is_ground())
     {
-        printf("on ground\n");
         on_success();
     }
 

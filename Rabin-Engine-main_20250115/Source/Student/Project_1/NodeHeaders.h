@@ -27,5 +27,6 @@
 #include "Leaf/L_MoveToRandomPosition.h"
 #include "Leaf/L_PlaySound.h"
 #include "Leaf/CustomLeaf/L_Jump.h"
+#include "Leaf/CustomLeaf/L_Die.h"
 
 // Student Leaf Nodes

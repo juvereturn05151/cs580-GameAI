@@ -201,6 +201,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.h" />
     <ClInclude Include="Source\Framework\CustomScript\Component\Component.h" />
     <ClInclude Include="Source\Framework\CustomScript\Component\PhysicsComponent.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.h" />
@@ -288,6 +289,7 @@
     <ClInclude Include="Source\Student\Project_2\P2_Pathfinding.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.cpp" />
     <ClCompile Include="Source\Framework\CustomScript\Component\Component.cpp" />
     <ClCompile Include="Source\Framework\CustomScript\Component\PhysicsComponent.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.cpp" />
