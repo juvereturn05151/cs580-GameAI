@@ -28,5 +28,7 @@
 #include "Leaf/L_PlaySound.h"
 #include "Leaf/CustomLeaf/L_Jump.h"
 #include "Leaf/CustomLeaf/L_Die.h"
+#include "Leaf/CustomLeaf/L_SpawnAgent.h"
+
 
 // Student Leaf Nodes

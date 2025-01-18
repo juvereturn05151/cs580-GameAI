@@ -279,6 +279,7 @@
     <ClInclude Include="Source\Student\Project_1\Decorator\D_Delay.h" />
     <ClInclude Include="Source\Student\Project_1\Decorator\D_InvertedRepeater.h" />
     <ClInclude Include="Source\Student\Project_1\Decorator\D_RepeatFourTimes.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnAgent.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\L_CheckMouseClick.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\L_Idle.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\L_MoveToFurthestAgent.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="Source\Student\Project_1\Decorator\D_Delay.cpp" />
     <ClCompile Include="Source\Student\Project_1\Decorator\D_InvertedRepeater.cpp" />
     <ClCompile Include="Source\Student\Project_1\Decorator\D_RepeatFourTimes.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnAgent.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\L_CheckMouseClick.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\L_Idle.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\L_MoveToFurthestAgent.cpp" />
