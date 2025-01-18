@@ -5,7 +5,7 @@
 void ProjectOne::setup()
 {
     // Create an agent (using the default "Agent::AgentModel::Man" model)
-    auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::Test1);
+    auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::GuardBT);
     man->set_position(Vec3(100, 0, 50));
     man->set_yaw(-270.0);
     //man->set_pitch(45.0);

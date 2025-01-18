@@ -3,11 +3,12 @@
 
 L_MoveToHut::L_MoveToHut()
 {}
-
+//X is Forward
+//Z is Side
 void L_MoveToHut::on_enter()
 {
     //const auto& bb = agent->get_blackboard();
-    targetPoint = Vec3(120, 0, -50);//bb.get_value<Vec3>("Hut Position");
+    targetPoint = Vec3(100, 0, 20);//bb.get_value<Vec3>("Hut Position");
 
     BehaviorNode::on_leaf_enter();
 }
