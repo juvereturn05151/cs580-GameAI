@@ -29,6 +29,7 @@ Agent::Agent(const char *type, size_t id) : position(0.0f, 0.0f, 0.0f),
     scaling(3.0f, 3.0f, 3.0f), eulerAngles(0.0f, 0.0f, 0.0f), isDirty(true), color(0.7f, 0.7f, 0.7f), type(type), id(id), movementSpeed(2000.0f / 2.3f)
 {
     addPhysicsComponent(1.0f);
+    addAnimationComp();
 }
 
 #pragma region Getters
@@ -304,10 +305,36 @@ void Agent::addPhysicsComponent(float mass)
     }
 }
 
+void Agent::addAnimationComp()
+{
+    if (animComp == NULL)
+    {
+        animComp = new AnimationComponent(*this);
+        components.push_back(animComp);
+    }
+}
+
 // Get the physics component
 PhysicsComponent* Agent::getPhysicsComp()
 {
     return physicsComp;
+}
+
+void Agent::setAnimAndPlay(const AnimationController& anim) 
+{
+    if (animComp != NULL)
+    {
+        animComp->add_anim(anim);
+        animComp->play();
+    }
+}
+
+void Agent::stopAnimAndPlay() 
+{
+    if (animComp != NULL)
+    {
+        animComp->stop();
+    }
 }
 
 void Agent::cleanComponents()

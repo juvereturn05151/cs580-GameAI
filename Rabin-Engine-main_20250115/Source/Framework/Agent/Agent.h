@@ -14,6 +14,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #pragma once
 #include "../Misc/NiceTypes.h"
 #include "CustomScript/Component/PhysicsComponent.h"
+#include "CustomScript/Component/AnimationComponent.h"
 
 // forward declarations
 class AgentOrganizer;
@@ -86,6 +87,11 @@ public:
 
     // Retrieves the PhysicsComponent attached to this GameObject
     PhysicsComponent* getPhysicsComp();
+
+    // Adds a PhysicsComponent to the GameObject with the specified mass
+    void addAnimationComp();
+    void setAnimAndPlay(const AnimationController& anim);
+    void stopAnimAndPlay();
 private:
     Vec3 position;
     Vec3 scaling;
@@ -116,6 +122,7 @@ private:
     AgentModel agentModel;
 
     PhysicsComponent* physicsComp = nullptr;
+    AnimationComponent* animComp = nullptr;
     std::vector<Component*> components;
 
 

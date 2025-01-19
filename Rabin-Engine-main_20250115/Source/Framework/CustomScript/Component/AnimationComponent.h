@@ -25,11 +25,15 @@ class AnimationComponent : public Component
 private:
     AnimationController animation; // Holds animation data (keyframes, duration, etc.)
     float currentTime;   // Current time in the animation timeline
+    bool isPlaying;
 
 public:
-    AnimationComponent(Agent& _owner, const AnimationController& anim);
+    AnimationComponent(Agent& _owner);
 
     void update(float deltaTime);
+    void add_anim(const AnimationController& anim);
+    void play();
+    void stop();
 };
 
 #endif
