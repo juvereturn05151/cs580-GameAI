@@ -17,6 +17,8 @@ void AnimationComponent::update(float deltaTime) {
 
         owner->set_position(animation.keyframes[currentFrame].position);
         owner->set_pitch(animation.keyframes[currentFrame].rotation.x);
+        owner->set_yaw(animation.keyframes[currentFrame].rotation.y);
+        owner->set_roll(animation.keyframes[currentFrame].rotation.z);
         owner->set_scaling(animation.keyframes[currentFrame].scale);
 
     }

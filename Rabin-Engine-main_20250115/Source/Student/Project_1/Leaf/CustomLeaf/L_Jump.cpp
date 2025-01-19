@@ -14,6 +14,7 @@ void L_Jump::on_enter()
 
 void L_Jump::on_update(float dt)
 {
+    printf("jump\n");
     // Check if the jump is complete
     if (agent->is_ground())
     {
