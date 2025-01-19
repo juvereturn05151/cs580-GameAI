@@ -8,19 +8,11 @@ void AnimationComponent::update(float deltaTime) {
     if (isPlaying)
     {
         elapsedTime += deltaTime;
-        if (elapsedTime >= animation.duration)
+        if (elapsedTime >= animation.frameSpeed)
         {
-            //if (isLoop)
-            //{
-            //    currentFrame = (currentFrame + 1) % animation.keyframes.capacity();
-            //}
-            //else if (currentFrame < animation.keyframes.capacity() - 2)
-            //{
-            //    currentFrame++; // Advance without looping
-            //}
             currentFrame = (currentFrame + 1) % animation.keyframes.capacity();
 
-            elapsedTime -= animation.duration;
+            elapsedTime -= animation.frameSpeed;
         }
 
         owner->set_position(animation.keyframes[currentFrame].position);
@@ -45,4 +37,14 @@ void AnimationComponent::play()
 void AnimationComponent::stop()
 {
     isPlaying = false;
+}
+
+void AnimationComponent::reset()
+{
+    currentFrame = 0;
+}
+
+int AnimationComponent::getCurrentFrame()
+{
+    return currentFrame;
 }

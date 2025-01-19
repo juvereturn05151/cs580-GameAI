@@ -333,6 +333,7 @@ void Agent::stopAnim()
 {
     if (animComp != NULL)
     {
+        animComp->reset();
         animComp->stop();
     }
 }
@@ -347,4 +348,9 @@ void Agent::cleanComponents()
 
     // Clear the vector to remove dangling pointers
     components.clear();
+}
+
+AnimationComponent* Agent::getAnimationComp()
+{
+    return animComp;
 }

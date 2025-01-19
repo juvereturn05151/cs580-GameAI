@@ -90,6 +90,7 @@ public:
 
     // Adds a PhysicsComponent to the GameObject with the specified mass
     void addAnimationComp();
+    AnimationComponent* getAnimationComp();
     void setAnimAndPlay(const Animation& anim);
     void stopAnim();
 private:

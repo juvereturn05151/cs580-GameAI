@@ -16,7 +16,7 @@ struct KeyFrame {
 struct Animation 
 {
     std::vector<KeyFrame> keyframes; // All keyframes for the animation
-    float duration;                  // Total duration of the animation
+    float frameSpeed;                  // Total duration of the animation
 };
 
 class AnimationComponent : public Component
@@ -37,6 +37,8 @@ public:
     void add_anim(const Animation& anim, bool _isLoop = false);
     void play();
     void stop();
+    void reset();
+    int getCurrentFrame();
 };
 
 #endif
