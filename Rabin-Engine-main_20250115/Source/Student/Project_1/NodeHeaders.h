@@ -26,9 +26,10 @@
 #include "Leaf/L_MoveToMouseClick.h"
 #include "Leaf/L_MoveToRandomPosition.h"
 #include "Leaf/L_PlaySound.h"
+
+// Student Leaf Nodes
 #include "Leaf/CustomLeaf/L_Jump.h"
 #include "Leaf/CustomLeaf/L_Die.h"
 #include "Leaf/CustomLeaf/L_SpawnAgent.h"
 #include "Leaf/CustomLeaf/L_MoveToHut.h"
-
-// Student Leaf Nodes
+#include "Leaf/CustomLeaf/L_KnockTheDoor.h"
