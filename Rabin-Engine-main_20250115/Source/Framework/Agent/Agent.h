@@ -90,8 +90,8 @@ public:
 
     // Adds a PhysicsComponent to the GameObject with the specified mass
     void addAnimationComp();
-    void setAnimAndPlay(const AnimationController& anim);
-    void stopAnimAndPlay();
+    void setAnimAndPlay(const Animation& anim);
+    void stopAnim();
 private:
     Vec3 position;
     Vec3 scaling;

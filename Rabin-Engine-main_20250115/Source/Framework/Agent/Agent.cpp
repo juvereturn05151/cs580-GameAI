@@ -320,7 +320,7 @@ PhysicsComponent* Agent::getPhysicsComp()
     return physicsComp;
 }
 
-void Agent::setAnimAndPlay(const AnimationController& anim) 
+void Agent::setAnimAndPlay(const Animation& anim) 
 {
     if (animComp != NULL)
     {
@@ -329,7 +329,7 @@ void Agent::setAnimAndPlay(const AnimationController& anim)
     }
 }
 
-void Agent::stopAnimAndPlay() 
+void Agent::stopAnim() 
 {
     if (animComp != NULL)
     {
