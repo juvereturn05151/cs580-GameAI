@@ -33,3 +33,4 @@
 #include "Leaf/CustomLeaf/L_SpawnAgent.h"
 #include "Leaf/CustomLeaf/L_MoveToHut.h"
 #include "Leaf/CustomLeaf/L_KnockTheDoor.h"
+#include "Leaf/CustomLeaf/L_MoveOutOfHut.h"

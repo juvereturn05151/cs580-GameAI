@@ -201,6 +201,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveOutOfHut.h" />
     <ClInclude Include="Source\Framework\CustomScript\Component\AnimationComponent.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_KnockTheDoor.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToHut.h" />
@@ -293,6 +294,7 @@
     <ClInclude Include="Source\Student\Project_2\P2_Pathfinding.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveOutOfHut.cpp" />
     <ClCompile Include="Source\Framework\CustomScript\Component\AnimationComponent.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_KnockTheDoor.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToHut.cpp" />

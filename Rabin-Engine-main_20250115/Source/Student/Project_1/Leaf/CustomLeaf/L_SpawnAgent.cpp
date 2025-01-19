@@ -8,14 +8,12 @@ L_SpawnAgent::L_SpawnAgent()
 void L_SpawnAgent::on_enter()
 {
     // 3. Create the agent, giving it the correct AgentModel type.
-    auto tree = agents->create_behavior_agent("ExampleAgent2", BehaviorTreeTypes::Example, Agent::AgentModel::Tree);
+    auto tree = agents->create_behavior_agent("ExampleAgent2", BehaviorTreeTypes::GoldbergBT, Agent::AgentModel::Man);
     
-    tree->set_position(Vec3(50,0, 50));
+    tree->set_position(Vec3(100,0, 20));
     
-    //4. (optional) You can also set the pitch of the model, if you want it to be rotated differently
-    tree->set_pitch(PI / 2);
     // 5. (optional) Set other aspects to make it start out correctly
-    tree->set_color(Vec3(0, 0.5, 0));   // Set the tree to green
+    tree->set_color(Vec3(1.0, 1.0, 0));   // Set the tree to green
 
     BehaviorNode::on_leaf_enter();
 
