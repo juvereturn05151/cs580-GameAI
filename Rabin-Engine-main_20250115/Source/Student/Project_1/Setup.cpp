@@ -13,6 +13,7 @@ void ProjectOne::setup()
     auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::GuardBT);
     man->set_position(Vec3(100, 0, 50));
     man->set_yaw(-270.0);
+    man->get_blackboard().set_value("originPos", man->get_position());
     //man->set_pitch(45.0);
 
 
@@ -72,6 +73,7 @@ void ProjectOne::setup()
     // Sound control (these sound functions can be kicked off in a behavior tree node - see the example in L_PlaySound.cpp)
     audioManager->SetVolume(0.5f);
     audioManager->PlaySoundEffect(L"Assets\\Audio\\retro.wav");
+    audioManager->PlayMusic(L"Assets\\Audio\\Goldberg Entrance Video.wav");
     // Uncomment for example on playing music in the engine (must be .wav)
     // audioManager->PlayMusic(L"Assets\\Audio\\motivate.wav");
     // audioManager->PauseMusic(...);
