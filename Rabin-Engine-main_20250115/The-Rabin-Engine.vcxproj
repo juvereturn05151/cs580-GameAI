@@ -201,6 +201,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CenterItself.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveOutOfHut.h" />
@@ -296,6 +297,7 @@
     <ClInclude Include="Source\Student\Project_2\P2_Pathfinding.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CenterItself.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveOutOfHut.cpp" />

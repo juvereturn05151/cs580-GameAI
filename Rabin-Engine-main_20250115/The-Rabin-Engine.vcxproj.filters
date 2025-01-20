@@ -360,6 +360,7 @@
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -613,6 +614,7 @@
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
