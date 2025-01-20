@@ -361,6 +361,7 @@
     </ClInclude>
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -615,6 +616,7 @@
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
