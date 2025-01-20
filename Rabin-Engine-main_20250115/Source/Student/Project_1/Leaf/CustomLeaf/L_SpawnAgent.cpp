@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "L_SpawnAgent.h"
 #include "Projects/ProjectOne.h"
-
+#include "CustomScript/GlobalBlackboard.h"
 L_SpawnAgent::L_SpawnAgent()
 {}
 
@@ -23,4 +23,9 @@ void L_SpawnAgent::on_enter()
 void L_SpawnAgent::on_update(float dt)
 {
     display_leaf_text();
+}
+
+void L_SpawnAgent::on_exit() 
+{
+    GlobalBlackboard::get_instance().set_value("GoldbergIsSpawn", true);
 }

@@ -40,3 +40,4 @@
 #include "Leaf/CustomLeaf/L_FireUpward.h"
 #include "Leaf/CustomLeaf/L_SpawnPyro.h"
 #include "Leaf/CustomLeaf/L_AutoRotate.h"
+#include "Leaf/CustomLeaf/L_CheckGoldbergIsSpawn.h"

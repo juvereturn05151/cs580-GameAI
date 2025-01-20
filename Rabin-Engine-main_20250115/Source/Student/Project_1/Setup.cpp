@@ -1,14 +1,21 @@
 #include <pch.h>
 #include "Projects/ProjectOne.h"
 #include "Agent/CameraAgent.h"
-
+#include "CustomScript/GlobalBlackboard.h"
 void ProjectOne::setup()
 {
+    auto& blackboard = GlobalBlackboard::get_instance();
+    blackboard.set_value("GoldbergIsSpawn", false);
+    blackboard.set_value("GoldbergIsStandBy", false);
+    blackboard.set_value("GoldbergPunchLeft", false);
+    blackboard.set_value("GoldbergPunchRight", false);
+
     // Create an agent (using the default "Agent::AgentModel::Man" model)
     auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::GuardBT);
     man->set_position(Vec3(100, 0, 50));
     man->set_yaw(-270.0);
     //man->set_pitch(45.0);
+
 
 
     // You can change properties here or at runtime from a behavior tree leaf node
