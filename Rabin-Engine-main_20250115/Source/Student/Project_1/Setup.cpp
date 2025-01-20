@@ -10,8 +10,6 @@ void ProjectOne::setup()
     man->set_yaw(-270.0);
     //man->set_pitch(45.0);
 
-    auto pyro = agents->create_behavior_agent("Pyro", BehaviorTreeTypes::PyroBT);
-    pyro->set_position(Vec3(50, 0, 50));
 
     // You can change properties here or at runtime from a behavior tree leaf node
     // Look in Agent.h for all of the setters, like these:
@@ -40,6 +38,14 @@ void ProjectOne::setup()
 
     auto hut = agents->create_behavior_agent("hut", BehaviorTreeTypes::Idle, Agent::AgentModel::Hut);
     hut->set_position(Vec3(120, 0, -50));
+
+    auto pyroSpawner = agents->create_behavior_agent("PyroSpawner", BehaviorTreeTypes::PyroSpawnerBT, Agent::AgentModel::Car);
+    pyroSpawner->set_scaling(Vec3(0.5, 0.5, 0.5));
+    pyroSpawner->set_position(Vec3(50, 0, 25));
+
+    auto pyroSpawner2 = agents->create_behavior_agent("PyroSpawner", BehaviorTreeTypes::PyroSpawnerBT, Agent::AgentModel::Car);
+    pyroSpawner2->set_scaling(Vec3(0.5, 0.5, 0.5));
+    pyroSpawner2->set_position(Vec3(50, 0, 75));
 
 
     // You can technically load any map you want, even create your own map file,
