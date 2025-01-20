@@ -19,6 +19,7 @@ void L_MoveToTarget::on_enter()
 
 void L_MoveToTarget::on_update(float dt)
 {
+    printf("move to target\n");
     const auto result = agent->move_toward_point(targetPoint, dt);
 
     if (result == true)

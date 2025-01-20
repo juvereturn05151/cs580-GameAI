@@ -13,7 +13,7 @@ void L_MoveToOrigin::on_enter()
     targetPoint = bb.get_value<Vec3>("originPos");
 
     //agent->look_at_point(targetPoint);
-    printf("moveToOrigin %f %f %f\n", targetPoint.x, targetPoint.y, targetPoint.z);
+    //printf("moveToOrigin %f %f %f\n", targetPoint.x, targetPoint.y, targetPoint.z);
     BehaviorNode::on_leaf_enter();
 }
 

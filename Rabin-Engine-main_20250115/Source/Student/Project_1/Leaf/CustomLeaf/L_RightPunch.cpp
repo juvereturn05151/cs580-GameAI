@@ -34,7 +34,6 @@ void L_RightPunch::on_enter()
 
 void L_RightPunch::on_update(float dt)
 {
-    printf("L_RightPunch\n");
     if (agent->getAnimationComp()->getCurrentFrame() == 2)
     {
         on_success();

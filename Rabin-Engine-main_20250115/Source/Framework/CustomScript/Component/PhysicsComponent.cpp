@@ -79,8 +79,8 @@ float PhysicsComponent::getMass() const
 
 bool PhysicsComponent::isGround()
 {
-	printf("owner->get_position().y: %f\n", owner->get_position().y);
-	printf("GROUND_HEIGHT: %f\n\n", GROUND_HEIGHT);
+	/*printf("owner->get_position().y: %f\n", owner->get_position().y);
+	printf("GROUND_HEIGHT: %f\n\n", GROUND_HEIGHT);*/
 	return is_ground;
 }
 

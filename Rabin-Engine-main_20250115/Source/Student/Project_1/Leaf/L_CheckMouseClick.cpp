@@ -4,6 +4,7 @@
 
 void L_CheckMouseClick::on_update(float dt)
 {
+    printf("check for mouse\n");
     const auto leftMouseState = InputHandler::get_current_state(MouseButtons::LEFT);
 
     if (leftMouseState == InputHandler::InputState::PRESSED)
