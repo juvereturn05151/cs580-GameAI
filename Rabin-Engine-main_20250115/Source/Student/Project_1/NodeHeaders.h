@@ -44,3 +44,4 @@
 #include "Leaf/CustomLeaf/L_CheckGoldbergIsStandby.h"
 #include "Leaf/CustomLeaf/L_CheckToSpawnPyro.h"
 #include "Leaf/CustomLeaf/L_MoveToOrigin.h"
+#include "Leaf/CustomLeaf/L_MoveToTarget.h"
