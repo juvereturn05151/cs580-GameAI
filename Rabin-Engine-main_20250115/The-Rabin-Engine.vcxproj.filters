@@ -394,6 +394,7 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -678,6 +679,7 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
