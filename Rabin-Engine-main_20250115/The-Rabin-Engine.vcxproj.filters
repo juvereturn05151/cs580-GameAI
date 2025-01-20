@@ -363,6 +363,7 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnPyro.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_AutoRotate.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -619,6 +620,7 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnPyro.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_AutoRotate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
