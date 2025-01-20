@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "L_LeftPunch.h"
-
+#include "CustomScript/GlobalBlackboard.h"
 Animation L_LeftPunch::createSampleAnimation() {
     Animation anim;
     anim.frameSpeed = 1.0f; // 5 seconds
@@ -28,16 +28,19 @@ void L_LeftPunch::on_enter()
     original_yaw = agent->get_yaw();
 
     agent->setAnimAndPlay(createSampleAnimation());
-
+    GlobalBlackboard::get_instance().set_value("CanSpawnPyro", true);
     BehaviorNode::on_leaf_enter();
 }
 
 void L_LeftPunch::on_update(float dt)
 {
-    printf("left punch\n");
     if (agent->getAnimationComp()->getCurrentFrame() == 2)
     {
         on_success();
+    }
+    else if (agent->getAnimationComp()->getCurrentFrame() == 1)
+    {
+
     }
 
     // Optional: log or display debugging info
@@ -47,6 +50,7 @@ void L_LeftPunch::on_update(float dt)
 void L_LeftPunch::on_exit()
 {
     agent->stopAnim();
+
     // Reset agent's pitch/yaw/roll to neutral position
     agent->set_yaw(original_yaw);
 }

@@ -7,8 +7,7 @@ void ProjectOne::setup()
     auto& blackboard = GlobalBlackboard::get_instance();
     blackboard.set_value("GoldbergIsSpawn", false);
     blackboard.set_value("GoldbergIsStandby", false);
-    blackboard.set_value("GoldbergPunchLeft", false);
-    blackboard.set_value("GoldbergPunchRight", false);
+    blackboard.set_value("CanSpawnPyro", false);
 
     // Create an agent (using the default "Agent::AgentModel::Man" model)
     auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::GuardBT);

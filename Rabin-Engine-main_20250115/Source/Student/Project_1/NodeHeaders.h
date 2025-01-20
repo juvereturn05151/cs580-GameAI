@@ -42,3 +42,4 @@
 #include "Leaf/CustomLeaf/L_AutoRotate.h"
 #include "Leaf/CustomLeaf/L_CheckGoldbergIsSpawn.h"
 #include "Leaf/CustomLeaf/L_CheckGoldbergIsStandby.h"
+#include "Leaf/CustomLeaf/L_CheckToSpawnPyro.h"
