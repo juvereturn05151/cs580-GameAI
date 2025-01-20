@@ -38,4 +38,5 @@
 #include "Leaf/CustomLeaf/L_LeftPunch.h"
 #include "Leaf/CustomLeaf/L_RightPunch.h"
 #include "Leaf/CustomLeaf/L_FireUpward.h"
+#include "Leaf/CustomLeaf/L_SpawnPyro.h"
 

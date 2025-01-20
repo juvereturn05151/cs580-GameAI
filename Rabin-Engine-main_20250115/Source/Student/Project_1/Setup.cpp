@@ -10,6 +10,8 @@ void ProjectOne::setup()
     man->set_yaw(-270.0);
     //man->set_pitch(45.0);
 
+    auto pyro = agents->create_behavior_agent("Pyro", BehaviorTreeTypes::PyroBT);
+    pyro->set_position(Vec3(50, 0, 50));
 
     // You can change properties here or at runtime from a behavior tree leaf node
     // Look in Agent.h for all of the setters, like these:
