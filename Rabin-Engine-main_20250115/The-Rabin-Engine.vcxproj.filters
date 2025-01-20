@@ -380,6 +380,7 @@
       <Filter>Assets\CustomScript</Filter>
     </ClInclude>
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsSpawn.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsStandby.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -650,6 +651,7 @@
       <Filter>Assets\CustomScript\Component</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsSpawn.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsStandby.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

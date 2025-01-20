@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "L_CenterItself.h"
+#include "CustomScript/GlobalBlackboard.h"
 
 L_CenterItself::L_CenterItself()
 {}
@@ -11,7 +12,7 @@ void L_CenterItself::on_enter()
     agent->set_pitch(0.0f);
     agent->set_yaw(-1.5f);
     agent->set_roll(0.0f);
-    printf("L_CenterItself\n");
+    GlobalBlackboard::get_instance().set_value("GoldbergIsStandby", true);
     BehaviorNode::on_leaf_enter();
 }
 

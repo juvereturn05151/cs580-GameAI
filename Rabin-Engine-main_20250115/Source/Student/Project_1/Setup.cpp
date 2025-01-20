@@ -6,7 +6,7 @@ void ProjectOne::setup()
 {
     auto& blackboard = GlobalBlackboard::get_instance();
     blackboard.set_value("GoldbergIsSpawn", false);
-    blackboard.set_value("GoldbergIsStandBy", false);
+    blackboard.set_value("GoldbergIsStandby", false);
     blackboard.set_value("GoldbergPunchLeft", false);
     blackboard.set_value("GoldbergPunchRight", false);
 
