@@ -15,6 +15,7 @@ void L_SpawnAgent::on_enter()
     goldberg->get_blackboard().set_value("target", Vec3(0, 0, 50));
     // 5. (optional) Set other aspects to make it start out correctly
     goldberg->set_color(Vec3(1.0, 1.0, 0));   // Set the tree to green
+    goldberg->soundName = L"Assets\\Audio\\malesound.wav";;
     GlobalBlackboard::get_instance().set_value("CanSpawnPyro", false);
     BehaviorNode::on_leaf_enter();
 

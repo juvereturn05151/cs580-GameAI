@@ -15,7 +15,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "../Misc/NiceTypes.h"
 #include "CustomScript/Component/PhysicsComponent.h"
 #include "CustomScript/Component/AnimationComponent.h"
-
 // forward declarations
 class AgentOrganizer;
 
@@ -93,6 +92,8 @@ public:
     AnimationComponent* getAnimationComp();
     void setAnimAndPlay(const Animation& anim);
     void stopAnim();
+
+    std::wstring soundName = L"Assets\\Audio\\retro.wav";
 private:
     Vec3 position;
     Vec3 scaling;

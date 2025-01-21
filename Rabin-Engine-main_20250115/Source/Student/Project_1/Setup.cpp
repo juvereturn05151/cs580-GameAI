@@ -15,6 +15,7 @@ void ProjectOne::setup()
     man->set_position(Vec3(100, 0, 50));
     man->set_yaw(-270.0);
     man->get_blackboard().set_value("originPos", man->get_position());
+    man->soundName = L"Assets\\Audio\\knock.wav";
 
     //man->set_pitch(45.0);
 
@@ -51,11 +52,11 @@ void ProjectOne::setup()
     auto pyroSpawner = agents->create_behavior_agent("PyroSpawner", BehaviorTreeTypes::PyroSpawnerBT, Agent::AgentModel::Car);
     pyroSpawner->set_scaling(Vec3(0.5, 0.5, 0.5));
     pyroSpawner->set_position(Vec3(50, 0, 25));
-
+    pyroSpawner->soundName = L"Assets\\Audio\\clicker.wav";
     auto pyroSpawner2 = agents->create_behavior_agent("PyroSpawner", BehaviorTreeTypes::PyroSpawnerBT, Agent::AgentModel::Car);
     pyroSpawner2->set_scaling(Vec3(0.5, 0.5, 0.5));
     pyroSpawner2->set_position(Vec3(50, 0, 75));
-
+    pyroSpawner2->soundName = L"Assets\\Audio\\clicker.wav";
 
     // You can technically load any map you want, even create your own map file,
     // but behavior agents won't actually avoid walls or anything special, unless you code
@@ -74,7 +75,7 @@ void ProjectOne::setup()
 
     // Sound control (these sound functions can be kicked off in a behavior tree node - see the example in L_PlaySound.cpp)
     audioManager->SetVolume(0.5f);
-    audioManager->PlaySoundEffect(L"Assets\\Audio\\retro.wav");
+   // audioManager->PlaySoundEffect(L"Assets\\Audio\\retro.wav");
     audioManager->PlayMusic(L"Assets\\Audio\\Goldberg Entrance Video.wav");
     // Uncomment for example on playing music in the engine (must be .wav)
     // audioManager->PlayMusic(L"Assets\\Audio\\motivate.wav");
