@@ -17,7 +17,16 @@ void ProjectOne::setup()
     man->get_blackboard().set_value("originPos", man->get_position());
     man->soundName = L"Assets\\Audio\\knock.wav";
 
-    //man->set_pitch(45.0);
+    //Spawn Minions GuardBT
+    for (int i = 0; i < 4; i++) 
+    {
+        auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::Idle);
+        man->set_position(Vec3(100, 0, 50));
+        man->set_yaw(-270.0);
+        man->get_blackboard().set_value("originPos", man->get_position());
+        man->soundName = L"Assets\\Audio\\knock.wav";
+    }
+
 
 
 
