@@ -70,6 +70,16 @@ void ProjectOne::setup()
     pyroSpawner2->set_position(Vec3(50, 0, 75));
     pyroSpawner2->soundName = L"Assets\\Audio\\clicker.wav";
 
+    for (int i = 0; i < 25; i++)
+    {
+        auto bird = agents->create_behavior_agent("bird", BehaviorTreeTypes::Idle, Agent::AgentModel::Bird);
+        bird->getPhysicsComp()->setIsFlying(true);
+        bird->get_blackboard().set_value("target", Vec3(50, 0, 50));
+        bird->set_scaling(Vec3(0.01, 0.01, 0.01));
+        bird->set_position(Vec3(50, 30, 25));
+    }
+
+
     // You can technically load any map you want, even create your own map file,
     // but behavior agents won't actually avoid walls or anything special, unless you code
     // that yourself (that's the realm of project 2)

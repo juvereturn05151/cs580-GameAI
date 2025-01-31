@@ -203,13 +203,13 @@
   <ItemGroup>
     <ClInclude Include="Source\Framework\CustomScript\Formation.h" />
     <ClInclude Include="Source\Framework\CustomScript\FormationController.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_FreeGoldberg.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToOrigin.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckToSpawnPyro.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsStandby.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsSpawn.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_MoveToOrigin.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_CheckToSpawnPyro.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_CheckGoldbergIsStandby.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_CheckGoldbergIsSpawn.h" />
     <ClInclude Include="Source\Framework\CustomScript\GlobalBlackboard.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_SpawnPyro.h" />
@@ -310,13 +310,13 @@
     <ClInclude Include="Source\Student\Project_2\P2_Pathfinding.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_FreeGoldberg.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToOrigin.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckToSpawnPyro.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsStandby.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsSpawn.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_MoveToOrigin.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_CheckToSpawnPyro.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_CheckGoldbergIsStandby.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_CheckGoldbergIsSpawn.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_SpawnPyro.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_FireUpward.cpp" />

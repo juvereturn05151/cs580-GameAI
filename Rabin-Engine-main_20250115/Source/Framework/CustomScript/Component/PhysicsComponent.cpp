@@ -9,6 +9,7 @@
 PhysicsComponent::PhysicsComponent(Agent& _owner, float _mass) : Component(_owner), mass(_mass)
 {
 	velocity = Vec3(0, 0, 0);
+	is_Flying = false;
 }
 
 void PhysicsComponent::update(float deltaTime)
@@ -22,6 +23,12 @@ void PhysicsComponent::update(float deltaTime)
 	}
 
 	Vec3 gravity(0.0f, GRAVITY * mass, 0.0f);
+
+	if (is_Flying)
+	{
+		gravity = Vec3(0.0f, 0.0f, 0.0f);
+	}
+
 	accumulatedForce += gravity;
 
 	Vec3 acceleration = accumulatedForce / mass;
@@ -35,6 +42,7 @@ void PhysicsComponent::update(float deltaTime)
 	pos.x += velocity.x * deltaTime;
 	pos.y += velocity.y * deltaTime;
 	pos.z += velocity.z * deltaTime;
+
 
 
 
@@ -79,12 +87,15 @@ float PhysicsComponent::getMass() const
 
 bool PhysicsComponent::isGround()
 {
-	/*printf("owner->get_position().y: %f\n", owner->get_position().y);
-	printf("GROUND_HEIGHT: %f\n\n", GROUND_HEIGHT);*/
 	return is_ground;
 }
 
 bool PhysicsComponent::isTooHigh()
 {
 	return owner->get_position().y >= SKY_HEIGHT;
+}
+
+void PhysicsComponent::setIsFlying(bool flying)
+{
+	is_Flying = flying;
 }
