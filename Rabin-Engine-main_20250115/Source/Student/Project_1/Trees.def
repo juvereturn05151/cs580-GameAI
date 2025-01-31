@@ -1,6 +1,7 @@
 #include "../Source/Student/Project_1/Trees/Example.bht"
 #include "../Source/Student/Project_1/Trees/GoldbergBT.bht"
 #include "../Source/Student/Project_1/Trees/GuardBT.bht"
+#include "../Source/Student/Project_1/Trees/GuardFollower.bht"
 #include "../Source/Student/Project_1/Trees/Idle.bht"
 #include "../Source/Student/Project_1/Trees/PyroBT.bht"
 #include "../Source/Student/Project_1/Trees/PyroSpawnerBT.bht"

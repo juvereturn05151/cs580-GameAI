@@ -23,7 +23,7 @@ public:
     
     void init() 
     {
-        formation.createLineFormation(1000, 2.0f);
+        formation.createWedgeFormation(5, 10.0f);
     }
 
     void assignLeader(BehaviorAgent* agent)
@@ -42,7 +42,7 @@ public:
             if (agents[i] != nullptr && leader != nullptr) 
             {
                 Vec3 targetPos = leader->get_position() + formation.slots[i].offset;
-                agents[i]->get_blackboard().set_value("target", agents[i]->get_position());
+                agents[i]->get_blackboard().set_value("target", targetPos);
             }
         }
     }

@@ -20,9 +20,9 @@ void ProjectOne::setup()
     FormationController::get_instance().assignLeader(man);
 
     //Spawn Minions GuardBT
-    for (int i = 0; i < 4; i++) 
+    for (int i = 0; i < 5; i++) 
     {
-        auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::Idle);
+        auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::GuardFollower);
         man->set_position(Vec3(100, 0, 50));
         man->set_yaw(-270.0);
         man->get_blackboard().set_value("originPos", man->get_position());
