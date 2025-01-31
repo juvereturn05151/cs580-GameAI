@@ -89,6 +89,11 @@ bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
     return result;
 }
 
+void BehaviorAgent::seek(const Vec3& target)
+{
+    getPhysicsComp()->Seek(target);
+}
+
 void BehaviorAgent::fireUpward()
 {
     getPhysicsComp()->applyForce(Vec3(0.0f, 40000.0f, 0.0f));

@@ -14,9 +14,6 @@ PhysicsComponent::PhysicsComponent(Agent& _owner, float _mass) : Component(_owne
 
 void PhysicsComponent::update(float deltaTime)
 {
-	//printf("pos Y: %f\n", owner->get_position().y);
-	//printf("velocity Y: %f\n", velocity.y);*/
-
 	if (!isActive)
 	{
 		return;
@@ -43,9 +40,6 @@ void PhysicsComponent::update(float deltaTime)
 	pos.y += velocity.y * deltaTime;
 	pos.z += velocity.z * deltaTime;
 
-
-
-
 	// Clamp the y position to ensure it doesn't go below 0
 	if (pos.y < GROUND_HEIGHT)
 	{
@@ -58,6 +52,18 @@ void PhysicsComponent::update(float deltaTime)
 
 	// Reset accumulated force for next frame
 	accumulatedForce = Vec3(0.0f, 0.0f, 0.0f);
+}
+
+Vec3 PhysicsComponent::normalized(Vec3 result)
+{
+	float len = std::sqrt(result.x * result.x + result.y * result.y + result.z * result.z);
+	return Vec3(result.x / len, result.y / len, result.z / len);
+}
+
+void PhysicsComponent::Seek(const Vec3& target)
+{
+	Vec3 desired = normalized((target - owner->get_position())) * owner->get_movement_speed();
+	accumulatedForce += normalized(desired - velocity) * 10.0f;
 }
 
 void PhysicsComponent::applyForce(const Vec3& force)

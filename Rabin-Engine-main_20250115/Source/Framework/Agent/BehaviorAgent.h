@@ -37,7 +37,7 @@ public:
     const std::wstring& get_debug_name() const;
     std::wstringstream& get_debug_text();
     void add_debug_text(const std::wstring& nodeName);
-
+    void seek(const Vec3& target);
 
 
 private:

@@ -53,6 +53,10 @@ public:
     bool isTooHigh();
 
     void setIsFlying(bool flying);
+
+    void Seek(const Vec3& target);
+
+    Vec3 normalized(Vec3 result);
 };
 
 #endif
