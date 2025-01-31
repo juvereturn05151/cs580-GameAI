@@ -89,6 +89,28 @@ bool BehaviorAgent::move_toward_point(const Vec3& point, float dt)
     return result;
 }
 
+bool BehaviorAgent::isReachTarget(const Vec3& point)
+{
+    bool result = false;
+
+    const auto currentPos = get_position();
+
+    //printf("%f %f %f\n", point.x, point.y, point.z);
+
+    auto delta = point - currentPos;
+
+    const float length = delta.Length();
+
+    // see if we're close enough to the goal
+    if (length <= movementEpsilon)
+    {
+        // no need to actually move
+        result = true;
+    }
+
+    return result;
+}
+
 void BehaviorAgent::seek(const Vec3& target)
 {
     getPhysicsComp()->Seek(target);

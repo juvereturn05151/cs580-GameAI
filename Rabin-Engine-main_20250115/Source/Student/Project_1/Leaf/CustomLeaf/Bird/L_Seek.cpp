@@ -16,12 +16,12 @@ void L_Seek::on_enter()
 void L_Seek::on_update(float dt)
 {
     agent->seek(targetPoint);
-    //const auto result = agent->move_toward_point(targetPoint, dt);
+    const auto result = agent->isReachTarget(targetPoint);
 
-    /*if (result == true)
+    if (result == true)
     {
         on_success();
-    }*/
+    }
     // Optional: log or display debugging info
     display_leaf_text();
 }

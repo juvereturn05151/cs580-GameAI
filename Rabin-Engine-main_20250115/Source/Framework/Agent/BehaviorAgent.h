@@ -28,6 +28,7 @@ public:
 
     // returns whether or not the point has been reached
     bool move_toward_point(const Vec3& point, float dt);
+    bool isReachTarget(const Vec3& point);
 
     void fireUpward();
     void jump();
