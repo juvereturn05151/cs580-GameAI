@@ -2,7 +2,7 @@
 #include "L_FreeGoldberg.h"
 
 #include "CustomScript/GlobalBlackboard.h"
-
+#include "CustomScript/FormationController.h"
 L_FreeGoldberg::L_FreeGoldberg() {}
 
 void L_FreeGoldberg::on_enter()
@@ -19,6 +19,7 @@ void L_FreeGoldberg::on_update(float dt)
     if (timer < 0.0f)
     {
         GlobalBlackboard::get_instance().set_value("GoldbergisFree", true);
+        FormationController::get_instance().ChangeFormationToLine(agent);
         on_success();
     }
 

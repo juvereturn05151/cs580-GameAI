@@ -34,7 +34,12 @@ public:
     void assignFormationSlots(BehaviorAgent* newAgent) 
     {
         agents.push_back(newAgent);
-        //formation.createLineFormation(agents.size(), 2.0f);
+    }
+
+    void ChangeFormationToLine(BehaviorAgent* agent)
+    {
+        leader = agent;
+        formation.createLineFormation(5, 10.0f);
     }
 
     void update() {
