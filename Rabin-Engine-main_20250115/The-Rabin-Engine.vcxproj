@@ -213,7 +213,7 @@
     <ClInclude Include="Source\Framework\CustomScript\GlobalBlackboard.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_SpawnPyro.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_FireUpward.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_RightPunch.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_LeftPunch.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_CenterItself.h" />
@@ -221,7 +221,7 @@
     <ClInclude Include="Source\Framework\CustomScript\Component\AnimationComponent.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_KnockTheDoor.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_MoveToHut.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_Die.h" />
     <ClInclude Include="Source\Framework\CustomScript\Component\Component.h" />
     <ClInclude Include="Source\Framework\CustomScript\Component\PhysicsComponent.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_Jump.h" />
@@ -319,7 +319,7 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckGoldbergIsSpawn.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_SpawnPyro.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_FireUpward.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_RightPunch.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_LeftPunch.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_CenterItself.cpp" />
@@ -327,7 +327,7 @@
     <ClCompile Include="Source\Framework\CustomScript\Component\AnimationComponent.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_KnockTheDoor.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_MoveToHut.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_Die.cpp" />
     <ClCompile Include="Source\Framework\CustomScript\Component\Component.cpp" />
     <ClCompile Include="Source\Framework\CustomScript\Component\PhysicsComponent.cpp" />
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_Jump.cpp" />

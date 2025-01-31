@@ -340,7 +340,7 @@
     <ClInclude Include="Source\Framework\CustomScript\Component\PhysicsComponent.h">
       <Filter>Assets\CustomScript\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_Die.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_SpawnAgent.h">
@@ -361,7 +361,7 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_FireUpward.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_LeftPunch.h">
@@ -635,7 +635,7 @@
     <ClCompile Include="Source\Framework\CustomScript\Component\PhysicsComponent.cpp">
       <Filter>Assets\CustomScript\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_Die.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_SpawnAgent.cpp">
@@ -656,7 +656,7 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Pyro\L_FireUpward.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_LeftPunch.cpp">

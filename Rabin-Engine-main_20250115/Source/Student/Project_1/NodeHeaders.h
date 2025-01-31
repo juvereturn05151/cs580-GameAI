@@ -29,7 +29,7 @@
 
 // Student Leaf Nodes
 #include "Leaf/CustomLeaf/Goldberg/L_Jump.h"
-#include "Leaf/CustomLeaf/L_Die.h"
+#include "Leaf/CustomLeaf/Pyro/L_Die.h"
 #include "Leaf/CustomLeaf/Guard/L_SpawnAgent.h"
 #include "Leaf/CustomLeaf/Guard/L_MoveToHut.h"
 #include "Leaf/CustomLeaf/Guard/L_KnockTheDoor.h"
@@ -37,7 +37,7 @@
 #include "Leaf/CustomLeaf/Goldberg/L_CenterItself.h"
 #include "Leaf/CustomLeaf/Goldberg/L_LeftPunch.h"
 #include "Leaf/CustomLeaf/Goldberg/L_RightPunch.h"
-#include "Leaf/CustomLeaf/L_FireUpward.h"
+#include "Leaf/CustomLeaf/Pyro/L_FireUpward.h"
 #include "Leaf/CustomLeaf/PyroSpawner/L_SpawnPyro.h"
 #include "Leaf/CustomLeaf/PyroSpawner/L_AutoRotate.h"
 #include "Leaf/CustomLeaf/L_CheckGoldbergIsSpawn.h"
