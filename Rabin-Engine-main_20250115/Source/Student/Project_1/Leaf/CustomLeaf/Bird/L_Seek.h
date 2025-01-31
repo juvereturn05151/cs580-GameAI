@@ -6,7 +6,7 @@ public:
     L_Seek();
 
 protected:
-
+    Vec3 targetPoint;
     virtual void on_enter() override;
     virtual void on_update(float dt) override;
 };
