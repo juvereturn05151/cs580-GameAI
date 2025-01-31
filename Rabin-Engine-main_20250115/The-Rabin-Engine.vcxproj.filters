@@ -331,7 +331,7 @@
     <ClInclude Include="Source\Framework\Core\AudioManager.h">
       <Filter>Source\Framework\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_Jump.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
     <ClInclude Include="Source\Framework\CustomScript\Component\Component.h">
@@ -343,34 +343,34 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnAgent.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_SpawnAgent.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToHut.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_MoveToHut.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_KnockTheDoor.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_KnockTheDoor.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveOutOfHut.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_MoveOutOfHut.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CenterItself.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_CenterItself.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_AutoRotate.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_LeftPunch.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_RightPunch.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnPyro.h">
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_SpawnPyro.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
     <ClInclude Include="Source\Framework\CustomScript\Component\AnimationComponent.h">
@@ -626,7 +626,7 @@
     <ClCompile Include="Source\Framework\Core\AudioManager.cpp">
       <Filter>Source\Framework\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Jump.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_Jump.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Framework\CustomScript\Component\Component.cpp">
@@ -638,34 +638,34 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_Die.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnAgent.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_SpawnAgent.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToHut.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_MoveToHut.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_KnockTheDoor.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Guard\L_KnockTheDoor.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveOutOfHut.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_MoveOutOfHut.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CenterItself.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_CenterItself.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_AutoRotate.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_AutoRotate.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FireUpward.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_LeftPunch.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_LeftPunch.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_RightPunch.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_RightPunch.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_SpawnPyro.cpp">
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\PyroSpawner\L_SpawnPyro.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Framework\CustomScript\Component\AnimationComponent.cpp">
