@@ -39,14 +39,23 @@ public:
     void ChangeFormationToLine(BehaviorAgent* agent)
     {
         leader = agent;
-        formation.createLineFormation(5, 10.0f);
+        formation.createLineFormation(5, 2.0f);
     }
 
     void update() {
         for (size_t i = 0; i < agents.size(); ++i) {
             if (agents[i] != nullptr && leader != nullptr) 
             {
-                Vec3 targetPos = leader->get_position() + Vec3(3.0f,0, 3.0f) + formation.slots[i].offset;
+                Vec3 targetPos;
+                if (formation.formationType == FormationType::Wedge) 
+                {
+                    targetPos = leader->get_position() + Vec3(3.0f, 0, 3.0f) + formation.slots[i].offset;
+                }
+                else 
+                {
+                    targetPos = leader->get_position()  + formation.slots[i].offset;
+                }
+
                 agents[i]->get_blackboard().set_value("target", targetPos);
             }
         }
