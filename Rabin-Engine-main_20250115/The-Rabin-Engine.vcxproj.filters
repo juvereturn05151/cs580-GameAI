@@ -402,6 +402,7 @@
     </ClInclude>
     <ClInclude Include="Source\Framework\CustomScript\Formation.h" />
     <ClInclude Include="Source\Framework\CustomScript\FormationController.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Seek.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -692,6 +693,7 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Goldberg\L_FreeGoldberg.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Seek.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

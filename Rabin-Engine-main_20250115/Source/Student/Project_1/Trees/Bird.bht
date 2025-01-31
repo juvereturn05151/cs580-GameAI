@@ -1,0 +1,5 @@
+TREENAME(Bird)
+TREENODE(C_Sequencer, 0)
+TREENODE(L_CheckMouseClick, 1)
+TREENODE(L_Idle, 1)
+TREENODE(L_MoveToMouseClick, 1)
