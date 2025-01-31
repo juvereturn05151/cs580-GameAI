@@ -23,7 +23,6 @@ class Agent
     friend class AgentOrganizer;
 public:
     Agent(const char *type, size_t id);
-
 #pragma region Getters
     const Vec3 &get_position() const;
     const Vec3 &get_scaling() const;

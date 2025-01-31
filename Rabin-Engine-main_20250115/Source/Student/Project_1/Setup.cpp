@@ -2,6 +2,7 @@
 #include "Projects/ProjectOne.h"
 #include "Agent/CameraAgent.h"
 #include "CustomScript/GlobalBlackboard.h"
+#include "../CustomScript/FormationController.h"
 void ProjectOne::setup()
 {
     auto& blackboard = GlobalBlackboard::get_instance();
@@ -16,6 +17,7 @@ void ProjectOne::setup()
     man->set_yaw(-270.0);
     man->get_blackboard().set_value("originPos", man->get_position());
     man->soundName = L"Assets\\Audio\\knock.wav";
+    FormationController::get_instance().assignLeader(man);
 
     //Spawn Minions GuardBT
     for (int i = 0; i < 4; i++) 
@@ -25,6 +27,7 @@ void ProjectOne::setup()
         man->set_yaw(-270.0);
         man->get_blackboard().set_value("originPos", man->get_position());
         man->soundName = L"Assets\\Audio\\knock.wav";
+        FormationController::get_instance().assignFormationSlots(man);
     }
 
 

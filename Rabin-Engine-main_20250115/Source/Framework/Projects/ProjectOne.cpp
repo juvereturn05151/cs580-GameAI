@@ -13,7 +13,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 
 #include <pch.h>
 #include "ProjectOne.h"
-
+#include "../CustomScript/FormationController.h"
 
 bool ProjectOne::initialize()
 {
@@ -39,6 +39,8 @@ bool ProjectOne::finalize()
     link_input();
 
     setup();
+
+    FormationController::get_instance().init();
 
     return true;
 }
@@ -90,6 +92,8 @@ void ProjectOne::update()
 
     // have the input system update its current state and send out notifications
     InputHandler::update();
+
+    FormationController::get_instance().update();
 
     agents->update(deltaTime);
 }

@@ -394,8 +394,14 @@
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.h">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.h" />
-    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.h">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.h">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Framework\CustomScript\Formation.h" />
+    <ClInclude Include="Source\Framework\CustomScript\FormationController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -680,8 +686,12 @@
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.cpp">
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.cpp" />
-    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.cpp">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.cpp">
+      <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

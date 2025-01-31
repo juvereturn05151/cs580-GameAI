@@ -201,6 +201,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Framework\CustomScript\Formation.h" />
+    <ClInclude Include="Source\Framework\CustomScript\FormationController.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_FreeGoldberg.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_CheckIfGoldbergIsFree.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\L_MoveToTarget.h" />

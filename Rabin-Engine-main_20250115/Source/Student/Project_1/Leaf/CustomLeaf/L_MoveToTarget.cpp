@@ -5,7 +5,6 @@
 
 void L_MoveToTarget::on_enter()
 {
-
     // set animation, speed, etc
 
     // grab the target position from the blackboard
