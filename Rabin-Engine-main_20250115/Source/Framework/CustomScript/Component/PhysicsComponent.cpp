@@ -77,12 +77,26 @@ void PhysicsComponent::Separation()
 {
 	Vec3 steer;
 	int count = 0;
+
 	for (BehaviorAgent* other : FlockController::get_instance().boids) {
+		if (other == owner) continue; // Skip self
+
 		float distance = Distance(owner->get_position(), other->get_position());
-		if (other != owner && distance < FlockController::get_instance().perceptionRadius)
+
+		if (std::isnan(distance) || std::isinf(distance)) {
+			std::cout << "Invalid distance detected!" << std::endl;
+			continue; // Skip invalid values
+		}
+
+		if (distance < FlockController::get_instance().perceptionRadius)
 		{
-			std::cout << "debug less than" <<std::endl;
-			Vec3 diff = normalized(owner->get_position() - other->get_position());
+			std::cout << "debug less than" << std::endl;
+			std::cout << "owner x: " << owner->get_position().x << " owner y: " << owner->get_position().y << std::endl;
+			std::cout << "other x: " << other->get_position().x << " other y: " << other->get_position().y << std::endl;
+
+			Vec3 diff = owner->get_position() - other->get_position();
+			diff = normalized(diff); // Apply safe normalization
+
 			steer = steer + diff;
 			count++;
 		}
@@ -92,7 +106,7 @@ void PhysicsComponent::Separation()
 	{
 		accumulatedForce += (steer * (1.0f / count));
 	}
-	else 
+	else
 	{
 		accumulatedForce += steer;
 	}
@@ -101,7 +115,7 @@ void PhysicsComponent::Separation()
 void PhysicsComponent::Seek(const Vec3& target)
 {
 	Vec3 desired = normalized((target - owner->get_position())) * owner->get_movement_speed();
-	accumulatedForce += normalized(desired - velocity) * 10.0f;
+	accumulatedForce += normalized(desired - velocity) * 20.0f;
 }
 
 void PhysicsComponent::applyForce(const Vec3& force)

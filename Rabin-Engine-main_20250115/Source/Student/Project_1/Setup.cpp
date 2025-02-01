@@ -71,14 +71,18 @@ void ProjectOne::setup()
     pyroSpawner2->set_position(Vec3(50, 0, 75));
     pyroSpawner2->soundName = L"Assets\\Audio\\clicker.wav";
 
-    for (int i = 0; i < 2; i++)
+
+    int posDif = 50;
+
+    for (int i = 0; i < 25; i++)
     {
         auto bird = agents->create_behavior_agent("bird", BehaviorTreeTypes::Bird, Agent::AgentModel::Bird);
         FlockController::get_instance().addBoid(bird);
         bird->getPhysicsComp()->setIsFlying(true);
         bird->get_blackboard().set_value("target", Vec3(50, 0, 50));
         bird->set_scaling(Vec3(0.01, 0.01, 0.01));
-        bird->set_position(Vec3(50, 30, 25));
+        bird->set_position(Vec3(posDif, 30, 25));
+        posDif += 10;
     }
 
 
