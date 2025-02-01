@@ -77,6 +77,7 @@ void ProjectOne::setup()
     for (int i = 0; i < 25; i++)
     {
         auto bird = agents->create_behavior_agent("bird", BehaviorTreeTypes::Bird, Agent::AgentModel::Bird);
+        bird->set_color(Vec3(0, 0, 1));
         FlockController::get_instance().addBoid(bird);
         bird->getPhysicsComp()->setIsFlying(true);
         bird->get_blackboard().set_value("target", Vec3(50, 0, 50));

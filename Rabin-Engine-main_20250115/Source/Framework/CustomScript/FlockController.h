@@ -15,7 +15,7 @@ public:
 
     std::vector<BehaviorAgent*> boids;
     float maxSpeed = 2.0f;
-    float perceptionRadius = 5.0f;
+    float perceptionRadius = 2.0f;
     float seekWeight = 2.0f;
 
     void init() {

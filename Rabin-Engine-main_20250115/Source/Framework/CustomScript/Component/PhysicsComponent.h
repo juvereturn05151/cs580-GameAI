@@ -55,6 +55,8 @@ public:
     void setIsFlying(bool flying);
 
     void Separation();
+    void Alignment();
+    void Cohesion();
     void Seek(const Vec3& target);
 
     Vec3 normalized(Vec3 result);

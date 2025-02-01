@@ -101,6 +101,9 @@ bool BehaviorAgent::isReachTarget(const Vec3& point)
 
     const float length = delta.Length();
 
+    const float yaw = std::atan2(delta.x, delta.z);
+    set_yaw(yaw);
+
     // see if we're close enough to the goal
     if (length <= movementEpsilon)
     {
@@ -114,6 +117,8 @@ bool BehaviorAgent::isReachTarget(const Vec3& point)
 void BehaviorAgent::seek(const Vec3& target)
 {
     getPhysicsComp()->Separation();
+    getPhysicsComp()->Alignment();
+    getPhysicsComp()->Cohesion();
     getPhysicsComp()->Seek(target);
 }
 
