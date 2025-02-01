@@ -201,6 +201,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Framework\CustomScript\FlockController.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Seek.h" />
     <ClInclude Include="Source\Framework\CustomScript\Formation.h" />
     <ClInclude Include="Source\Framework\CustomScript\FormationController.h" />

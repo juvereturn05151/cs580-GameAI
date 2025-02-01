@@ -14,6 +14,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <pch.h>
 #include "ProjectOne.h"
 #include "../CustomScript/FormationController.h"
+#include "../CustomScript/FlockController.h"
 
 bool ProjectOne::initialize()
 {
@@ -41,6 +42,7 @@ bool ProjectOne::finalize()
     setup();
 
     FormationController::get_instance().init();
+    FlockController::get_instance().init();
 
     return true;
 }

@@ -113,6 +113,7 @@ bool BehaviorAgent::isReachTarget(const Vec3& point)
 
 void BehaviorAgent::seek(const Vec3& target)
 {
+    getPhysicsComp()->Separation();
     getPhysicsComp()->Seek(target);
 }
 

@@ -54,9 +54,12 @@ public:
 
     void setIsFlying(bool flying);
 
+    void Separation();
     void Seek(const Vec3& target);
 
     Vec3 normalized(Vec3 result);
+    float DistanceSquared(Vec3 firstVec, Vec3 secondVec);
+    float Distance(Vec3 firstVec, Vec3 secondVec);
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "PhysicsComponent.h"
 #include "Agent/Agent.h"
+#include "../CustomScript/FlockController.h"
 
 #define GRAVITY -20
 #define GROUND_HEIGHT 0.0
@@ -58,6 +59,43 @@ Vec3 PhysicsComponent::normalized(Vec3 result)
 {
 	float len = std::sqrt(result.x * result.x + result.y * result.y + result.z * result.z);
 	return Vec3(result.x / len, result.y / len, result.z / len);
+}
+
+float PhysicsComponent::DistanceSquared(Vec3 firstVec, Vec3 secondVec)
+{
+	return (firstVec.x - secondVec.x) * (firstVec.x - secondVec.x) +
+		(firstVec.y - secondVec.y) * (firstVec.y - secondVec.y) +
+		(firstVec.z - secondVec.z) * (firstVec.z - secondVec.z);
+}
+
+float PhysicsComponent::Distance(Vec3 firstVec, Vec3 secondVec)
+{
+	return std::sqrt(DistanceSquared(firstVec, secondVec));
+}
+
+void PhysicsComponent::Separation()
+{
+	Vec3 steer;
+	int count = 0;
+	for (BehaviorAgent* other : FlockController::get_instance().boids) {
+		float distance = Distance(owner->get_position(), other->get_position());
+		if (other != owner && distance < FlockController::get_instance().perceptionRadius)
+		{
+			std::cout << "debug less than" <<std::endl;
+			Vec3 diff = normalized(owner->get_position() - other->get_position());
+			steer = steer + diff;
+			count++;
+		}
+	}
+
+	if (count > 0)
+	{
+		accumulatedForce += (steer * (1.0f / count));
+	}
+	else 
+	{
+		accumulatedForce += steer;
+	}
 }
 
 void PhysicsComponent::Seek(const Vec3& target)
