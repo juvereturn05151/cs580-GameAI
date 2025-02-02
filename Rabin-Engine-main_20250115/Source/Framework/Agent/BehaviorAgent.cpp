@@ -122,6 +122,14 @@ void BehaviorAgent::seek(const Vec3& target)
     getPhysicsComp()->Seek(target);
 }
 
+void BehaviorAgent::wander()
+{
+    getPhysicsComp()->Separation();
+    getPhysicsComp()->Alignment();
+    getPhysicsComp()->Cohesion();
+    getPhysicsComp()->Wander();
+}
+
 void BehaviorAgent::fireUpward()
 {
     getPhysicsComp()->applyForce(Vec3(0.0f, 40000.0f, 0.0f));

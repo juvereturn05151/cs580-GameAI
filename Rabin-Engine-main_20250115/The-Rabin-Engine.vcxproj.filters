@@ -404,6 +404,7 @@
     <ClInclude Include="Source\Framework\CustomScript\FormationController.h" />
     <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Seek.h" />
     <ClInclude Include="Source\Framework\CustomScript\FlockController.h" />
+    <ClInclude Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Wander.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework\Main.cpp">
@@ -695,6 +696,7 @@
       <Filter>Source\Student\Project_1\Leaf\CustomLeaf</Filter>
     </ClCompile>
     <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Seek.cpp" />
+    <ClCompile Include="Source\Student\Project_1\Leaf\CustomLeaf\Bird\L_Wander.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

@@ -57,6 +57,7 @@ public:
     void Separation();
     void Alignment();
     void Cohesion();
+    void Wander();
     void Seek(const Vec3& target);
 
     Vec3 normalized(Vec3 result);

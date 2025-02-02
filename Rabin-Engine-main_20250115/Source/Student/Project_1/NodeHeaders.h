@@ -48,3 +48,4 @@
 #include "Leaf/CustomLeaf/L_CheckIfGoldbergIsFree.h"
 #include "Leaf/CustomLeaf/Goldberg/L_FreeGoldberg.h"
 #include "Leaf/CustomLeaf/Bird/L_Seek.h"
+#include "Leaf/CustomLeaf/Bird/L_Wander.h"

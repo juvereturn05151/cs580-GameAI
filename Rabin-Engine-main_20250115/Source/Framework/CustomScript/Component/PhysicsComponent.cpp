@@ -178,6 +178,11 @@ void PhysicsComponent::Cohesion()
 	}
 }
 
+void PhysicsComponent::Wander()
+{
+	accumulatedForce += Vec3((rand() % 3 - 1) * 0.5f,0, (rand() % 3 - 1) * 0.5f) * 500.0f;
+}
+
 void PhysicsComponent::Seek(const Vec3& target)
 {
 	Vec3 desired = normalized((target - owner->get_position())) * owner->get_movement_speed();
