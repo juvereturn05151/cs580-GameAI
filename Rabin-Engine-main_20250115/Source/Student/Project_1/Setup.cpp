@@ -81,7 +81,7 @@ void ProjectOne::setup()
         FlockController::get_instance().addBoid(bird);
         bird->getPhysicsComp()->setIsFlying(true);
         bird->get_blackboard().set_value("target", Vec3(50, 0, 50));
-        bird->set_scaling(Vec3(0.01, 0.01, 0.01));
+        bird->set_scaling(Vec3(0.005, 0.005, 0.005));
         bird->set_position(Vec3(posDif, 30, 25));
         posDif += 10;
     }
