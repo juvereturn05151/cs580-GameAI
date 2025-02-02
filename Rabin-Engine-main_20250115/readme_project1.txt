@@ -30,7 +30,6 @@ Including
 2. For formation, I created Guard Followers' behavior tree that only follows the normal guard and then switch to follow Goldberg at the end.
 3. For flocking, I just implemented birds that are independent from Goldberg's entrance.
 
-
 Directions (if needed):
 1. At the start of the project, the guard and his followers will go to the Hut, and knock on the door to call Goldberg.
 2. Once the Goldberg is spawned, he will go to the position between the pyro spawners.
@@ -91,7 +90,6 @@ Shared nodes(used by more than 2 Behavior Trees)
 For Bird
 21. L_Seek
 
-
 4 Behavior trees (names):
 
 1. GuardBT.bht
@@ -103,6 +101,26 @@ For Bird
 7. Bird.bht
 
 Extra credit:
-Formation
+Bug Report - 
+Read the information and e-mail evidence here.
+https://docs.google.com/document/d/1gPjw0_6xb9njpCHw4gTa3XIzgZyQnaXR1_pfjHjzrJ4/edit?tab=t.0
+
+Formation:
+Important Scripts - 1. Formation.h 2. FormationController.h
+Agent's BT - GuardFollower.bht
+Implementation Details: 
+1. I scripted Formation store the formation for Line and Wedge Formation.
+2. FormationController stores the agent that is related to the formation including the leader and followers
+3. FormationController sets the target position related to the leader as either Wedge or Line formation.
+4. Then, GuardFollower.bht that moves toward that position set by Formation Controller
+Note - the guard followers will go with Wedge formation at the start, then after Goldberg is free, they will go as Line formation.
 
 Flocking
+Important Scripts - 1. FlockController.h 2. PhysicsComponent.h
+Agent's BT - Bird.bht
+Leaf Node - L_Seek
+Implementation Details: 
+1. FlockController stores behavior agents and perception radius.
+2. Physics component is where the steering behaviors are implemented(Sepation, Alignment, Cohesion, and Seek).
+3. I call the implementations in BehaviorAgent's Seek function.
+4. The Bird then uses L_Seek to go to where the click position is.
