@@ -41,15 +41,23 @@ Note - bird agents are independent agents that are controllable at the start.
 
 
 What I liked about the project and framework:
-- It is very easy to use.
-- It is very customizable on the lower level.
+The framework is very easy to use and customizable at a lower level. 
+This encourages me to write the features that are not present in the engine.
+It is very challenging indeed.
+I love that this project is very open-ended because I like to use my creativity to create something.
+After finishin this project, I feel like I learn so much about what I have implemented.
 
 What I disliked about the project and framework:
-- There are not a lot of resources
+Even though I like this project since it is not a commercial engine. It limits me on the features that I can use.
+For example, when I adjust the camera to be further, it doesn't render anything that is behind.
+With that, I'm only limited to showing Goldberg showing his entrance in a limited area.
 
 Any difficulties I experienced while doing the project:
+Since there were not a lot of resources, I had to spend time implementing extra features like Affine Transformation and physics components.
 
-Hours spent: 28 hours (approximately)
+Also, I am not receiving e-mail messages back from the TA and Professor, leaving my questions unanswered unless I come to the professor in the class. 
+
+Hours spent: 24 hours (approximately)
 I didn't sleep on the weekend that this homework was given.
 
 New selector node (name): - (no new ones)
