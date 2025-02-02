@@ -24,6 +24,8 @@ void ProjectOne::setup()
     for (int i = 0; i < 5; i++) 
     {
         auto man = agents->create_behavior_agent("ExampleAgent", BehaviorTreeTypes::GuardFollower);
+        man->set_color(Vec3(0, 1, 0));
+        man->set_scaling(Vec3(3, 3, 3));
         man->set_position(Vec3(100, 0, 50));
         man->set_yaw(-270.0);
         man->get_blackboard().set_value("originPos", man->get_position());
@@ -60,15 +62,35 @@ void ProjectOne::setup()
     //tree->set_color(Vec3(0, 0.5, 0));   // Set the tree to green
 
     auto hut = agents->create_behavior_agent("hut", BehaviorTreeTypes::Idle, Agent::AgentModel::Hut);
-    hut->set_position(Vec3(120, 0, -50));
+    hut->set_position(Vec3(100, 0, -15));
+
+    auto tree = agents->create_behavior_agent("tree", BehaviorTreeTypes::Idle, Agent::AgentModel::Tree);
+    tree->set_position(Vec3(0, 0, 70));
+    tree->set_scaling(Vec3(1.0, 1.0, 1.0));
+    tree->set_pitch(PI / 2);
+
+    auto tree2 = agents->create_behavior_agent("tree", BehaviorTreeTypes::Idle, Agent::AgentModel::Tree);
+    tree2->set_position(Vec3(0, 0, 25));
+    tree2->set_scaling(Vec3(1.0, 1.0, 1.0));
+    tree2->set_pitch(PI / 2);
+
+    auto tree3 = agents->create_behavior_agent("tree", BehaviorTreeTypes::Idle, Agent::AgentModel::Tree);
+    tree3->set_position(Vec3(25, 0, 25));
+    tree3->set_scaling(Vec3(1.0, 1.0, 1.0));
+    tree3->set_pitch(PI / 2);
+
+    auto tree4 = agents->create_behavior_agent("tree", BehaviorTreeTypes::Idle, Agent::AgentModel::Tree);
+    tree4->set_position(Vec3(25, 0, 70));
+    tree4->set_scaling(Vec3(1.0, 1.0, 1.0));
+    tree4->set_pitch(PI / 2);
 
     auto pyroSpawner = agents->create_behavior_agent("PyroSpawner", BehaviorTreeTypes::PyroSpawnerBT, Agent::AgentModel::Car);
     pyroSpawner->set_scaling(Vec3(0.5, 0.5, 0.5));
-    pyroSpawner->set_position(Vec3(50, 0, 25));
+    pyroSpawner->set_position(Vec3(65, 0, 35));
     pyroSpawner->soundName = L"Assets\\Audio\\clicker.wav";
     auto pyroSpawner2 = agents->create_behavior_agent("PyroSpawner", BehaviorTreeTypes::PyroSpawnerBT, Agent::AgentModel::Car);
     pyroSpawner2->set_scaling(Vec3(0.5, 0.5, 0.5));
-    pyroSpawner2->set_position(Vec3(50, 0, 75));
+    pyroSpawner2->set_position(Vec3(65, 0, 60));
     pyroSpawner2->soundName = L"Assets\\Audio\\clicker.wav";
 
 
@@ -90,7 +112,7 @@ void ProjectOne::setup()
     // You can technically load any map you want, even create your own map file,
     // but behavior agents won't actually avoid walls or anything special, unless you code
     // that yourself (that's the realm of project 2)
-    terrain->goto_map(3);
+    terrain->goto_map(7);
 
     // You can also enable the pathing layer and set grid square colors as you see fit.
     // Works best with map 0, the completely blank map

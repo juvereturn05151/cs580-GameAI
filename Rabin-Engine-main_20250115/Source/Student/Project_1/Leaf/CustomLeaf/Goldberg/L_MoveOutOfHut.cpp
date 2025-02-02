@@ -8,7 +8,7 @@ L_MoveOutOfHut::L_MoveOutOfHut()
 void L_MoveOutOfHut::on_enter()
 {
     //const auto& bb = agent->get_blackboard();
-    targetPoint = Vec3(50, 0, 50);//bb.get_value<Vec3>("Hut Position");
+    targetPoint = Vec3(65, 0, 47.5);//bb.get_value<Vec3>("Hut Position");
 
     BehaviorNode::on_leaf_enter();
 }
