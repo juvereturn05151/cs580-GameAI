@@ -1,6 +1,6 @@
 Student Name: Ju-ve Chankasemporn
 
-Project Name: Goldberg Entrance (Wild Version)
+Project Name: Goldberg's Entrance 
 
 What I implemented:
 
@@ -16,10 +16,30 @@ Referenced in this video: https://www.youtube.com/watch?v=pEOQrsph3po&t=81s
 - Since the engine doesn't have many features. I have to develop and import many features by myself. 
 Including 
 1. Physics Component System - To make the character jump and make the pyro(or firework) go up in the sky.
-2. Affine Transformation System - To animate simple animations such as knocking on the door, left punch, and right punch
-3. Global Blackboard - To store global transformation
+2. Affine Transformation System - To animate simple animations such as knocking on the door, left punch, and right punch.
+3. Global Blackboard - To store global transformation.
+
+3rd Step: Implementing Leaf Nodes and Behavior Trees
+1. I start setting up by creating a guard's behavior tree that only moves to the Hut to trigger(or spawn Goldberg).
+2. Then I build Goldberg's behavior tree which does his cool stuff such as walking and punching.
+3. Then I built Pyro Spawner and Pyro(or fireworks)'s behavior trees.
+4. To make all the agents work together, I utilize Global Blackboard to store important information such as when Goldberg is free and when Goldberg is on standby as Booleans. With this information, I create leaf nodes that wait until the certain Boolean is true, then do their actions.
+
+4th Step: Implementing extra credits
+1. After I was done with my own version of Goldberg's entrance sequences, I started doing extra credits.
+2. For formation, I created Guard Followers' behavior tree that only follows the normal guard and then switch to follow Goldberg at the end.
+3. For flocking, I just implemented birds that are independent from Goldberg's entrance.
+
 
 Directions (if needed):
+1. At the start of the project, the guard and his followers will go to the Hut, and knock on the door to call Goldberg.
+2. Once the Goldberg is spawned, he will go to the position between the pyro spawners.
+3. There, he will punch left and right, and the pyro spawners will spawn pyro(or fireworks).
+4. After he jumps, he is controllable by using the mouse click to go to target position.
+5. After he is controllable, the guard followers will follow him.
+
+Note - bird agents are independent agents that are controllable at the start.
+
 
 What I liked about the project and framework:
 - It is very easy to use.
@@ -71,12 +91,13 @@ Shared nodes(used by more than 2 Behavior Trees)
 For Bird
 21. L_Seek
 
+
 4 Behavior trees (names):
 
 1. GuardBT.bht
 2. GuardFollower.bht
-3. Idle.bht
-4. GoldbergBT.bht
+3. Idle.bht 
+4. GoldbergBT.bht (this one has 3 nodes deep)
 5. PyroSpawnerBT.bht
 6. PyroBT.bht
 7. Bird.bht
