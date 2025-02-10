@@ -58,6 +58,8 @@ bool ProjectTwo::initialize()
     pather = std::make_unique<AStarPather>();
     audioManager = std::make_unique<AudioManager>();
 
+
+
     return terrain->initialize() &&
         agents->initialize() &&
         ui->initialize() &&
@@ -98,6 +100,8 @@ bool ProjectTwo::finalize()
     Messenger::listen_for_message(Messages::PATH_TEST_END, testEndCB);
 
     link_input();
+    Terrain* rawTerrain = terrain.get();
+    pather->print_map(rawTerrain);
 
     return true;
 }

@@ -14,6 +14,10 @@ bool ProjectTwo::implemented_goal_bounding()
 }
 #pragma endregion
 
+AStarPather::AStarPather()
+{
+}
+
 bool AStarPather::initialize()
 {
     // handle any one-time setup requirements you have
@@ -29,6 +33,7 @@ bool AStarPather::initialize()
         Callback is just a typedef for std::function<void(void)>, so any std::invoke'able
         object that std::function can wrap will suffice.
     */
+
 
     return true; // return false if any errors actually occur, to stop engine initialization
 }
@@ -86,4 +91,32 @@ PathResult AStarPather::compute_path(PathRequest &request)
     request.path.push_back(request.start);
     request.path.push_back(request.goal);
     return PathResult::COMPLETE;
+}
+
+void AStarPather::print_map(Terrain* terrain)
+{
+    if (!terrain)
+    {
+        std::cerr << "Error: Terrain is null." << std::endl;
+        return;
+    }
+
+    int height = terrain->get_map_height();
+    int width = terrain->get_map_width();
+
+    for (int row = 0; row < height; ++row)
+    {
+        for (int col = 0; col < width; ++col)
+        {
+            if (terrain->is_wall(row, col))
+            {
+                std::cout << "#"; // Wall
+            }
+            else
+            {
+                std::cout << "."; // Open space
+            }
+        }
+        std::cout << std::endl;
+    }
 }
