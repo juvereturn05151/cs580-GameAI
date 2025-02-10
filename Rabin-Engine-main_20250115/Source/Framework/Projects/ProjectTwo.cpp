@@ -101,7 +101,7 @@ bool ProjectTwo::finalize()
 
     link_input();
     Terrain* rawTerrain = terrain.get();
-    pather->print_map(rawTerrain);
+    pather->set_terrain(rawTerrain);
 
     return true;
 }

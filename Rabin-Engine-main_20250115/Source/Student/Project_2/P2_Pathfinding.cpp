@@ -46,51 +46,59 @@ void AStarPather::shutdown()
     */
 }
 
+/*
+    This is where you handle pathing requests, each request has several fields:
+
+    start/goal - start and goal world positions
+    path - where you will build the path upon completion, path should be
+        start to goal, not goal to start
+    heuristic - which heuristic calculation to use
+    weight - the heuristic weight to be applied
+    newRequest - whether this is the first request for this path, should generally
+        be true, unless single step is on
+
+    smoothing - whether to apply smoothing to the path
+    rubberBanding - whether to apply rubber banding
+    singleStep - whether to perform only a single A* step
+    debugColoring - whether to color the grid based on the A* state:
+        closed list nodes - yellow
+        open list nodes - blue
+
+        use terrain->set_color(row, col, Colors::YourColor);
+        also it can be helpful to temporarily use other colors for specific states
+        when you are testing your algorithms
+
+    method - which algorithm to use: A*, Floyd-Warshall, JPS+, or goal bounding,
+        will be A* generally, unless you implement extra credit features
+
+    The return values are:
+        PROCESSING - a path hasn't been found yet, should only be returned in
+            single step mode until a path is found
+        COMPLETE - a path to the goal was found and has been built in request.path
+        IMPOSSIBLE - a path from start to goal does not exist, do not add start position to path
+*/
+
 PathResult AStarPather::compute_path(PathRequest &request)
 {
-    /*
-        This is where you handle pathing requests, each request has several fields:
+    if (!terrain)
+    {
+        return PathResult::IMPOSSIBLE;
+    }
 
-        start/goal - start and goal world positions
-        path - where you will build the path upon completion, path should be
-            start to goal, not goal to start
-        heuristic - which heuristic calculation to use
-        weight - the heuristic weight to be applied
-        newRequest - whether this is the first request for this path, should generally
-            be true, unless single step is on
+    if (request.newRequest) 
+    {
+        start = terrain->get_grid_position(request.start);
+        goal = terrain->get_grid_position(request.goal);
+        gCost[start] = 0;
+        openSet.push({ start, 0, heuristic(start, goal) });
+    }
 
-        smoothing - whether to apply smoothing to the path
-        rubberBanding - whether to apply rubber banding
-        singleStep - whether to perform only a single A* step
-        debugColoring - whether to color the grid based on the A* state:
-            closed list nodes - yellow
-            open list nodes - blue
-
-            use terrain->set_color(row, col, Colors::YourColor);
-            also it can be helpful to temporarily use other colors for specific states
-            when you are testing your algorithms
-
-        method - which algorithm to use: A*, Floyd-Warshall, JPS+, or goal bounding,
-            will be A* generally, unless you implement extra credit features
-
-        The return values are:
-            PROCESSING - a path hasn't been found yet, should only be returned in
-                single step mode until a path is found
-            COMPLETE - a path to the goal was found and has been built in request.path
-            IMPOSSIBLE - a path from start to goal does not exist, do not add start position to path
-    */
-
-    // WRITE YOUR CODE HERE
-
-    
-    // Just sample code, safe to delete
-    GridPos start = terrain->get_grid_position(request.start);
-    GridPos goal = terrain->get_grid_position(request.goal);
-    terrain->set_color(start, Colors::Orange);
-    terrain->set_color(goal, Colors::Orange);
-    request.path.push_back(request.start);
-    request.path.push_back(request.goal);
     return PathResult::COMPLETE;
+}
+
+void AStarPather::set_terrain(Terrain* terrain)
+{
+    this->terrain = terrain;
 }
 
 void AStarPather::print_map(Terrain* terrain)
@@ -119,4 +127,23 @@ void AStarPather::print_map(Terrain* terrain)
         }
         std::cout << std::endl;
     }
+}
+
+float AStarPather::heuristic(const GridPos& a, const GridPos& b)
+{
+    return std::abs(a.col - b.col) + std::abs(a.row - b.row);
+}
+
+std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos, std::shared_ptr<Terrain> terrain)
+{
+    std::vector<GridPos> neighbors;
+    std::vector<GridPos> directions = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} }; // 4-way movement
+
+    for (const auto& dir : directions)
+    {
+        GridPos newPos = { pos.row + dir.row, pos.col + dir.col };
+        if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos))
+            neighbors.push_back(newPos);
+    }
+    return neighbors;
 }
