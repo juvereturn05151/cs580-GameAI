@@ -87,22 +87,59 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
     if (request.newRequest) 
     {
+        request.path.clear();
+        openList = {}; 
+        gCost.clear();
+        cameFrom.clear();
+        closedSet.clear();
+
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
         terrain->set_color(start, Colors::Orange);
         terrain->set_color(goal, Colors::Orange);
         request.path.push_back(request.start);
-        //request.path.push_back(request.goal);
+
         gCost[start] = 0;
-        openSet.push({ start, 0, heuristic(start, goal) });
+        openList.push({ start, 0, heuristic(start, goal) });
     }
 
-   /* while (!openSet.empty())
+    while (!openList.empty())
     {
+        Node current = openList.top();
+        openList.pop();
 
-    }*/
+        if (current.gridPos == goal)
+        {
+            std::vector<Vec3> finalPath = reconstruct_path(cameFrom, start, goal);
+            for (const auto& pos : finalPath)
+            {
+                request.path.push_back(pos);
+            }
+            return PathResult::COMPLETE;
+        }
 
-    return PathResult::COMPLETE;
+        closedSet.insert(current.gridPos);
+
+        for (const GridPos& neighbor : get_neighbors(current.gridPos))
+        {
+            if (terrain->is_wall(neighbor)  || closedSet.count(neighbor))
+                continue; // Ignore walls and closed nodes
+
+            float new_g = gCost[current.gridPos] + 1; // Assume uniform cost
+
+            if (!gCost.count(neighbor) || new_g < gCost[neighbor])
+            {
+                gCost[neighbor] = new_g;
+                cameFrom[neighbor] = current.gridPos;
+                openList.push({ neighbor, new_g, heuristic(neighbor, goal) });
+            }
+        }
+
+        if (request.settings.singleStep)
+            return PathResult::PROCESSING; // Allow pausing for step-by-step execution
+    }
+
+    return PathResult::IMPOSSIBLE;
 }
 
 void AStarPather::print_map()
@@ -138,7 +175,7 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b)
     return std::abs(a.col - b.col) + std::abs(a.row - b.row);
 }
 
-std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos, std::shared_ptr<Terrain> terrain)
+std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
 {
     std::vector<GridPos> neighbors;
     std::vector<GridPos> directions = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} }; // 4-way movement
@@ -150,4 +187,18 @@ std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos, std::shared_
             neighbors.push_back(newPos);
     }
     return neighbors;
+}
+
+std::vector<Vec3> AStarPather::reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal)
+{
+    std::vector<Vec3> finalPath;
+    for (GridPos step = goal; step != start; step = cameFrom[step]) 
+    {
+        finalPath.push_back(terrain->get_world_position(step));
+    }
+
+    finalPath.push_back(terrain->get_world_position(start));
+    std::reverse(finalPath.begin(), finalPath.end());
+
+    return finalPath;
 }

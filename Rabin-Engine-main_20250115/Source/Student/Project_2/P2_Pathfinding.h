@@ -3,6 +3,7 @@
 #include "../Terrain/Terrain.h"
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 
 enum ListStatus 
 { 
@@ -43,19 +44,15 @@ public:
     PathResult compute_path(PathRequest &request);
     void print_map();
     float heuristic(const GridPos& a, const GridPos& b);
-    std::vector<GridPos> get_neighbors(const GridPos& pos, std::shared_ptr<Terrain> terrain);
+    std::vector<GridPos> get_neighbors(const GridPos& pos);
+    std::vector<Vec3> reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal);
     /* ************************************************** */
-
-    /*
-        You should create whatever functions, variables, or classes you need.
-        It doesn't all need to be in this header and cpp, structure it whatever way
-        makes sense to you.
-    */
 
 private:
     GridPos start;
     GridPos goal;
-    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openSet;
+    std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openList;
     std::unordered_map<GridPos, float, GridPosHash> gCost;
     std::unordered_map<GridPos, GridPos, GridPosHash> cameFrom;
+    std::unordered_set<GridPos, GridPosHash> closedSet;
 };
