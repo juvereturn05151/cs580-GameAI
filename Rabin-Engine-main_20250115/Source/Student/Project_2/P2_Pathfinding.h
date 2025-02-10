@@ -11,14 +11,18 @@ enum ListStatus
 
 struct Node
 {
-    GridPos pos;
-    float g; // Cost from start
-    float h; // Heuristic
-    float f() const { return g + h; } // Total estimated cost
+    Node* parent;       // Pointer to the parent node
+    GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
+    float finalCost;    // f(x) = g(x) + h(x), total estimated cost
+    float givenCost;    // g(x), cost from the start node to this node
+    enum class ListStatus { None, Open, Closed } onList; // Track if the node is in open/closed list
+
+    Node(GridPos pos, float g = 0.0f, float f = 0.0f, Node* p = nullptr)
+        : parent(p), gridPos(pos), givenCost(g), finalCost(f), onList(ListStatus::None) {}
 
     bool operator>(const Node& other) const
     {
-        return f() > other.f();
+        return finalCost > other.finalCost;
     }
 };
 
@@ -37,8 +41,7 @@ public:
     bool initialize();
     void shutdown();
     PathResult compute_path(PathRequest &request);
-    void set_terrain(Terrain* terrain);
-    void print_map(Terrain* terrain);
+    void print_map();
     float heuristic(const GridPos& a, const GridPos& b);
     std::vector<GridPos> get_neighbors(const GridPos& pos, std::shared_ptr<Terrain> terrain);
     /* ************************************************** */
@@ -50,7 +53,6 @@ public:
     */
 
 private:
-    Terrain* terrain;
     GridPos start;
     GridPos goal;
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openSet;

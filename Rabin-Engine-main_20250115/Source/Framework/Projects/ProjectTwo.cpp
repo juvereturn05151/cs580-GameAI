@@ -100,8 +100,6 @@ bool ProjectTwo::finalize()
     Messenger::listen_for_message(Messages::PATH_TEST_END, testEndCB);
 
     link_input();
-    Terrain* rawTerrain = terrain.get();
-    pather->set_terrain(rawTerrain);
 
     return true;
 }

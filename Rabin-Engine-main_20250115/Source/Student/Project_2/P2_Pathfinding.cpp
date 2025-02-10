@@ -89,19 +89,23 @@ PathResult AStarPather::compute_path(PathRequest &request)
     {
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
+        terrain->set_color(start, Colors::Orange);
+        terrain->set_color(goal, Colors::Orange);
+        request.path.push_back(request.start);
+        //request.path.push_back(request.goal);
         gCost[start] = 0;
         openSet.push({ start, 0, heuristic(start, goal) });
     }
 
+   /* while (!openSet.empty())
+    {
+
+    }*/
+
     return PathResult::COMPLETE;
 }
 
-void AStarPather::set_terrain(Terrain* terrain)
-{
-    this->terrain = terrain;
-}
-
-void AStarPather::print_map(Terrain* terrain)
+void AStarPather::print_map()
 {
     if (!terrain)
     {
