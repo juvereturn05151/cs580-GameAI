@@ -205,18 +205,36 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, Heuristic heuri
 std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
 {
     std::vector<GridPos> neighbors;
-    std::vector<GridPos> directions = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} }; // 4-way movement
+    std::vector<GridPos> directions = {
+        {1, 0}, {-1, 0}, {0, 1}, {0, -1},  // Cardinal directions
+        {1, 1}, {1, -1}, {-1, 1}, {-1, -1} // Diagonal directions
+    };
 
     for (const auto& dir : directions)
     {
         GridPos newPos = { pos.row + dir.row, pos.col + dir.col };
-        if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos)) 
+
+        // Check if the position is within bounds and is not a wall
+        if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos))
         {
+            // For diagonal movement, ensure we are not cutting corners
+            if (std::abs(dir.row) + std::abs(dir.col) == 2) // It's a diagonal move
+            {
+                GridPos adjacent1 = { pos.row, newPos.col }; // Horizontal neighbor
+                GridPos adjacent2 = { newPos.row, pos.col }; // Vertical neighbor
+
+                if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
+                {
+                    continue; // Skip this diagonal move if it cuts through a wall
+                }
+            }
+
             neighbors.push_back(newPos);
         }
     }
     return neighbors;
 }
+
 
 std::vector<Vec3> AStarPather::reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal)
 {
