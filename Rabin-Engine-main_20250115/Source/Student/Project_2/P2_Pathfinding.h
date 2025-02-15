@@ -46,6 +46,8 @@ public:
     float heuristic(const GridPos& a, const GridPos& b, Heuristic heuristic);
     std::vector<GridPos> get_neighbors(const GridPos& pos);
     std::vector<Vec3> reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal);
+    bool has_line_of_sight(const Vec3& start, const Vec3& end);
+    void apply_rubberbanding(std::vector<Vec3>& path);
     /* ************************************************** */
 
 private:
