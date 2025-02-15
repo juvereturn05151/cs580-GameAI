@@ -43,7 +43,7 @@ public:
     void shutdown();
     PathResult compute_path(PathRequest &request);
     void print_map();
-    float heuristic(const GridPos& a, const GridPos& b);
+    float heuristic(const GridPos& a, const GridPos& b, Heuristic heuristic);
     std::vector<GridPos> get_neighbors(const GridPos& pos);
     std::vector<Vec3> reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal);
     /* ************************************************** */
@@ -52,7 +52,7 @@ private:
     GridPos start;
     GridPos goal;
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openList;
+    std::unordered_set<GridPos, GridPosHash> closedList;
     std::unordered_map<GridPos, float, GridPosHash> gCost;
     std::unordered_map<GridPos, GridPos, GridPosHash> cameFrom;
-    std::unordered_set<GridPos, GridPosHash> closedSet;
 };

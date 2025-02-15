@@ -64,10 +64,6 @@ void AStarPather::shutdown()
         closed list nodes - yellow
         open list nodes - blue
 
-        use terrain->set_color(row, col, Colors::YourColor);
-        also it can be helpful to temporarily use other colors for specific states
-        when you are testing your algorithms
-
     method - which algorithm to use: A*, Floyd-Warshall, JPS+, or goal bounding,
         will be A* generally, unless you implement extra credit features
 
@@ -91,7 +87,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
         openList = {}; 
         gCost.clear();
         cameFrom.clear();
-        closedSet.clear();
+        closedList.clear();
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
@@ -100,7 +96,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
         request.path.push_back(request.start);
 
         gCost[start] = 0;
-        openList.push({ start, 0, heuristic(start, goal) });
+        openList.push({ start, 0, heuristic(start, goal, request.settings.heuristic) });
     }
 
     while (!openList.empty())
@@ -118,25 +114,29 @@ PathResult AStarPather::compute_path(PathRequest &request)
             return PathResult::COMPLETE;
         }
 
-        closedSet.insert(current.gridPos);
+        closedList.insert(current.gridPos);
+        terrain->set_color(current.gridPos, Colors::Yellow);
 
         for (const GridPos& neighbor : get_neighbors(current.gridPos))
         {
-            if (terrain->is_wall(neighbor)  || closedSet.count(neighbor))
-                continue; // Ignore walls and closed nodes
+            if (terrain->is_wall(neighbor) || closedList.count(neighbor)) 
+            {
+                continue;
+            }
 
-            float new_g = gCost[current.gridPos] + 1; // Assume uniform cost
+            float new_g = gCost[current.gridPos] + 1; 
 
             if (!gCost.count(neighbor) || new_g < gCost[neighbor])
             {
                 gCost[neighbor] = new_g;
                 cameFrom[neighbor] = current.gridPos;
-                openList.push({ neighbor, new_g, heuristic(neighbor, goal) });
+                openList.push({ neighbor, new_g, heuristic(neighbor, goal, request.settings.heuristic) });
+                terrain->set_color(neighbor, Colors::Blue);
             }
         }
 
         if (request.settings.singleStep)
-            return PathResult::PROCESSING; // Allow pausing for step-by-step execution
+            return PathResult::PROCESSING; 
     }
 
     return PathResult::IMPOSSIBLE;
@@ -170,9 +170,36 @@ void AStarPather::print_map()
     }
 }
 
-float AStarPather::heuristic(const GridPos& a, const GridPos& b)
+float AStarPather::heuristic(const GridPos& a, const GridPos& b, Heuristic heuristic)
 {
-    return std::abs(a.col - b.col) + std::abs(a.row - b.row);
+    int dx = std::abs(a.col - b.col);
+    int dy = std::abs(a.row - b.row);
+
+    if (heuristic == Heuristic::OCTILE)
+    {
+        return (std::min(dx, dy) * std::sqrt(2.0f)) + std::max(dx, dy) -  std::min(dx, dy);
+    }
+    else if (heuristic == Heuristic::CHEBYSHEV)
+    {
+        return std::max(dx, dy);
+    }
+    else if (heuristic == Heuristic::INCONSISTENT)
+    {
+        return (dx + dy) + (0.25f * std::abs(dx - dy));
+    }
+    else if (heuristic == Heuristic::MANHATTAN)
+    {
+        return dx + dy;
+    }
+    else if (heuristic == Heuristic::EUCLIDEAN)
+    {
+        return std::sqrt(dx * dx + dy * dy);
+    }
+    else
+    {
+        //NUM_ENTRIES
+        return 0.0f;
+    }
 }
 
 std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
@@ -183,8 +210,10 @@ std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
     for (const auto& dir : directions)
     {
         GridPos newPos = { pos.row + dir.row, pos.col + dir.col };
-        if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos))
+        if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos)) 
+        {
             neighbors.push_back(newPos);
+        }
     }
     return neighbors;
 }
