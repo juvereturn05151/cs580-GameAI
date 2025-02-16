@@ -230,7 +230,7 @@ std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
                 if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
                 {
                     continue; // Skip this diagonal move if it cuts through a wall
-                                                                                                                                                                                }
+                }
             }
 
             neighbors.push_back(newPos);
@@ -256,59 +256,58 @@ std::vector<Vec3> AStarPather::reconstruct_path(std::unordered_map<GridPos, Grid
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
 {
-    if (path.size() < 3) return; // No need to process if path is too short
+    if (path.size() < 3) // No need to process if the path is too short
+        return;
 
-    std::vector<Vec3> smoothedPath;
-    smoothedPath.push_back(path.front()); // Keep start point
-
-    size_t current = 0;
-    while (current < path.size() - 1)
+    size_t i = 0;
+    while (i < path.size() - 2)
     {
-        size_t next = current + 2; // Start by checking two steps ahead
+        Vec3 startPos = path[i];
+        Vec3 middlePos = path[i + 1];
+        Vec3 endPos = path[i + 2];
 
-        while (next < path.size())
+        if (can_eliminate_middle_node(startPos, middlePos, endPos))
         {
-            GridPos currGrid = terrain->get_grid_position(path[current]);
-            GridPos nextGrid = terrain->get_grid_position(path[next]);
-
-            if (!is_valid_straight_path(currGrid, nextGrid)) // NEW FUNCTION TO CHECK WALLS
-                break; // Stop when we hit an obstacle
-
-            ++next; // Keep checking further
+            path.erase(path.begin() + i + 1); // Remove the middle node
         }
-
-        // Step back one because the last increment failed
-        smoothedPath.push_back(path[next - 1]);
-        current = next - 1; // Move current pointer
+        else
+        {
+            i++; // Move to the next node
+        }
     }
-
-    path = std::move(smoothedPath);
 }
 
-bool AStarPather::is_valid_straight_path(const GridPos& start, const GridPos& end)
+bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end)
 {
-    int dx = abs(end.col - start.col);
-    int dy = abs(end.row - start.row);
-    int steps = std::max(dx, dy);
+    GridPos startGrid = terrain->get_grid_position(start);
+    GridPos middleGrid = terrain->get_grid_position(middle);
+    GridPos endGrid = terrain->get_grid_position(end);
 
-    float xIncrement = static_cast<float>(end.col - start.col) / steps;
-    float yIncrement = static_cast<float>(end.row - start.row) / steps;
-
-    float x = start.col;
-    float y = start.row;
-
-    for (int i = 0; i <= steps; ++i)
+    // Check if the middle node is aligned horizontally or vertically with start and end
+    if (startGrid.row == middleGrid.row && middleGrid.row == endGrid.row)
     {
-        GridPos step = { static_cast<int>(std::round(x)), static_cast<int>(std::round(y)) };
-
-        // Check if this position is a wall
-        if (terrain->is_wall(step))
-            return false;
-
-        x += xIncrement;
-        y += yIncrement;
+        // All nodes are in the same row
+        int colStart = std::min(startGrid.col, endGrid.col);
+        int colEnd = std::max(startGrid.col, endGrid.col);
+        for (int col = colStart; col <= colEnd; ++col)
+        {
+            if (terrain->is_wall(startGrid.row, col))
+                return false;
+        }
+        return true;
+    }
+    else if (startGrid.col == middleGrid.col && middleGrid.col == endGrid.col)
+    {
+        // All nodes are in the same column
+        int rowStart = std::min(startGrid.row, endGrid.row);
+        int rowEnd = std::max(startGrid.row, endGrid.row);
+        for (int row = rowStart; row <= rowEnd; ++row)
+        {
+            if (terrain->is_wall(row, startGrid.col))
+                return false;
+        }
+        return true;
     }
 
-    return true; // If no walls were found, the path is valid
+    return false;
 }
-

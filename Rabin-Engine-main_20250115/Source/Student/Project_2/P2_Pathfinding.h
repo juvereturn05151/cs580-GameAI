@@ -47,7 +47,7 @@ public:
     std::vector<GridPos> get_neighbors(const GridPos& pos);
     std::vector<Vec3> reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal);
     void apply_rubberbanding(std::vector<Vec3>& path);
-    bool is_valid_straight_path(const GridPos& start, const GridPos& end);
+    bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
     /* ************************************************** */
 
 private:
