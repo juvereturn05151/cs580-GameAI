@@ -83,6 +83,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
     if (request.newRequest) 
     {
+        std::cout << "new request----------" << std::endl;
         request.path.clear();
         openList = {}; 
         closedList.clear();
@@ -256,27 +257,20 @@ std::vector<Vec3> AStarPather::reconstruct_path(std::unordered_map<GridPos, Grid
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
 {
-    if (path.size() < 3) // No need to process if the path is too short
-        return;
+    //if (path.size() < 3) // No need to process if the path is too short
+    //    return;
 
-    bool changed;
-    do
+    for (size_t i = path.size() - 1; i >= 2; --i)
     {
-        changed = false;
-        for (size_t i = path.size() - 1; i >= 2; --i)
-        {
-            Vec3 startPos = path[i - 2];
-            Vec3 middlePos = path[i - 1];
-            Vec3 endPos = path[i];
+        Vec3 endPos = path[i];
+        Vec3 middlePos = path[i - 1];
+        Vec3 startPos = path[i - 2];
 
-            if (can_eliminate_middle_node(startPos, middlePos, endPos))
-            {
-                path.erase(path.begin() + i - 1); // Remove the middle node
-                changed = true;
-                break; // Restart the loop after modification
-            }
+        if (can_eliminate_middle_node(startPos, middlePos, endPos))
+        {
+            path.erase(path.begin() + i - 1); // Remove the middle node
         }
-    } while (changed);
+    }
 }
 
 bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end)
@@ -290,6 +284,11 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     int minCol = std::min(startGrid.col, endGrid.col);
     int maxCol = std::max(startGrid.col, endGrid.col);
 
+    std::cout << "minRow: " << minRow << std::endl;
+    std::cout << "maxRow: " << maxRow << std::endl;
+    std::cout << "minCol: " << minCol << std::endl;
+    std::cout << "maxCol: " << maxCol << std::endl;
+    std::cout << "------------------------------ " << std::endl;
     // Iterate over the square area
     for (int row = minRow; row <= maxRow; ++row)
     {
