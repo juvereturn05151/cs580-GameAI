@@ -283,31 +283,53 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     GridPos middleGrid = terrain->get_grid_position(middle);
     GridPos endGrid = terrain->get_grid_position(end);
 
-    // Check if the middle node is aligned horizontally or vertically with start and end
-    if (startGrid.row == middleGrid.row && middleGrid.row == endGrid.row)
+    // Check if the middle node is aligned horizontally, vertically, or diagonally with start and end
+    if (is_straight_line(startGrid, middleGrid, endGrid))
     {
-        // All nodes are in the same row
-        int colStart = std::min(startGrid.col, endGrid.col);
-        int colEnd = std::max(startGrid.col, endGrid.col);
-        for (int col = colStart; col <= colEnd; ++col)
-        {
-            if (terrain->is_wall(startGrid.row, col))
-                return false;
-        }
-        return true;
-    }
-    else if (startGrid.col == middleGrid.col && middleGrid.col == endGrid.col)
-    {
-        // All nodes are in the same column
-        int rowStart = std::min(startGrid.row, endGrid.row);
-        int rowEnd = std::max(startGrid.row, endGrid.row);
-        for (int row = rowStart; row <= rowEnd; ++row)
-        {
-            if (terrain->is_wall(row, startGrid.col))
-                return false;
-        }
-        return true;
+        return is_path_clear(startGrid, endGrid);
     }
 
     return false;
+}
+
+bool AStarPather::is_straight_line(const GridPos& start, const GridPos& middle, const GridPos& end)
+{
+    // Check if all three points are in a straight line (horizontal, vertical, or diagonal)
+    return (start.row == middle.row && middle.row == end.row) || // Horizontal
+        (start.col == middle.col && middle.col == end.col) || // Vertical
+        (std::abs(start.row - end.row) == std::abs(start.col - end.col)); // Diagonal
+}
+
+bool AStarPather::is_path_clear(const GridPos& start, const GridPos& end)
+{
+    int dx = end.col - start.col;
+    int dy = end.row - start.row;
+    int steps = std::max(std::abs(dx), std::abs(dy));
+    float xIncrement = static_cast<float>(dx) / steps;
+    float yIncrement = static_cast<float>(dy) / steps;
+
+    for (int i = 0; i <= steps; ++i)
+    {
+        int x = start.col + static_cast<int>(i * xIncrement);
+        int y = start.row + static_cast<int>(i * yIncrement);
+
+        if (terrain->is_wall(y, x))
+        {
+            return false;
+        }
+
+        // Check for corner-cutting in diagonal moves
+        if (i > 0 && std::abs(xIncrement) > 0 && std::abs(yIncrement) > 0)
+        {
+            int prevX = start.col + static_cast<int>((i - 1) * xIncrement);
+            int prevY = start.row + static_cast<int>((i - 1) * yIncrement);
+
+            if (terrain->is_wall(prevY, x) || terrain->is_wall(y, prevX))
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }

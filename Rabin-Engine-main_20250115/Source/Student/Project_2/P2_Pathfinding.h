@@ -48,6 +48,8 @@ public:
     std::vector<Vec3> reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal);
     void apply_rubberbanding(std::vector<Vec3>& path);
     bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
+    bool is_straight_line(const GridPos& start, const GridPos& middle, const GridPos& end);
+    bool is_path_clear(const GridPos& start, const GridPos& end);
     /* ************************************************** */
 
 private:
