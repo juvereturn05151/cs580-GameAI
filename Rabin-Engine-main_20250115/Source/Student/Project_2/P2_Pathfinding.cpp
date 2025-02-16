@@ -259,77 +259,48 @@ void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
     if (path.size() < 3) // No need to process if the path is too short
         return;
 
-    size_t i = 0;
-    while (i < path.size() - 2)
+    bool changed;
+    do
     {
-        Vec3 startPos = path[i];
-        Vec3 middlePos = path[i + 1];
-        Vec3 endPos = path[i + 2];
+        changed = false;
+        for (size_t i = path.size() - 1; i >= 2; --i)
+        {
+            Vec3 startPos = path[i - 2];
+            Vec3 middlePos = path[i - 1];
+            Vec3 endPos = path[i];
 
-        if (can_eliminate_middle_node(startPos, middlePos, endPos))
-        {
-            path.erase(path.begin() + i + 1); // Remove the middle node
+            if (can_eliminate_middle_node(startPos, middlePos, endPos))
+            {
+                path.erase(path.begin() + i - 1); // Remove the middle node
+                changed = true;
+                break; // Restart the loop after modification
+            }
         }
-        else
-        {
-            i++; // Move to the next node
-        }
-    }
+    } while (changed);
 }
 
 bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end)
 {
     GridPos startGrid = terrain->get_grid_position(start);
-    GridPos middleGrid = terrain->get_grid_position(middle);
     GridPos endGrid = terrain->get_grid_position(end);
 
-    // Check if the middle node is aligned horizontally, vertically, or diagonally with start and end
-    if (is_straight_line(startGrid, middleGrid, endGrid))
+    // Determine the bounding box for the square area
+    int minRow = std::min(startGrid.row, endGrid.row);
+    int maxRow = std::max(startGrid.row, endGrid.row);
+    int minCol = std::min(startGrid.col, endGrid.col);
+    int maxCol = std::max(startGrid.col, endGrid.col);
+
+    // Iterate over the square area
+    for (int row = minRow; row <= maxRow; ++row)
     {
-        return is_path_clear(startGrid, endGrid);
-    }
-
-    return false;
-}
-
-bool AStarPather::is_straight_line(const GridPos& start, const GridPos& middle, const GridPos& end)
-{
-    // Check if all three points are in a straight line (horizontal, vertical, or diagonal)
-    return (start.row == middle.row && middle.row == end.row) || // Horizontal
-        (start.col == middle.col && middle.col == end.col) || // Vertical
-        (std::abs(start.row - end.row) == std::abs(start.col - end.col)); // Diagonal
-}
-
-bool AStarPather::is_path_clear(const GridPos& start, const GridPos& end)
-{
-    int dx = end.col - start.col;
-    int dy = end.row - start.row;
-    int steps = std::max(std::abs(dx), std::abs(dy));
-    float xIncrement = static_cast<float>(dx) / steps;
-    float yIncrement = static_cast<float>(dy) / steps;
-
-    for (int i = 0; i <= steps; ++i)
-    {
-        int x = start.col + static_cast<int>(i * xIncrement);
-        int y = start.row + static_cast<int>(i * yIncrement);
-
-        if (terrain->is_wall(y, x))
+        for (int col = minCol; col <= maxCol; ++col)
         {
-            return false;
-        }
-
-        // Check for corner-cutting in diagonal moves
-        if (i > 0 && std::abs(xIncrement) > 0 && std::abs(yIncrement) > 0)
-        {
-            int prevX = start.col + static_cast<int>((i - 1) * xIncrement);
-            int prevY = start.row + static_cast<int>((i - 1) * yIncrement);
-
-            if (terrain->is_wall(prevY, x) || terrain->is_wall(y, prevX))
+            if (terrain->is_wall(row, col))
             {
-                return false;
+                return false; // If any wall is found, the middle node cannot be eliminated
             }
         }
     }
 
-    return true;
+    return true; // No walls found, the middle node can be eliminated
 }
