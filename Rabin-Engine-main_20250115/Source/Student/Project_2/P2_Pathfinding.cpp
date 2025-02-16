@@ -85,9 +85,9 @@ PathResult AStarPather::compute_path(PathRequest &request)
     {
         request.path.clear();
         openList = {}; 
+        closedList.clear();
         gCost.clear();
         cameFrom.clear();
-        closedList.clear();
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
@@ -230,7 +230,7 @@ std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
                 if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
                 {
                     continue; // Skip this diagonal move if it cuts through a wall
-                }
+                                                                                                                                                                                }
             }
 
             neighbors.push_back(newPos);
@@ -254,83 +254,61 @@ std::vector<Vec3> AStarPather::reconstruct_path(std::unordered_map<GridPos, Grid
     return finalPath;
 }
 
-bool AStarPather::has_line_of_sight(const Vec3& start, const Vec3& end)
-{
-    GridPos gridStart = terrain->get_grid_position(start);
-    GridPos gridEnd = terrain->get_grid_position(end);
-
-    int dx = std::abs(gridEnd.col - gridStart.col);
-    int dy = std::abs(gridEnd.row - gridStart.row);
-    int sx = (gridStart.col < gridEnd.col) ? 1 : -1;
-    int sy = (gridStart.row < gridEnd.row) ? 1 : -1;
-
-    int err = dx - dy;
-
-    while (gridStart != gridEnd)
-    {
-        if (terrain->is_wall(gridStart))
-        {
-            return false; // Path is blocked
-        }
-
-        int e2 = 2 * err;
-        if (e2 > -dy)
-        {
-            err -= dy;
-            gridStart.col += sx;
-        }
-        if (e2 < dx)
-        {
-            err += dx;
-            gridStart.row += sy;
-        }
-
-        // **Ensure diagonal correctness**
-        if (sx != 0 && sy != 0) // If moving diagonally
-        {
-            GridPos adjacent1 = { gridStart.row, gridStart.col - sx }; // Horizontal neighbor
-            GridPos adjacent2 = { gridStart.row - sy, gridStart.col }; // Vertical neighbor
-
-
-            if (terrain->is_valid_grid_position(adjacent1) && terrain->is_wall(adjacent1)
-                || terrain->is_valid_grid_position(adjacent2) && terrain->is_wall(adjacent2))
-            { 
-                return false; // Diagonal cut is invalid
-            }
-        }
-
-    }
-
-    return true; // No obstacles found, valid straight-line path
-}
-
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
 {
-    if (path.size() < 3) return; // No need to process if there are less than 3 points
+    if (path.size() < 3) return; // No need to process if path is too short
 
     std::vector<Vec3> smoothedPath;
-    smoothedPath.push_back(path.front()); // Start point remains
+    smoothedPath.push_back(path.front()); // Keep start point
 
     size_t current = 0;
     while (current < path.size() - 1)
     {
-        size_t next = path.size() - 1; // Start checking from the end
+        size_t next = current + 2; // Start by checking two steps ahead
 
-        // Find the furthest valid point that can be reached directly
-        while (next > current + 1)
+        while (next < path.size())
         {
-            if (has_line_of_sight(path[current], path[next]))
-            {
-                break; // Found the furthest valid point
-            }
-            next--;
+            GridPos currGrid = terrain->get_grid_position(path[current]);
+            GridPos nextGrid = terrain->get_grid_position(path[next]);
+
+            if (!is_valid_straight_path(currGrid, nextGrid)) // NEW FUNCTION TO CHECK WALLS
+                break; // Stop when we hit an obstacle
+
+            ++next; // Keep checking further
         }
 
-        smoothedPath.push_back(path[next]);
-        current = next; // Move current pointer to the chosen next point
+        // Step back one because the last increment failed
+        smoothedPath.push_back(path[next - 1]);
+        current = next - 1; // Move current pointer
     }
 
     path = std::move(smoothedPath);
 }
 
+bool AStarPather::is_valid_straight_path(const GridPos& start, const GridPos& end)
+{
+    int dx = abs(end.col - start.col);
+    int dy = abs(end.row - start.row);
+    int steps = std::max(dx, dy);
+
+    float xIncrement = static_cast<float>(end.col - start.col) / steps;
+    float yIncrement = static_cast<float>(end.row - start.row) / steps;
+
+    float x = start.col;
+    float y = start.row;
+
+    for (int i = 0; i <= steps; ++i)
+    {
+        GridPos step = { static_cast<int>(std::round(x)), static_cast<int>(std::round(y)) };
+
+        // Check if this position is a wall
+        if (terrain->is_wall(step))
+            return false;
+
+        x += xIncrement;
+        y += yIncrement;
+    }
+
+    return true; // If no walls were found, the path is valid
+}
 
