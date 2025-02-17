@@ -72,14 +72,6 @@ struct GridPos
     }
 };
 
-struct GridPosHash
-{
-    std::size_t operator()(const GridPos& pos) const
-    {
-        return std::hash<int>()(pos.row) ^ (std::hash<int>()(pos.col) << 1);
-    }
-};
-
 
 struct WindowSize
 {

@@ -18,6 +18,17 @@ struct Node
     Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None) {}
 };
 
+static const int8_t NEIGHBOR_OFFSETS[16] = {
+    1,  0,   // down      (row +1, col +0)
+   -1,  0,   // up        (row -1, col +0)
+    0,  1,   // right     (row +0, col +1)
+    0, -1,   // left      (row +0, col -1)
+    1,  1,   // down-right
+    1, -1,   // down-left
+   -1,  1,   // up-right
+   -1, -1    // up-left
+};
+
 class AStarPather
 {
 public:

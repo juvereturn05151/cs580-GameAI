@@ -208,30 +208,29 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
 {
     std::vector<GridPos> neighbors;
-    std::vector<GridPos> directions = {
-        {1, 0}, {-1, 0}, {0, 1}, {0, -1},  // Cardinal directions
-        {1, 1}, {1, -1}, {-1, 1}, {-1, -1} // Diagonal directions
-    };
-
-    for (const auto& dir : directions)
+    // There are 8 neighbors; each uses 2 bytes from our precomputed array.
+    for (int i = 0; i < 8; ++i)
     {
-        GridPos newPos = { pos.row + dir.row, pos.col + dir.col };
+        // Extract row and column offset from the byte array.
+        int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
+        int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
 
-        // Check if the position is within bounds and is not a wall
+        GridPos newPos = { pos.row + dRow, pos.col + dCol };
+
+        // Check if newPos is within bounds and not a wall.
         if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos))
         {
-            // For diagonal movement, ensure we are not cutting corners
-            if (std::abs(dir.row) + std::abs(dir.col) == 2) // It's a diagonal move
+            // For diagonal moves, ensure we are not "cutting a corner"
+            // (i.e. the move is diagonal if the sum of the absolute offsets is 2).
+            if (std::abs(dRow) + std::abs(dCol) == 2)
             {
-                GridPos adjacent1 = { pos.row, newPos.col }; // Horizontal neighbor
-                GridPos adjacent2 = { newPos.row, pos.col }; // Vertical neighbor
-
+                GridPos adjacent1 = { pos.row, pos.col + dCol };
+                GridPos adjacent2 = { pos.row + dRow, pos.col };
                 if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
                 {
-                    continue; // Skip this diagonal move if it cuts through a wall
+                    continue; // Skip this diagonal neighbor.
                 }
             }
-
             neighbors.push_back(newPos);
         }
     }
