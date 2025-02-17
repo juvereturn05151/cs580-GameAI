@@ -103,7 +103,8 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
             Node* childNode = &nodes[neighbor.row][neighbor.col];
 
-            float new_g = parentNode->givenCost + 1; // Assuming uniform cost
+            float cost = (neighbor.row != parentNode->gridPos.row && neighbor.col != parentNode->gridPos.col) ? 1.414f : 1.0f;
+            float new_g = parentNode->givenCost + cost; // Assuming uniform cost
             float new_f = new_g + heuristic(neighbor, goal, request);
 
             if (childNode->onList == ListStatus::None)
