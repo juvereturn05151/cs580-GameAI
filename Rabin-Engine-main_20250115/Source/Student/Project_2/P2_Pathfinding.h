@@ -48,6 +48,9 @@ public:
     std::vector<Vec3> reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal);
     void apply_rubberbanding(std::vector<Vec3>& path);
     bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
+    Vec3 catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t);
+    void apply_catmull_rom_smoothing(std::vector<Vec3>& path);
+
     /* ************************************************** */
 
 private:

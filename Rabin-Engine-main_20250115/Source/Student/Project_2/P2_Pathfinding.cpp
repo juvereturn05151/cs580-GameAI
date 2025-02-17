@@ -112,6 +112,11 @@ PathResult AStarPather::compute_path(PathRequest &request)
             {
                 apply_rubberbanding(finalPath);
             }
+            if (request.settings.smoothing)
+            {
+                apply_catmull_rom_smoothing(finalPath);
+            }
+
             for (const auto& pos : finalPath)
             {
                 request.path.push_back(pos);
@@ -284,11 +289,11 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     int minCol = std::min(startGrid.col, endGrid.col);
     int maxCol = std::max(startGrid.col, endGrid.col);
 
-    std::cout << "minRow: " << minRow << std::endl;
-    std::cout << "maxRow: " << maxRow << std::endl;
-    std::cout << "minCol: " << minCol << std::endl;
-    std::cout << "maxCol: " << maxCol << std::endl;
-    std::cout << "------------------------------ " << std::endl;
+    //std::cout << "minRow: " << minRow << std::endl;
+    //std::cout << "maxRow: " << maxRow << std::endl;
+    //std::cout << "minCol: " << minCol << std::endl;
+    //std::cout << "maxCol: " << maxCol << std::endl;
+    //std::cout << "------------------------------ " << std::endl;
     // Iterate over the square area
     for (int row = minRow; row <= maxRow; ++row)
     {
@@ -302,4 +307,46 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     }
 
     return true; // No walls found, the middle node can be eliminated
+}
+
+Vec3 AStarPather::catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t)
+{
+    float t2 = t * t;
+    float t3 = t2 * t;
+
+    Vec3 a = (p1 * 2.0f) + (p2 - p0) * t + (p0 * 2.0f - p1 * 5.0f + p2 * 4.0f - p3) * t2 + (p1 * 3.0f - p0 - p2 * 3.0f + p3) * t3;
+    return a * 0.5f;
+}
+
+void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
+{
+    if (path.size() < 3) // No need to process if the path is too short
+        return;
+
+    std::vector<Vec3> smoothedPath;
+    int n = path.size();
+
+    // Add the first point
+    smoothedPath.push_back(path[0]);
+
+    // Iterate through the path and apply Catmull-Rom interpolation
+    for (int i = 0; i < n - 1; ++i)
+    {
+        Vec3 p0 = (i == 0) ? path[0] : path[i - 1];
+        Vec3 p1 = path[i];
+        Vec3 p2 = path[i + 1];
+        Vec3 p3 = (i == n - 2) ? path[n - 1] : path[i + 2];
+
+        // Add intermediate points
+        for (float t = 0.0f; t < 1.0f; t += 0.1f)
+        {
+            smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, t));
+        }
+    }
+
+    // Add the last point
+    smoothedPath.push_back(path[n - 1]);
+
+    // Replace the original path with the smoothed path
+    path = smoothedPath;
 }
