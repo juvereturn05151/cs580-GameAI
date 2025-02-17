@@ -60,7 +60,7 @@ public:
     void open_list_push(Node* node, PathRequest& request);
     Node* open_list_pop();
     void open_list_update(Node* node);
-
+    void clear_open_list();
     /* ************************************************** */
 
 private:
@@ -72,5 +72,5 @@ private:
     GridPos goal;
 
     std::vector<Node*> openList;
-    bool hasPrecompute = false;
+    int lastIndex;
 };

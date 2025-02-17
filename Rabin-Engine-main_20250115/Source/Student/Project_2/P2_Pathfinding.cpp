@@ -27,7 +27,9 @@ AStarPather::AStarPather()
 
 bool AStarPather::initialize()
 {
-
+    openList.clear(); // Clear the open list
+    openList.reserve(1600); // Preallocate 1600 slots
+    lastIndex = -1; // No elements in the open list initially
     return true;
 }
 
@@ -38,7 +40,7 @@ void AStarPather::shutdown()
         keeping you need to do during shutdown.
     */
 
-    openList.clear();
+    clear_open_list();
 }
 
 PathResult AStarPather::compute_path(PathRequest &request)
@@ -52,7 +54,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
     {
         request.path.clear();
         clear_nodes();
-        openList.clear();
+        clear_open_list();
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
@@ -67,7 +69,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
         open_list_push(startNode, request);
     }
 
-    while (!openList.empty())
+    while (lastIndex >= 0)
     {
         Node* parentNode = open_list_pop();
 
@@ -383,18 +385,36 @@ void AStarPather::open_list_push(Node* node, PathRequest& request)
         terrain->set_color(node->gridPos, Colors::Blue);
     }
 
-    openList.push_back(node);
+    // Increment lastIndex and add the node to the open list
+    lastIndex++;
+    if (lastIndex < openList.size()) {
+        openList[lastIndex] = node; // Overwrite existing slot
+    }
+    else {
+        openList.push_back(node); // Add new slot
+    }
 }
 
 Node* AStarPather::open_list_pop()
 {
-    // Find the node with the smallest finalCost
-    auto minIt = std::min_element(openList.begin(), openList.end(),
-        [](Node* a, Node* b) { return a->finalCost < b->finalCost; });
+    if (lastIndex < 0) {
+        return nullptr; // No nodes in the open list
+    }
 
-    // Remove it from the open list
-    Node* cheapestNode = *minIt;
-    openList.erase(minIt);
+    // Find the node with the smallest finalCost
+    int cheapestIndex = 0;
+    float cheapestCost = openList[0]->finalCost;
+    for (int i = 1; i <= lastIndex; ++i) {
+        if (openList[i]->finalCost < cheapestCost) {
+            cheapestCost = openList[i]->finalCost;
+            cheapestIndex = i;
+        }
+    }
+
+    // Replace the cheapest node with the last node
+    Node* cheapestNode = openList[cheapestIndex];
+    openList[cheapestIndex] = openList[lastIndex];
+    lastIndex--; // Decrement lastIndex
 
     return cheapestNode;
 }
@@ -402,4 +422,10 @@ Node* AStarPather::open_list_pop()
 void AStarPather::open_list_update(Node* node)
 {
     // No special handling needed for an unsorted open list
+}
+
+void AStarPather::clear_open_list()
+{
+    openList.clear();
+    lastIndex = -1;
 }
