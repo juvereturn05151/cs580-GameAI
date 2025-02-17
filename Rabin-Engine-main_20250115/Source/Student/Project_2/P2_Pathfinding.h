@@ -1,9 +1,6 @@
 #pragma once
 #include "Misc/PathfindingDetails.hpp"
 #include "../Terrain/Terrain.h"
-#include <queue>
-#include <unordered_map>
-#include <unordered_set>
 
 enum ListStatus 
 { 
