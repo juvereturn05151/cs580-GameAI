@@ -83,7 +83,6 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
     if (request.newRequest) 
     {
-        std::cout << "new request----------" << std::endl;
         request.path.clear();
         openList = {}; 
         closedList.clear();
@@ -290,11 +289,6 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     int minCol = std::min(startGrid.col, endGrid.col);
     int maxCol = std::max(startGrid.col, endGrid.col);
 
-    //std::cout << "minRow: " << minRow << std::endl;
-    //std::cout << "maxRow: " << maxRow << std::endl;
-    //std::cout << "minCol: " << minCol << std::endl;
-    //std::cout << "maxCol: " << maxCol << std::endl;
-    //std::cout << "------------------------------ " << std::endl;
     // Iterate over the square area
     for (int row = minRow; row <= maxRow; ++row)
     {
