@@ -16,7 +16,7 @@ struct Node
     GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
     float finalCost;    // f(x) = g(x) + h(x), total estimated cost
     float givenCost;    // g(x), cost from the start node to this node
-    enum class ListStatus { None, Open, Closed } onList; // Track if the node is in open/closed list
+    ListStatus onList; // Track if the node is in open/closed list
 
     Node(GridPos pos, float g = 0.0f, float f = 0.0f, Node* p = nullptr)
         : parent(p), gridPos(pos), givenCost(g), finalCost(f), onList(ListStatus::None) {}

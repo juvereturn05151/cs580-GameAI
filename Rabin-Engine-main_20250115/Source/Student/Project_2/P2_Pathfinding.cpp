@@ -187,7 +187,7 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, Heuristic heuri
 
     if (heuristic == Heuristic::OCTILE)
     {
-        return (std::min(dx, dy) * std::sqrt(2.0f)) + std::max(dx, dy) -  std::min(dx, dy);
+        return (std::min(dx, dy) * 1.414) + std::max(dx, dy) -  std::min(dx, dy);
     }
     else if (heuristic == Heuristic::CHEBYSHEV)
     {
