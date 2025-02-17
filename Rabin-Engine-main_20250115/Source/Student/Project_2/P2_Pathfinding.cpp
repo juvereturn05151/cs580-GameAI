@@ -80,7 +80,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
             }
             if (request.settings.smoothing)
             {
-                add_intermediate_points(finalPath, 10.0f);
+                add_intermediate_points(finalPath, 5.0f);
                 apply_catmull_rom_smoothing(finalPath);
             }
 
@@ -179,7 +179,14 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     }
     else if (request.settings.heuristic == Heuristic::INCONSISTENT)
     {
-        h = (dx + dy) + (0.25f * std::abs(dx - dy));
+        if ((a.row + a.col) % 2 > 0)
+        {
+            h = std::sqrt(dx * dx + dy * dy); // Euclidean distance for odd-sum coordinates
+        }
+        else
+        {
+            h = 0.0f; // Artificially setting heuristic to zero for even-sum coordinates
+        }
     }
     else if (request.settings.heuristic == Heuristic::MANHATTAN)
     {
