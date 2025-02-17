@@ -12,14 +12,12 @@ enum ListStatus
 
 struct Node
 {
-    Node* parent;       // Pointer to the parent node
     GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
     float finalCost;    // f(x) = g(x) + h(x), total estimated cost
     float givenCost;    // g(x), cost from the start node to this node
-    ListStatus onList; // Track if the node is in open/closed list
 
-    Node(GridPos pos, float g = 0.0f, float f = 0.0f, Node* p = nullptr)
-        : parent(p), gridPos(pos), givenCost(g), finalCost(f), onList(ListStatus::None) {}
+    Node(GridPos pos, float g = 0.0f, float f = 0.0f)
+        : gridPos(pos), givenCost(g), finalCost(f) {}
 
     bool operator>(const Node& other) const
     {
@@ -51,6 +49,7 @@ public:
     Vec3 catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t);
     void apply_catmull_rom_smoothing(std::vector<Vec3>& path);
     void add_intermediate_points(std::vector<Vec3>& path, float maxDistance);
+    void precompute_neighbors();
     /* ************************************************** */
 
 private:
@@ -60,4 +59,6 @@ private:
     std::unordered_set<GridPos, GridPosHash> closedList;
     std::unordered_map<GridPos, float, GridPosHash> gCost;
     std::unordered_map<GridPos, GridPos, GridPosHash> cameFrom;
+    std::unordered_map<GridPos, std::vector<GridPos>, GridPosHash> neighborCache;
+    bool hasPrecompute = false;
 };
