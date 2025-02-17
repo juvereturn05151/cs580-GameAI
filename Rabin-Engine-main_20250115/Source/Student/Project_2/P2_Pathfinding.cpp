@@ -64,7 +64,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
         startNode->givenCost = 0;
         startNode->finalCost = heuristic(start, goal, request);
         startNode->onList = ListStatus::Open;
-        open_list_push(startNode);
+        open_list_push(startNode, request);
     }
 
     while (!openList.empty())
@@ -92,7 +92,10 @@ PathResult AStarPather::compute_path(PathRequest &request)
         }
 
         parentNode->onList = ListStatus::Closed;
-        terrain->set_color(parentNode->gridPos, Colors::Yellow);
+        if (request.settings.debugColoring) {
+            terrain->set_color(parentNode->gridPos, Colors::Yellow);
+        }
+
 
         for (const GridPos& neighbor : get_neighbors(parentNode->gridPos))
         {
@@ -114,7 +117,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
                 childNode->givenCost = new_g;
                 childNode->finalCost = new_f;
                 childNode->onList = ListStatus::Open;
-                open_list_push(childNode);
+                open_list_push(childNode, request);
             }
             else if (childNode->onList == ListStatus::Open || childNode->onList == ListStatus::Closed)
             {
@@ -130,7 +133,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
                     {
                         // Reopen the node if it was closed
                         childNode->onList = ListStatus::Open;
-                        open_list_push(childNode);
+                        open_list_push(childNode, request);
                     }
                     else
                     {
@@ -374,9 +377,12 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDist
     path = newPath; // Replace the original path with the new path
 }
 
-void AStarPather::open_list_push(Node* node)
+void AStarPather::open_list_push(Node* node, PathRequest& request)
 {
-    terrain->set_color(node->gridPos, Colors::Blue);
+    if (request.settings.debugColoring) {
+        terrain->set_color(node->gridPos, Colors::Blue);
+    }
+
     openList.push_back(node);
 }
 

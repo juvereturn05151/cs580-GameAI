@@ -57,7 +57,7 @@ public:
     void add_intermediate_points(std::vector<Vec3>& path, float maxDistance);
 
     // Open list operations
-    void open_list_push(Node* node);
+    void open_list_push(Node* node, PathRequest& request);
     Node* open_list_pop();
     void open_list_update(Node* node);
 
