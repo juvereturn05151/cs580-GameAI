@@ -114,6 +114,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
             }
             if (request.settings.smoothing)
             {
+                add_intermediate_points(finalPath, 10.0f);
                 apply_catmull_rom_smoothing(finalPath);
             }
 
@@ -349,4 +350,39 @@ void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
 
     // Replace the original path with the smoothed path
     path = smoothedPath;
+}
+
+void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDistance)
+{
+    if (path.size() < 2) // No need to process if the path is too short
+        return;
+
+    std::vector<Vec3> newPath;
+    newPath.push_back(path[0]); // Add the first point
+
+    for (size_t i = 1; i < path.size(); ++i)
+    {
+        Vec3 prevPoint = newPath.back();
+        Vec3 currentPoint = path[i];
+
+        float distance = (currentPoint - prevPoint).Length();
+
+        if (distance > maxDistance)
+        {
+            // Calculate the direction vector
+            Vec3 direction = (currentPoint - prevPoint) / distance;
+
+            // Add intermediate points spaced by maxDistance
+            int numPoints = static_cast<int>(distance / maxDistance);
+            for (int j = 1; j <= numPoints; ++j)
+            {
+                Vec3 intermediatePoint = prevPoint + direction * (maxDistance * j);
+                newPath.push_back(intermediatePoint);
+            }
+        }
+
+        newPath.push_back(currentPoint); // Add the current point
+    }
+
+    path = newPath; // Replace the original path with the new path
 }
