@@ -16,7 +16,13 @@ bool ProjectTwo::implemented_goal_bounding()
 
 AStarPather::AStarPather()
 {
-
+    for (int row = 0; row < MAP_HEIGHT; ++row)
+    {
+        for (int col = 0; col < MAP_WIDTH; ++col)
+        {
+            nodes[row][col].gridPos = { row, col };
+        }
+    }
 }
 
 bool AStarPather::initialize()
@@ -32,11 +38,7 @@ void AStarPather::shutdown()
         keeping you need to do during shutdown.
     */
 
-    openList = {};
-    closedList.clear();
-    gCost.clear();
-    cameFrom.clear();
-    neighborCache.clear();
+    openList.clear();
 }
 
 PathResult AStarPather::compute_path(PathRequest &request)
@@ -48,36 +50,30 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
     if (request.newRequest) 
     {
-        if (!hasPrecompute) 
-        {
-            precompute_neighbors();
-            hasPrecompute = true;
-        }
-
         request.path.clear();
-        openList = {}; 
-        closedList.clear();
-        gCost.clear();
-        cameFrom.clear();
+        clear_nodes();
+        openList.clear();
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
         terrain->set_color(start, Colors::Orange);
         terrain->set_color(goal, Colors::Orange);
-        request.path.push_back(request.start);
 
-        gCost[start] = 0;
-        openList.push({ start, 0, heuristic(start, goal, request.settings.heuristic) });
+
+        Node* startNode = &nodes[start.row][start.col];
+        startNode->givenCost = 0;
+        startNode->finalCost = heuristic(start, goal, request);
+        startNode->onList = ListStatus::Open;
+        open_list_push(startNode);
     }
 
     while (!openList.empty())
     {
-        Node current = openList.top();
-        openList.pop();
+        Node* parentNode = open_list_pop();
 
-        if (current.gridPos == goal)
+        if (parentNode->gridPos == goal)
         {
-            std::vector<Vec3> finalPath = reconstruct_path(cameFrom, start, goal);
+            std::vector<Vec3> finalPath = reconstruct_path(parentNode);
             if (request.settings.rubberBanding)
             {
                 apply_rubberbanding(finalPath);
@@ -95,24 +91,52 @@ PathResult AStarPather::compute_path(PathRequest &request)
             return PathResult::COMPLETE;
         }
 
-        closedList.insert(current.gridPos);
-        terrain->set_color(current.gridPos, Colors::Yellow);
+        parentNode->onList = ListStatus::Closed;
+        terrain->set_color(parentNode->gridPos, Colors::Yellow);
 
-        for (const GridPos& neighbor : neighborCache[current.gridPos])
+        for (const GridPos& neighbor : get_neighbors(parentNode->gridPos))
         {
-            if (terrain->is_wall(neighbor) || closedList.count(neighbor)) 
+            if (terrain->is_wall(neighbor))
             {
-                continue;
+                continue; // Skip walls
             }
 
-            float new_g = gCost[current.gridPos] + 1; 
+            Node* childNode = &nodes[neighbor.row][neighbor.col];
 
-            if (!gCost.count(neighbor) || new_g < gCost[neighbor])
+            float new_g = parentNode->givenCost + 1; // Assuming uniform cost
+            float new_f = new_g + heuristic(neighbor, goal, request);
+
+            if (childNode->onList == ListStatus::None)
             {
-                gCost[neighbor] = new_g;
-                cameFrom[neighbor] = current.gridPos;
-                openList.push({ neighbor, new_g, heuristic(neighbor, goal, request.settings.heuristic) });
-                terrain->set_color(neighbor, Colors::Blue);
+                // If child node isn’t on Open or Closed list, put it on Open List
+                childNode->parent = parentNode;
+                childNode->givenCost = new_g;
+                childNode->finalCost = new_f;
+                childNode->onList = ListStatus::Open;
+                open_list_push(childNode);
+            }
+            else if (childNode->onList == ListStatus::Open || childNode->onList == ListStatus::Closed)
+            {
+                // If child node is on Open or Closed List, AND this new one is cheaper,
+                // then update the node
+                if (new_g < childNode->givenCost)
+                {
+                    childNode->parent = parentNode;
+                    childNode->givenCost = new_g;
+                    childNode->finalCost = new_f;
+
+                    if (childNode->onList == ListStatus::Closed)
+                    {
+                        // Reopen the node if it was closed
+                        childNode->onList = ListStatus::Open;
+                        open_list_push(childNode);
+                    }
+                    else
+                    {
+                        // Update the node in the open list
+                        open_list_update(childNode);
+                    }
+                }
             }
         }
 
@@ -123,64 +147,54 @@ PathResult AStarPather::compute_path(PathRequest &request)
     return PathResult::IMPOSSIBLE;
 }
 
-void AStarPather::print_map()
+void AStarPather::clear_nodes()
 {
-    if (!terrain)
+    for (int row = 0; row < MAP_HEIGHT; ++row)
     {
-        std::cerr << "Error: Terrain is null." << std::endl;
-        return;
-    }
-
-    int height = terrain->get_map_height();
-    int width = terrain->get_map_width();
-
-    for (int row = 0; row < height; ++row)
-    {
-        for (int col = 0; col < width; ++col)
+        for (int col = 0; col < MAP_WIDTH; ++col)
         {
-            if (terrain->is_wall(row, col))
-            {
-                std::cout << "#"; // Wall
-            }
-            else
-            {
-                std::cout << "."; // Open space
-            }
+            nodes[row][col].parent = nullptr;
+            nodes[row][col].finalCost = 0;
+            nodes[row][col].givenCost = 0;
+            nodes[row][col].onList = ListStatus::None;
         }
-        std::cout << std::endl;
     }
 }
 
-float AStarPather::heuristic(const GridPos& a, const GridPos& b, Heuristic heuristic)
+float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& request)
 {
     int dx = std::abs(a.col - b.col);
     int dy = std::abs(a.row - b.row);
 
-    if (heuristic == Heuristic::OCTILE)
+    float h = 0.0;
+
+    if (request.settings.heuristic == Heuristic::OCTILE)
     {
-        return (std::min(dx, dy) * 1.414) + std::max(dx, dy) -  std::min(dx, dy);
+        h = (std::min(dx, dy) * 1.414) + std::max(dx, dy) -  std::min(dx, dy);
     }
-    else if (heuristic == Heuristic::CHEBYSHEV)
+    else if (request.settings.heuristic == Heuristic::CHEBYSHEV)
     {
-        return std::max(dx, dy);
+        h =  std::max(dx, dy);
     }
-    else if (heuristic == Heuristic::INCONSISTENT)
+    else if (request.settings.heuristic == Heuristic::INCONSISTENT)
     {
-        return (dx + dy) + (0.25f * std::abs(dx - dy));
+        h = (dx + dy) + (0.25f * std::abs(dx - dy));
     }
-    else if (heuristic == Heuristic::MANHATTAN)
+    else if (request.settings.heuristic == Heuristic::MANHATTAN)
     {
-        return dx + dy;
+        h = dx + dy;
     }
-    else if (heuristic == Heuristic::EUCLIDEAN)
+    else if (request.settings.heuristic == Heuristic::EUCLIDEAN)
     {
-        return std::sqrt(dx * dx + dy * dy);
+        h = std::sqrt(dx * dx + dy * dy);
     }
     else
     {
         //NUM_ENTRIES
-        return 0.0f;
+        h =  0.0f;
     }
+
+    return h * request.settings.weight;
 }
 
 std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
@@ -217,18 +231,19 @@ std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
 }
 
 
-std::vector<Vec3> AStarPather::reconstruct_path(std::unordered_map<GridPos, GridPos, GridPosHash>& cameFrom, GridPos start, GridPos goal)
+std::vector<Vec3> AStarPather::reconstruct_path(Node* goalNode)
 {
-    std::vector<Vec3> finalPath;
-    for (GridPos step = goal; step != start; step = cameFrom[step]) 
+    std::vector<Vec3> path;
+    Node* current = goalNode;
+
+    while (current)
     {
-        finalPath.push_back(terrain->get_world_position(step));
+        path.push_back(terrain->get_world_position(current->gridPos));
+        current = current->parent;
     }
 
-    finalPath.push_back(terrain->get_world_position(start));
-    std::reverse(finalPath.begin(), finalPath.end());
-
-    return finalPath;
+    std::reverse(path.begin(), path.end());
+    return path;
 }
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
@@ -352,14 +367,26 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDist
     path = newPath; // Replace the original path with the new path
 }
 
-void AStarPather::precompute_neighbors()
+void AStarPather::open_list_push(Node* node)
 {
-    for (int row = 0; row < terrain->get_map_height(); ++row)
-    {
-        for (int col = 0; col < terrain->get_map_width(); ++col)
-        {
-            GridPos pos = { row, col };
-            neighborCache[pos] = get_neighbors(pos);
-        }
-    }
+    terrain->set_color(node->gridPos, Colors::Blue);
+    openList.push_back(node);
+}
+
+Node* AStarPather::open_list_pop()
+{
+    // Find the node with the smallest finalCost
+    auto minIt = std::min_element(openList.begin(), openList.end(),
+        [](Node* a, Node* b) { return a->finalCost < b->finalCost; });
+
+    // Remove it from the open list
+    Node* cheapestNode = *minIt;
+    openList.erase(minIt);
+
+    return cheapestNode;
+}
+
+void AStarPather::open_list_update(Node* node)
+{
+    // No special handling needed for an unsorted open list
 }
