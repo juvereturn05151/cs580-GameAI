@@ -30,6 +30,11 @@ bool AStarPather::initialize()
     openList.clear(); // Clear the open list
     openList.reserve(1600); // Preallocate 1600 slots
     lastIndex = -1; // No elements in the open list initially
+
+    Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
+    Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
+
+
     return true;
 }
 
@@ -214,34 +219,7 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 
 std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
 {
-    std::vector<GridPos> neighbors;
-    // There are 8 neighbors; each uses 2 bytes from our precomputed array.
-    for (int i = 0; i < 8; ++i)
-    {
-        // Extract row and column offset from the byte array.
-        int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
-        int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
-
-        GridPos newPos = { pos.row + dRow, pos.col + dCol };
-
-        // Check if newPos is within bounds and not a wall.
-        if (terrain->is_valid_grid_position(newPos) && !terrain->is_wall(newPos))
-        {
-            // For diagonal moves, ensure we are not "cutting a corner"
-            // (i.e. the move is diagonal if the sum of the absolute offsets is 2).
-            if (std::abs(dRow) + std::abs(dCol) == 2)
-            {
-                GridPos adjacent1 = { pos.row, pos.col + dCol };
-                GridPos adjacent2 = { pos.row + dRow, pos.col };
-                if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
-                {
-                    continue; // Skip this diagonal neighbor.
-                }
-            }
-            neighbors.push_back(newPos);
-        }
-    }
-    return neighbors;
+    return validNeighbors[pos.row][pos.col];
 }
 
 
@@ -429,4 +407,52 @@ void AStarPather::clear_open_list()
 {
     openList.clear();
     lastIndex = -1;
+}
+
+void AStarPather::precompute_valid_neighbors()
+{
+    for (int row = 0; row < MAP_HEIGHT; ++row)
+    {
+        for (int col = 0; col < MAP_WIDTH; ++col)
+        {
+            GridPos pos = { row, col };
+            validNeighbors[row][col] = compute_valid_neighbors(pos);
+        }
+    }
+}
+
+std::vector<GridPos> AStarPather::compute_valid_neighbors(const GridPos& pos)
+{
+    std::vector<GridPos> neighbors;
+    neighbors.reserve(8);
+
+    for (int i = 0; i < 8; ++i)
+    {
+        int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
+        int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
+
+        GridPos newPos = { pos.row + dRow, pos.col + dCol };
+
+        if (!terrain->is_valid_grid_position(newPos) || terrain->is_wall(newPos))
+        {
+            continue;
+        }
+
+        bool isDiagonal = (dRow != 0) && (dCol != 0);
+
+        if (isDiagonal)
+        {
+            GridPos adjacent1 = { pos.row, pos.col + dCol };
+            GridPos adjacent2 = { pos.row + dRow, pos.col };
+
+            if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
+            {
+                continue;
+            }
+        }
+
+        neighbors.push_back(newPos);
+    }
+
+    return neighbors;
 }

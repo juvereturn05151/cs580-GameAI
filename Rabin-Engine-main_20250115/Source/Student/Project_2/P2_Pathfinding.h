@@ -61,6 +61,8 @@ public:
     Node* open_list_pop();
     void open_list_update(Node* node);
     void clear_open_list();
+    void precompute_valid_neighbors();
+    std::vector<GridPos> compute_valid_neighbors(const GridPos& pos);
     /* ************************************************** */
 
 private:
@@ -71,6 +73,7 @@ private:
 
     std::vector<Node*> openList;  // 24 bytes (8-byte aligned)
     std::vector<Vec3> finalPath;
+    std::vector<GridPos> validNeighbors[MAP_HEIGHT][MAP_WIDTH];
     int lastIndex;                // 4 bytes (placing it here may reduce padding)
 
     GridPos start, goal;  // 16 bytes (8-byte aligned)
