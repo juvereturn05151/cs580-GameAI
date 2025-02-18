@@ -59,7 +59,6 @@ public:
     // Open list operations
     void open_list_push(Node* node, PathRequest& request);
     Node* open_list_pop();
-    void open_list_update(Node* node);
     void clear_open_list();
     void precompute_valid_neighbors();
     std::vector<GridPos> compute_valid_neighbors(const GridPos& pos);

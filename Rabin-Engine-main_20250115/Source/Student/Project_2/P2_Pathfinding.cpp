@@ -144,11 +144,6 @@ PathResult AStarPather::compute_path(PathRequest &request)
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
-                    else
-                    {
-                        // Update the node in the open list
-                        open_list_update(childNode);
-                    }
                 }
             }
         }
@@ -396,11 +391,6 @@ Node* AStarPather::open_list_pop()
     lastIndex--; // Decrement lastIndex
 
     return cheapestNode;
-}
-
-void AStarPather::open_list_update(Node* node)
-{
-    // No special handling needed for an unsorted open list
 }
 
 void AStarPather::clear_open_list()
