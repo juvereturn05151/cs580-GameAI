@@ -105,9 +105,10 @@ PathResult AStarPather::compute_path(PathRequest &request)
             terrain->set_color(parentNode->gridPos, Colors::Yellow);
         }
 
-
-        for (const GridPos& neighbor : get_neighbors(parentNode->gridPos))
+        Neighbors neighbors = get_neighbors(parentNode->gridPos);
+        for (int i = 0; i < neighbors.count; ++i)
         {
+            const GridPos& neighbor = neighbors.positions[i];
             if (terrain->is_wall(neighbor))
             {
                 continue; // Skip walls
@@ -212,11 +213,9 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     return h * request.settings.weight;
 }
 
-std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
-{
+const Neighbors& AStarPather::get_neighbors(const GridPos& pos) {
     return validNeighbors[pos.row][pos.col];
 }
-
 
 void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
     path.clear(); // Clear the path vector to ensure it's empty
@@ -399,50 +398,37 @@ void AStarPather::clear_open_list()
     lastIndex = -1;
 }
 
-void AStarPather::precompute_valid_neighbors()
-{
-    for (int row = 0; row < MAP_HEIGHT; ++row)
-    {
-        for (int col = 0; col < MAP_WIDTH; ++col)
-        {
+void AStarPather::precompute_valid_neighbors() {
+    for (int row = 0; row < MAP_HEIGHT; ++row) {
+        for (int col = 0; col < MAP_WIDTH; ++col) {
             GridPos pos = { row, col };
-            validNeighbors[row][col] = compute_valid_neighbors(pos);
+            compute_valid_neighbors(pos, validNeighbors[row][col]);
         }
     }
 }
 
-std::vector<GridPos> AStarPather::compute_valid_neighbors(const GridPos& pos)
-{
-    std::vector<GridPos> neighbors;
-    neighbors.reserve(8);
+void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors) {
+    neighbors.count = 0; // Reset the count
 
-    for (int i = 0; i < 8; ++i)
-    {
+    for (int i = 0; i < 8; ++i) {
         int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
         int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
 
         GridPos newPos = { pos.row + dRow, pos.col + dCol };
 
-        if (!terrain->is_valid_grid_position(newPos) || terrain->is_wall(newPos))
-        {
-            continue;
-        }
+        if (!terrain->is_valid_grid_position(newPos)) continue;
+        if (terrain->is_wall(newPos)) continue;
 
         bool isDiagonal = (dRow != 0) && (dCol != 0);
-
-        if (isDiagonal)
-        {
+        if (isDiagonal) {
             GridPos adjacent1 = { pos.row, pos.col + dCol };
             GridPos adjacent2 = { pos.row + dRow, pos.col };
 
-            if (terrain->is_wall(adjacent1) || terrain->is_wall(adjacent2))
-            {
-                continue;
-            }
+            if (terrain->is_wall(adjacent1)) continue;
+            if (terrain->is_wall(adjacent2)) continue;
         }
 
-        neighbors.push_back(newPos);
+        // Add the valid neighbor
+        neighbors.positions[neighbors.count++] = newPos;
     }
-
-    return neighbors;
 }

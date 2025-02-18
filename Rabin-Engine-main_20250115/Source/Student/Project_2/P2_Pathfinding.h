@@ -2,13 +2,11 @@
 #include "Misc/PathfindingDetails.hpp"
 #include "../Terrain/Terrain.h"
 
-enum ListStatus 
-{ 
-    None, Open, Closed 
+enum ListStatus {
+    None, Open, Closed
 };
 
-struct Node
-{
+struct Node {
     Node* parent;
     GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
     float finalCost;    // f(x) = g(x) + h(x), total estimated cost
@@ -29,26 +27,23 @@ static const int8_t NEIGHBOR_OFFSETS[16] = {
    -1, -1    // up-left
 };
 
-class AStarPather
-{
-public:
-    /* 
-        The class should be default constructible, so you might need to define a constructor.
-        If needed, you can modify the framework where the class is constructed in the
-        initialize functions of ProjectTwo and ProjectThree.
-    */
+static const int MAX_NEIGHBORS = 8;
 
-    /* ************************************************** */
-    // DO NOT MODIFY THESE SIGNATURES
+struct Neighbors {
+    GridPos positions[MAX_NEIGHBORS];
+    int count = 0; // Number of valid neighbors
+};
+
+class AStarPather {
+public:
     AStarPather();
     bool initialize();
     void shutdown();
-    PathResult compute_path(PathRequest &request);
-
+    PathResult compute_path(PathRequest& request);
 
     void clear_nodes();
     float heuristic(const GridPos& a, const GridPos& b, PathRequest& request);
-    std::vector<GridPos> get_neighbors(const GridPos& pos);
+    const Neighbors& get_neighbors(const GridPos& pos);
     void reconstruct_path(Node* goalNode, std::vector<Vec3>& path);
     void apply_rubberbanding(std::vector<Vec3>& path);
     bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
@@ -61,18 +56,17 @@ public:
     Node* open_list_pop();
     void clear_open_list();
     void precompute_valid_neighbors();
-    std::vector<GridPos> compute_valid_neighbors(const GridPos& pos);
-    /* ************************************************** */
+    void compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors);
 
 private:
     static const int MAP_WIDTH = 40;
     static const int MAP_HEIGHT = 40;
+    // Maximum number of neighbors for any cell
 
     Node nodes[MAP_HEIGHT][MAP_WIDTH];  // 51200 bytes
-
+    Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; // Fixed-size array for neighbors
     std::vector<Node*> openList;  // 24 bytes (8-byte aligned)
     std::vector<Vec3> finalPath;
-    std::vector<GridPos> validNeighbors[MAP_HEIGHT][MAP_WIDTH];
     int lastIndex;                // 4 bytes (placing it here may reduce padding)
 
     GridPos start, goal;  // 16 bytes (8-byte aligned)
