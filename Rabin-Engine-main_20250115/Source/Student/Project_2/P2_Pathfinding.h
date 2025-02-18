@@ -32,12 +32,6 @@ static const int8_t NEIGHBOR_OFFSETS[16] = {
 class AStarPather
 {
 public:
-    /* 
-        The class should be default constructible, so you might need to define a constructor.
-        If needed, you can modify the framework where the class is constructed in the
-        initialize functions of ProjectTwo and ProjectThree.
-    */
-
     /* ************************************************** */
     // DO NOT MODIFY THESE SIGNATURES
     AStarPather();
@@ -59,7 +53,6 @@ public:
     // Open list operations
     void open_list_push(Node* node, PathRequest& request);
     Node* open_list_pop();
-    void open_list_update(Node* node);
     void clear_open_list();
     /* ************************************************** */
 

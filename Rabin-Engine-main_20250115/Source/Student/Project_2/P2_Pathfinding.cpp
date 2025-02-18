@@ -35,11 +35,6 @@ bool AStarPather::initialize()
 
 void AStarPather::shutdown()
 {
-    /*
-        Free any dynamically allocated memory or any other general house-
-        keeping you need to do during shutdown.
-    */
-
     clear_open_list();
 }
 
@@ -139,11 +134,6 @@ PathResult AStarPather::compute_path(PathRequest &request)
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
-                    else
-                    {
-                        // Update the node in the open list
-                        open_list_update(childNode);
-                    }
                 }
             }
         }
@@ -176,37 +166,34 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 
     float h = 0.0;
 
-    if (request.settings.heuristic == Heuristic::OCTILE)
+    switch (request.settings.heuristic)
     {
-        h = (std::min(dx, dy) * 1.414) + std::max(dx, dy) -  std::min(dx, dy);
-    }
-    else if (request.settings.heuristic == Heuristic::CHEBYSHEV)
-    {
-        h =  std::max(dx, dy);
-    }
-    else if (request.settings.heuristic == Heuristic::INCONSISTENT)
-    {
+    case Heuristic::OCTILE:
+        h = (std::min(dx, dy) * 1.414) + std::max(dx, dy) - std::min(dx, dy);
+        break;
+
+    case Heuristic::CHEBYSHEV:
+        h = std::max(dx, dy);
+        break;
+
+    case Heuristic::INCONSISTENT:
         if ((a.row + a.col) % 2 > 0)
-        {
             h = std::sqrt(dx * dx + dy * dy); // Euclidean distance for odd-sum coordinates
-        }
         else
-        {
             h = 0.0f; // Artificially setting heuristic to zero for even-sum coordinates
-        }
-    }
-    else if (request.settings.heuristic == Heuristic::MANHATTAN)
-    {
+        break;
+
+    case Heuristic::MANHATTAN:
         h = dx + dy;
-    }
-    else if (request.settings.heuristic == Heuristic::EUCLIDEAN)
-    {
+        break;
+
+    case Heuristic::EUCLIDEAN:
         h = std::sqrt(dx * dx + dy * dy);
-    }
-    else
-    {
-        //NUM_ENTRIES
-        h =  0.0f;
+        break;
+
+    default:
+        h = 0.0f;
+        break;
     }
 
     return h * request.settings.weight;
@@ -249,14 +236,11 @@ void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
     path.clear(); // Clear the path vector to ensure it's empty
     Node* current = goalNode;
 
-    // Traverse from the goal node to the start node
+    // Traverse from the goal node to the start node and insert elements at the beginning
     while (current) {
-        path.push_back(terrain->get_world_position(current->gridPos));
+        path.insert(path.begin(), terrain->get_world_position(current->gridPos));
         current = current->parent;
     }
-
-    // Reverse the path to get the correct order (start -> goal)
-    std::reverse(path.begin(), path.end());
 }
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
@@ -418,11 +402,6 @@ Node* AStarPather::open_list_pop()
     lastIndex--; // Decrement lastIndex
 
     return cheapestNode;
-}
-
-void AStarPather::open_list_update(Node* node)
-{
-    // No special handling needed for an unsorted open list
 }
 
 void AStarPather::clear_open_list()
