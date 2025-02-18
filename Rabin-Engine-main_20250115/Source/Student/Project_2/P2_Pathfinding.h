@@ -49,7 +49,7 @@ public:
     void clear_nodes();
     float heuristic(const GridPos& a, const GridPos& b, PathRequest& request);
     std::vector<GridPos> get_neighbors(const GridPos& pos);
-    std::vector<Vec3> reconstruct_path(Node* goalNode);
+    void reconstruct_path(Node* goalNode, std::vector<Vec3>& path);
     void apply_rubberbanding(std::vector<Vec3>& path);
     bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
     Vec3 catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t);
@@ -66,11 +66,12 @@ public:
 private:
     static const int MAP_WIDTH = 40;
     static const int MAP_HEIGHT = 40;
-    Node nodes[MAP_HEIGHT][MAP_WIDTH];
 
-    GridPos start;
-    GridPos goal;
+    Node nodes[MAP_HEIGHT][MAP_WIDTH];  // 51200 bytes
 
-    std::vector<Node*> openList;
-    int lastIndex;
+    std::vector<Node*> openList;  // 24 bytes (8-byte aligned)
+    std::vector<Vec3> finalPath;
+    int lastIndex;                // 4 bytes (placing it here may reduce padding)
+
+    GridPos start, goal;  // 16 bytes (8-byte aligned)
 };

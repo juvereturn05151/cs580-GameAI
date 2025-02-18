@@ -58,9 +58,11 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
-        terrain->set_color(start, Colors::Orange);
-        terrain->set_color(goal, Colors::Orange);
 
+        if (request.settings.debugColoring) {
+            terrain->set_color(start, Colors::Orange);
+            terrain->set_color(goal, Colors::Orange);
+        }
 
         Node* startNode = &nodes[start.row][start.col];
         startNode->givenCost = 0;
@@ -75,7 +77,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
 
         if (parentNode->gridPos == goal)
         {
-            std::vector<Vec3> finalPath = reconstruct_path(parentNode);
+            reconstruct_path(parentNode, finalPath);
             if (request.settings.rubberBanding)
             {
                 apply_rubberbanding(finalPath);
@@ -243,19 +245,18 @@ std::vector<GridPos> AStarPather::get_neighbors(const GridPos& pos)
 }
 
 
-std::vector<Vec3> AStarPather::reconstruct_path(Node* goalNode)
-{
-    std::vector<Vec3> path;
+void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
+    path.clear(); // Clear the path vector to ensure it's empty
     Node* current = goalNode;
 
-    while (current)
-    {
+    // Traverse from the goal node to the start node
+    while (current) {
         path.push_back(terrain->get_world_position(current->gridPos));
         current = current->parent;
     }
 
+    // Reverse the path to get the correct order (start -> goal)
     std::reverse(path.begin(), path.end());
-    return path;
 }
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
