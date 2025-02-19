@@ -277,11 +277,11 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
 
 Vec3 AStarPather::catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t)
 {
-    float t2 = t * t;
-    float t3 = t2 * t;
-
-    Vec3 a = (p1 * 2.0f) + (p2 - p0) * t + (p0 * 2.0f - p1 * 5.0f + p2 * 4.0f - p3) * t2 + (p1 * 3.0f - p0 - p2 * 3.0f + p3) * t3;
-    return a * 0.5f;
+    Vec3 outputPoint = p0 * (-0.5f * t * t * t + t * t - 0.5f * t) +
+                        p1 * (1.5f*t*t*t + -2.5 * t *t + 1.0f) +
+                        p2 * (-1.5f* t * t* t + 2.0*t*t + 0.5*t) +
+                        p3 * (0.5*t*t*t - 0.5*t*t);
+    return outputPoint;
 }
 
 void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
