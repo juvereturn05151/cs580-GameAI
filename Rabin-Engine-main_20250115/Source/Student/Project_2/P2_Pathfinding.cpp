@@ -89,7 +89,7 @@ PathResult AStarPather::compute_path(PathRequest &request)
             }
             if (request.settings.smoothing)
             {
-                add_intermediate_points(finalPath, 5.0f);
+                add_intermediate_points(finalPath, 1.5f);
                 apply_catmull_rom_smoothing(finalPath);
             }
 
@@ -304,10 +304,9 @@ void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
         Vec3 p3 = (i == n - 2) ? path[n - 1] : path[i + 2];
 
         // Add intermediate points
-        for (float t = 0.0f; t < 1.0f; t += 0.1f)
-        {
-            smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, t));
-        }
+        smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, 0.25));
+        smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, 0.5));
+        smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, 0.75));
     }
 
     // Add the last point
@@ -408,7 +407,7 @@ void AStarPather::precompute_valid_neighbors() {
 }
 
 void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors) {
-    neighbors.count = 0; // Reset the count
+    neighbors.count = 0; 
 
     for (int i = 0; i < 8; ++i) {
         int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
@@ -428,7 +427,6 @@ void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbo
             if (terrain->is_wall(adjacent2)) continue;
         }
 
-        // Add the valid neighbor
         neighbors.positions[neighbors.count++] = newPos;
     }
 }
