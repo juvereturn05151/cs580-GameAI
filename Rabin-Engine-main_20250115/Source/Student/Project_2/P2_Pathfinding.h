@@ -2,6 +2,8 @@
 #include "Misc/PathfindingDetails.hpp"
 #include "../Terrain/Terrain.h"
 
+#define INF 99999
+
 enum ListStatus {
     None, Open, Closed
 };
@@ -113,6 +115,10 @@ public:
     void clear_open_list();
     void precompute_valid_neighbors();
     void compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors);
+    
+    //floyd_warshall
+    void init_floyd_warshall();
+    void reconstruct_path_floyd_warshall(int startIdx, int goalIdx, std::vector<GridPos>& path);
 
 private:
     //maximum number of neighbors for any cell
@@ -125,4 +131,9 @@ private:
     std::vector<Vec3> finalPath;
 
     GridPos start, goal;
+
+    // Floyd-Warshall Distance and Next matrices
+    float dist[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
+    Node* next[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
+
 };

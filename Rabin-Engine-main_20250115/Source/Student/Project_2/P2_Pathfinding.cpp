@@ -115,6 +115,16 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
     if (request.newRequest)
     {
+        if (request.settings.method == Method::FLOYD_WARSHALL)
+        {
+        
+        }
+        else if (request.settings.method == Method::ASTAR)
+        {
+        
+        }
+
+
         request.path.clear();
         clear_nodes();
         clear_open_list();  // This now resets m_openList (bucket queue)
@@ -466,5 +476,55 @@ void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbo
         }
 
         neighbors.positions[neighbors.count++] = newPos;
+    }
+}
+
+void AStarPather::init_floyd_warshall()
+{
+    for (int i = 0; i < MAP_HEIGHT; ++i)
+    {
+        for (int j = 0; j < MAP_WIDTH; ++j)
+        {
+            for (int k = 0; k < MAP_HEIGHT; ++k)
+            {
+                for (int l = 0; l < MAP_WIDTH; ++l)
+                {
+                    if (i == k && j == l)
+                    {
+                        dist[i][j][k][l] = 0; // Distance to itself is 0.
+                        next[i][j][k][l] = nullptr; // No intermediate node.
+                    }
+                    else if (terrain->is_wall(i, j) || terrain->is_wall(k, l))
+                    {
+                        dist[i][j][k][l] = INF; // Walls are unreachable.
+                        next[i][j][k][l] = nullptr; // No next node.
+                    }
+                    else
+                    {
+                        dist[i][j][k][l] = std::sqrt(std::pow(i - k, 2) + std::pow(j - l, 2)); // Default distance using Euclidean.
+                        next[i][j][k][l] = &nodes[k][l]; // Default next node is the destination.
+                    }
+                }
+            }
+        }
+    }
+}
+
+void AStarPather::reconstruct_path_floyd_warshall(int startIdx, int goalIdx, std::vector<GridPos>& path)
+{
+    // Reconstruct the path using the next matrix.
+    if (next[startIdx][goalIdx][startIdx][goalIdx] == nullptr)
+    {
+        path.clear(); // No path.
+        return;
+    }
+
+    GridPos current = { startIdx, goalIdx };
+    path.push_back(current);
+
+    while (current != goal)
+    {
+        current = next[current.row][current.col][current.row][current.col];
+        path.push_back(current);
     }
 }
