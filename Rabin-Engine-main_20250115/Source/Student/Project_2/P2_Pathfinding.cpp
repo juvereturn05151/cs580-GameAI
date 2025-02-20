@@ -74,7 +74,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     Push(node);
 }
 
-AStarPather::AStarPather() : m_openList(600, 0.25f)
+AStarPather::AStarPather() : openList(600, 0.25f)
 {
     for (int row = 0; row < MAP_HEIGHT; ++row)
     {
@@ -134,7 +134,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
         open_list_push(startNode, request);  
     }
 
-    while (!m_openList.Empty())
+    while (!openList.Empty())
     {
         Node* parentNode = open_list_pop();  
 
@@ -147,7 +147,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
             }
             if (request.settings.smoothing)
             {
-                add_intermediate_points(finalPath, 1.5f);
+                add_intermediate_points(finalPath);
                 apply_catmull_rom_smoothing(finalPath);
             }
 
@@ -200,7 +200,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
                     if (childNode->onList == ListStatus::Open)
                     {
                         //the node is already in the open list; update its bucket location.
-                        m_openList.DecreaseKey(childNode, old_f);
+                        openList.DecreaseKey(childNode, old_f);
                     }
                     else if (childNode->onList == ListStatus::Closed)
                     {
@@ -349,16 +349,17 @@ Vec3 AStarPather::catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const 
 
 void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
 {
-    if (path.size() < 3) // No need to process if the path is too short
+    //no need to process if the path is too short
+    if (path.size() < 3) 
         return;
 
     std::vector<Vec3> smoothedPath;
     int n = path.size();
 
-    // Add the first point
+    //add the first point
     smoothedPath.push_back(path[0]);
 
-    // Iterate through the path and apply Catmull-Rom interpolation
+    //iterate through the path and apply Catmull-Rom interpolation
     for (int i = 0; i < n - 1; ++i)
     {
         Vec3 p0 = (i == 0) ? path[0] : path[i - 1];
@@ -366,20 +367,20 @@ void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
         Vec3 p2 = path[i + 1];
         Vec3 p3 = (i == n - 2) ? path[n - 1] : path[i + 2];
 
-        // Add intermediate points
+        //add intermediate points
         smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, 0.25));
         smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, 0.5));
         smoothedPath.push_back(catmull_rom_interpolate(p0, p1, p2, p3, 0.75));
     }
 
-    // Add the last point
+    //add the last point
     smoothedPath.push_back(path[n - 1]);
 
-    // Replace the original path with the smoothed path
+    //replace the original path with the smoothed path
     path = smoothedPath;
 }
 
-void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDistance)
+void AStarPather::add_intermediate_points(std::vector<Vec3>& path)
 {
     //no need to process if the path is too short
     if (path.size() < 2) 
@@ -396,16 +397,16 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDist
 
         float distance = (currentPoint - prevPoint).Length();
 
-        if (distance > maxDistance)
+        if (distance > 1.5f)
         {
             //calculate the direction vector
             Vec3 direction = (currentPoint - prevPoint) / distance;
 
             //add intermediate points spaced by maxDistance
-            int numPoints = static_cast<int>(distance / maxDistance);
+            int numPoints = static_cast<int>(distance / 1.5f);
             for (int j = 1; j <= numPoints; ++j)
             {
-                Vec3 intermediatePoint = prevPoint + direction * (maxDistance * j);
+                Vec3 intermediatePoint = prevPoint + direction * (1.5f * j);
                 newPath.push_back(intermediatePoint);
             }
         }
@@ -421,17 +422,17 @@ void AStarPather::open_list_push(Node* node, PathRequest& request)
     if (request.settings.debugColoring) {
         terrain->set_color(node->gridPos, Colors::Blue);
     }
-    m_openList.Push(node);
+    openList.Push(node);
 }
 
 Node* AStarPather::open_list_pop()
 {
-    return m_openList.Pop();
+    return openList.Pop();
 }
 
 void AStarPather::clear_open_list()
 {
-    m_openList.Reset();
+    openList.Reset();
 }
 
 void AStarPather::precompute_valid_neighbors() {

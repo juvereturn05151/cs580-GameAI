@@ -105,7 +105,7 @@ public:
     bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
     Vec3 catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t);
     void apply_catmull_rom_smoothing(std::vector<Vec3>& path);
-    void add_intermediate_points(std::vector<Vec3>& path, float maxDistance);
+    void add_intermediate_points(std::vector<Vec3>& path);
 
     //open list operations
     void open_list_push(Node* node, PathRequest& request);
@@ -121,7 +121,7 @@ private:
 
     Node nodes[MAP_HEIGHT][MAP_WIDTH];  
     Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; 
-    BucketPriorityQueue m_openList;
+    BucketPriorityQueue openList;
     std::vector<Vec3> finalPath;
 
     GridPos start, goal;
