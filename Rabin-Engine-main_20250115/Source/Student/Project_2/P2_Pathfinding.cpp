@@ -5,7 +5,7 @@
 #pragma region Extra Credit 
 bool ProjectTwo::implemented_floyd_warshall()
 {
-    return false;
+    return true;
 }
 
 bool ProjectTwo::implemented_goal_bounding()
@@ -92,6 +92,8 @@ bool AStarPather::initialize()
     Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
     Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
 
+    cb = std::bind(&AStarPather::init_floyd_warshall, this);
+    Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
 
     return true;
 }
@@ -115,33 +117,40 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
     if (request.newRequest)
     {
-        if (request.settings.method == Method::FLOYD_WARSHALL)
-        {
-        
-        }
-        else if (request.settings.method == Method::ASTAR)
-        {
-        
-        }
-
-
         request.path.clear();
         clear_nodes();
-        clear_open_list();  // This now resets m_openList (bucket queue)
+        clear_open_list();
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
+
+        if (request.settings.method == Method::FLOYD_WARSHALL) {
+            std::vector<GridPos> path = reconstruct_floyd_warshall_path(start, goal);
+
+            if (path.empty()) {
+                return PathResult::IMPOSSIBLE;
+            }
+
+            for (const auto& pos : path) {
+                request.path.push_back(terrain->get_world_position(pos));
+            }
+
+            return PathResult::COMPLETE;
+        }
+        else if (request.settings.method == Method::ASTAR) {
+            Node* startNode = &nodes[start.row][start.col];
+            startNode->givenCost = 0;
+            startNode->finalCost = heuristic(start, goal, request);
+            startNode->onList = ListStatus::Open;
+            open_list_push(startNode, request);
+        }
 
         if (request.settings.debugColoring) {
             terrain->set_color(start, Colors::Orange);
             terrain->set_color(goal, Colors::Orange);
         }
 
-        Node* startNode = &nodes[start.row][start.col];
-        startNode->givenCost = 0;
-        startNode->finalCost = heuristic(start, goal, request);
-        startNode->onList = ListStatus::Open;
-        open_list_push(startNode, request);  
+
     }
 
     while (!openList.Empty())
@@ -479,30 +488,58 @@ void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbo
     }
 }
 
-void AStarPather::init_floyd_warshall()
-{
-    for (int i = 0; i < MAP_HEIGHT; ++i)
-    {
-        for (int j = 0; j < MAP_WIDTH; ++j)
-        {
-            for (int k = 0; k < MAP_HEIGHT; ++k)
-            {
-                for (int l = 0; l < MAP_WIDTH; ++l)
-                {
-                    if (i == k && j == l)
-                    {
-                        dist[i][j][k][l] = 0; // Distance to itself is 0.
-                        next[i][j][k][l] = nullptr; // No intermediate node.
+void AStarPather::init_floyd_warshall() {
+    // Initialize distances and next nodes
+    for (int i = 0; i < MAP_HEIGHT; ++i) {
+        for (int j = 0; j < MAP_WIDTH; ++j) {
+            for (int k = 0; k < MAP_HEIGHT; ++k) {
+                for (int l = 0; l < MAP_WIDTH; ++l) {
+                    if (i == k && j == l) {
+                        fwDistances[i][j][k][l] = 0; // Distance to self is 0
                     }
-                    else if (terrain->is_wall(i, j) || terrain->is_wall(k, l))
-                    {
-                        dist[i][j][k][l] = INF; // Walls are unreachable.
-                        next[i][j][k][l] = nullptr; // No next node.
+                    else {
+                        fwDistances[i][j][k][l] = std::numeric_limits<float>::infinity(); // Initialize to infinity
                     }
-                    else
-                    {
-                        dist[i][j][k][l] = std::sqrt(std::pow(i - k, 2) + std::pow(j - l, 2)); // Default distance using Euclidean.
-                        next[i][j][k][l] = &nodes[k][l]; // Default next node is the destination.
+                    fwNext[i][j][k][l] = { -1, -1 }; // No next node initially
+                }
+            }
+        }
+    }
+
+    // Set distances for direct neighbors
+    for (int i = 0; i < MAP_HEIGHT; ++i) {
+        for (int j = 0; j < MAP_WIDTH; ++j) {
+            if (terrain->is_wall(i, j)) continue; // Skip walls
+
+            Neighbors neighbors = get_neighbors({ i, j });
+            for (int n = 0; n < neighbors.count; ++n) {
+                GridPos neighbor = neighbors.positions[n];
+                float cost = (neighbor.row != i && neighbor.col != j) ? 1.414f : 1.0f; // Diagonal cost is sqrt(2)
+                fwDistances[i][j][neighbor.row][neighbor.col] = cost;
+                fwNext[i][j][neighbor.row][neighbor.col] = neighbor;
+            }
+        }
+    }
+
+    // Floyd-Warshall algorithm
+    for (int kRow = 0; kRow < MAP_HEIGHT; ++kRow) {
+        for (int kCol = 0; kCol < MAP_WIDTH; ++kCol) {
+            if (terrain->is_wall(kRow, kCol)) continue; // Skip walls
+
+            for (int iRow = 0; iRow < MAP_HEIGHT; ++iRow) {
+                for (int iCol = 0; iCol < MAP_WIDTH; ++iCol) {
+                    if (terrain->is_wall(iRow, iCol)) continue; // Skip walls
+
+                    for (int jRow = 0; jRow < MAP_HEIGHT; ++jRow) {
+                        for (int jCol = 0; jCol < MAP_WIDTH; ++jCol) {
+                            if (terrain->is_wall(jRow, jCol)) continue; // Skip walls
+
+                            float throughK = fwDistances[iRow][iCol][kRow][kCol] + fwDistances[kRow][kCol][jRow][jCol];
+                            if (throughK < fwDistances[iRow][iCol][jRow][jCol]) {
+                                fwDistances[iRow][iCol][jRow][jCol] = throughK;
+                                fwNext[iRow][iCol][jRow][jCol] = fwNext[iRow][iCol][kRow][kCol];
+                            }
+                        }
                     }
                 }
             }
@@ -510,21 +547,19 @@ void AStarPather::init_floyd_warshall()
     }
 }
 
-void AStarPather::reconstruct_path_floyd_warshall(int startIdx, int goalIdx, std::vector<GridPos>& path)
-{
-    // Reconstruct the path using the next matrix.
-    if (next[startIdx][goalIdx][startIdx][goalIdx] == nullptr)
-    {
-        path.clear(); // No path.
-        return;
+std::vector<GridPos> AStarPather::reconstruct_floyd_warshall_path(const GridPos& start, const GridPos& goal) {
+    std::vector<GridPos> path;
+
+    if (fwNext[start.row][start.col][goal.row][goal.col].row == -1) {
+        return path; // No path exists
     }
 
-    GridPos current = { startIdx, goalIdx };
-    path.push_back(current);
-
-    while (current != goal)
-    {
-        current = next[current.row][current.col][current.row][current.col];
+    GridPos current = start;
+    while (current != goal) {
         path.push_back(current);
+        current = fwNext[current.row][current.col][goal.row][goal.col];
     }
+    path.push_back(goal);
+
+    return path;
 }

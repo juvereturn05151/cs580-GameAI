@@ -118,7 +118,7 @@ public:
     
     //floyd_warshall
     void init_floyd_warshall();
-    void reconstruct_path_floyd_warshall(int startIdx, int goalIdx, std::vector<GridPos>& path);
+    std::vector<GridPos> reconstruct_floyd_warshall_path(const GridPos& start, const GridPos& goal);
 
 private:
     //maximum number of neighbors for any cell
@@ -133,7 +133,7 @@ private:
     GridPos start, goal;
 
     // Floyd-Warshall Distance and Next matrices
-    float dist[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
-    Node* next[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
+    float fwDistances[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
+    GridPos fwNext[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
 
 };
