@@ -50,13 +50,13 @@ public:
         for (auto& bucket : buckets) {
             bucket.clear();
         }
-        m_numNodesTracked = 0;
+        numNodesTracked = 0;
         lowestNonEmptyBin = numBuckets;
         baseCost = 0.0f;
     }
 
     //returns true if there are no nodes in any bucket.
-    inline bool Empty() const { return m_numNodesTracked == 0; }
+    inline bool Empty() const { return numNodesTracked == 0; }
 
     //inserts a node into the appropriate bucket based on node->finalCost.
     void Push(Node* node);
@@ -73,7 +73,7 @@ private:
     //index of the lowest bucket that is not empty.
     int lowestNonEmptyBin;  
     //total number of nodes in the queue.
-    int m_numNodesTracked;    
+    int numNodesTracked;    
     //cost range covered per bucket.
     float division;   
     //base cost offset.

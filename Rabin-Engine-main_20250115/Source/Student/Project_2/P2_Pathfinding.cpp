@@ -19,7 +19,7 @@ BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
     division(division),
     baseCost(0.0f),
     lowestNonEmptyBin(numBuckets),
-    m_numNodesTracked(0)
+    numNodesTracked(0)
 {
     //resize the bucket vector so that we have numBuckets buckets.
     buckets.resize(numBuckets);
@@ -32,7 +32,7 @@ BucketPriorityQueue::~BucketPriorityQueue() {
 void BucketPriorityQueue::Push(Node* node) {
     int index = GetBinIndex(node->finalCost);
     buckets[index].push_back(node);
-    m_numNodesTracked++;
+    numNodesTracked++;
     if (index < lowestNonEmptyBin) {
         lowestNonEmptyBin = index;
     }
@@ -54,7 +54,7 @@ Node* BucketPriorityQueue::Pop() {
     //remove a node from the back of the bucket.
     Node* node = buckets[lowestNonEmptyBin].back();
     buckets[lowestNonEmptyBin].pop_back();
-    m_numNodesTracked--;
+    numNodesTracked--;
     return node;
 }
 
@@ -66,7 +66,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     for (auto it = bucket.begin(); it != bucket.end(); ++it) {
         if (*it == node) {
             bucket.erase(it);
-            m_numNodesTracked--;
+            numNodesTracked--;
             break;
         }
     }
