@@ -103,7 +103,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     Push(node);
 }
 
-AStarPather::AStarPather() : m_openList(600, 0.5f)
+AStarPather::AStarPather() : m_openList(600, 0.25f)
 {
     for (int row = 0; row < MAP_HEIGHT; ++row)
     {
