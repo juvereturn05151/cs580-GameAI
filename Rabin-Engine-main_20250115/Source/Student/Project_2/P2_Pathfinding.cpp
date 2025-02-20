@@ -38,7 +38,9 @@ void BucketPriorityQueue::Push(Node* node) {
     }
 }
 
+//Since it is not working much better than optimized unsorted array, I'm going back to use unsorted array
 Node* BucketPriorityQueue::Pop() {
+    //Faster Version
     if (Empty()) {
         return nullptr;
     }
@@ -49,21 +51,40 @@ Node* BucketPriorityQueue::Pop() {
     if (m_lowestNonEmptyBin >= m_numBuckets) {
         return nullptr;
     }
-    // Scan the bucket to find the node with the lowest finalCost.
-    auto& bucket = m_buckets[m_lowestNonEmptyBin];
-    int bestIndex = 0;
-    float bestCost = bucket[0]->finalCost;
-    for (size_t i = 1; i < bucket.size(); ++i) {
-        if (bucket[i]->finalCost < bestCost) {
-            bestCost = bucket[i]->finalCost;
-            bestIndex = i;
-        }
-    }
-    Node* bestNode = bucket[bestIndex];
-    // Remove the best node from the bucket.
-    bucket.erase(bucket.begin() + bestIndex);
+    // Remove a node from the back of the bucket.
+    Node* node = m_buckets[m_lowestNonEmptyBin].back();
+    m_buckets[m_lowestNonEmptyBin].pop_back();
     m_numNodesTracked--;
-    return bestNode;
+    return node;
+
+
+
+    //Working Version
+    //if (Empty()) {
+    //    return nullptr;
+    //}
+    //// Make sure m_lowestNonEmptyBin points to a non-empty bucket.
+    //while (m_lowestNonEmptyBin < m_numBuckets && m_buckets[m_lowestNonEmptyBin].empty()) {
+    //    m_lowestNonEmptyBin++;
+    //}
+    //if (m_lowestNonEmptyBin >= m_numBuckets) {
+    //    return nullptr;
+    //}
+    //// Scan the bucket to find the node with the lowest finalCost.
+    //auto& bucket = m_buckets[m_lowestNonEmptyBin];
+    //int bestIndex = 0;
+    //float bestCost = bucket[0]->finalCost;
+    //for (size_t i = 1; i < bucket.size(); ++i) {
+    //    if (bucket[i]->finalCost < bestCost) {
+    //        bestCost = bucket[i]->finalCost;
+    //        bestIndex = i;
+    //    }
+    //}
+    //Node* bestNode = bucket[bestIndex];
+    //// Remove the best node from the bucket.
+    //bucket.erase(bucket.begin() + bestIndex);
+    //m_numNodesTracked--;
+    //return bestNode;
 }
 
 
