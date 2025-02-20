@@ -120,6 +120,9 @@ public:
     void init_floyd_warshall();
     std::vector<GridPos> reconstruct_floyd_warshall_path(const GridPos& start, const GridPos& goal);
 
+    //goalbounding
+    void compute_goal_bounding_boxes();
+
 private:
     //maximum number of neighbors for any cell
     static const int MAP_WIDTH = 40;
@@ -135,5 +138,14 @@ private:
     // Floyd-Warshall Distance and Next matrices
     float fwDistances[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
     GridPos fwNext[MAP_HEIGHT][MAP_WIDTH][MAP_HEIGHT][MAP_WIDTH];
+
+    //Goalbounding
+    struct BoundingBox 
+    {
+        int minRow, maxRow;
+        int minCol, maxCol;
+    };
+
+    BoundingBox goalBounds[MAP_HEIGHT][MAP_WIDTH];
 
 };

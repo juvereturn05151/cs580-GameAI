@@ -5,12 +5,12 @@
 #pragma region Extra Credit 
 bool ProjectTwo::implemented_floyd_warshall()
 {
-    return true;
+    return false;
 }
 
 bool ProjectTwo::implemented_goal_bounding()
 {
-    return false;
+    return true;
 }
 #pragma endregion
 
@@ -92,7 +92,10 @@ bool AStarPather::initialize()
     Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
     Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
 
-    cb = std::bind(&AStarPather::init_floyd_warshall, this);
+    //cb = std::bind(&AStarPather::init_floyd_warshall, this);
+    //Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
+
+    cb = std::bind(&AStarPather::compute_goal_bounding_boxes, this);
     Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
 
     return true;
@@ -124,7 +127,26 @@ PathResult AStarPather::compute_path(PathRequest& request)
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
 
-        if (request.settings.method == Method::FLOYD_WARSHALL) {
+        if (request.settings.method == Method::GOAL_BOUNDING) 
+        {
+            // Check if the goal is within the bounding box of the start node
+            if (goal.row < goalBounds[start.row][start.col].minRow ||
+                goal.row > goalBounds[start.row][start.col].maxRow ||
+                goal.col < goalBounds[start.row][start.col].minCol ||
+                goal.col > goalBounds[start.row][start.col].maxCol) 
+            {
+                return PathResult::IMPOSSIBLE; // Goal is unreachable
+            }
+
+            // Use A* with Goal Bounding pruning
+            Node* startNode = &nodes[start.row][start.col];
+            startNode->givenCost = 0;
+            startNode->finalCost = heuristic(start, goal, request);
+            startNode->onList = ListStatus::Open;
+            open_list_push(startNode, request);
+        }
+        else if (request.settings.method == Method::FLOYD_WARSHALL) 
+        {
             std::vector<GridPos> path = reconstruct_floyd_warshall_path(start, goal);
 
             if (path.empty()) {
@@ -189,6 +211,16 @@ PathResult AStarPather::compute_path(PathRequest& request)
             if (terrain->is_wall(neighbor))
             {
                 continue; 
+            }
+
+            // Goal Bounding pruning
+            if (request.settings.method == Method::GOAL_BOUNDING) {
+                if (neighbor.row < goalBounds[parentNode->gridPos.row][parentNode->gridPos.col].minRow ||
+                    neighbor.row > goalBounds[parentNode->gridPos.row][parentNode->gridPos.col].maxRow ||
+                    neighbor.col < goalBounds[parentNode->gridPos.row][parentNode->gridPos.col].minCol ||
+                    neighbor.col > goalBounds[parentNode->gridPos.row][parentNode->gridPos.col].maxCol) {
+                    continue; // Skip nodes outside the bounding box
+                }
             }
 
             Node* childNode = &nodes[neighbor.row][neighbor.col];
@@ -562,4 +594,53 @@ std::vector<GridPos> AStarPather::reconstruct_floyd_warshall_path(const GridPos&
     path.push_back(goal);
 
     return path;
+}
+
+void AStarPather::compute_goal_bounding_boxes() {
+    //init bounding boxes
+    for (int i = 0; i < MAP_HEIGHT; ++i) 
+    {
+        for (int j = 0; j < MAP_WIDTH; ++j) 
+        {
+            //init to invalid values
+            goalBounds[i][j] = { MAP_HEIGHT, 0, MAP_WIDTH, 0 }; 
+        }
+    }
+
+    //use BFS to compute bounding boxes
+    for (int i = 0; i < MAP_HEIGHT; ++i) 
+    {
+        for (int j = 0; j < MAP_WIDTH; ++j) 
+        {
+            if (terrain->is_wall(i, j)) continue; 
+
+            std::queue<GridPos> queue;
+            queue.push({ i, j });
+
+            while (!queue.empty()) {
+                GridPos current = queue.front();
+                queue.pop();
+
+                //update bounding box for the current node
+                goalBounds[i][j].minRow = std::min(goalBounds[i][j].minRow, current.row);
+                goalBounds[i][j].maxRow = std::max(goalBounds[i][j].maxRow, current.row);
+                goalBounds[i][j].minCol = std::min(goalBounds[i][j].minCol, current.col);
+                goalBounds[i][j].maxCol = std::max(goalBounds[i][j].maxCol, current.col);
+
+                //explore neighbors
+                Neighbors neighbors = get_neighbors(current);
+                for (int n = 0; n < neighbors.count; ++n) {
+                    GridPos neighbor = neighbors.positions[n];
+                    //already within the bounding box
+                    if (goalBounds[i][j].minRow <= neighbor.row && neighbor.row <= goalBounds[i][j].maxRow &&
+                        goalBounds[i][j].minCol <= neighbor.col && neighbor.col <= goalBounds[i][j].maxCol) 
+                    {
+                        continue; 
+                    }
+
+                    queue.push(neighbor);
+                }
+            }
+        }
+    }
 }
