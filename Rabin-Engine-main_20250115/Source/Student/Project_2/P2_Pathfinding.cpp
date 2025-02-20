@@ -14,7 +14,64 @@ bool ProjectTwo::implemented_goal_bounding()
 }
 #pragma endregion
 
-AStarPather::AStarPather()
+BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
+    : m_numBuckets(numBuckets),
+    m_division(division),
+    m_baseCost(0.0f),
+    m_lowestNonEmptyBin(numBuckets),
+    m_numNodesTracked(0)
+{
+    // Resize the bucket vector so that we have numBuckets buckets.
+    m_buckets.resize(m_numBuckets);
+}
+
+BucketPriorityQueue::~BucketPriorityQueue() {
+    // Nothing to do because std::vector cleans up automatically.
+}
+
+void BucketPriorityQueue::Push(Node* node) {
+    int index = GetBinIndex(node->finalCost);
+    m_buckets[index].push_back(node);
+    m_numNodesTracked++;
+    if (index < m_lowestNonEmptyBin) {
+        m_lowestNonEmptyBin = index;
+    }
+}
+
+Node* BucketPriorityQueue::Pop() {
+    if (Empty()) {
+        return nullptr;
+    }
+    // Make sure m_lowestNonEmptyBin points to a non-empty bucket.
+    while (m_lowestNonEmptyBin < m_numBuckets && m_buckets[m_lowestNonEmptyBin].empty()) {
+        m_lowestNonEmptyBin++;
+    }
+    if (m_lowestNonEmptyBin >= m_numBuckets) {
+        return nullptr;
+    }
+    // Remove a node from the back of the bucket.
+    Node* node = m_buckets[m_lowestNonEmptyBin].back();
+    m_buckets[m_lowestNonEmptyBin].pop_back();
+    m_numNodesTracked--;
+    return node;
+}
+
+void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
+    // Find the bucket corresponding to the old cost.
+    int oldIndex = GetBinIndex(oldCost);
+    auto& bucket = m_buckets[oldIndex];
+    for (auto it = bucket.begin(); it != bucket.end(); ++it) {
+        if (*it == node) {
+            bucket.erase(it);
+            m_numNodesTracked--;
+            break;
+        }
+    }
+    // Reinsert the node with its updated cost.
+    Push(node);
+}
+
+AStarPather::AStarPather() : m_openList(600, 0.5f)
 {
     for (int row = 0; row < MAP_HEIGHT; ++row)
     {
@@ -27,9 +84,10 @@ AStarPather::AStarPather()
 
 bool AStarPather::initialize()
 {
-    openList.clear(); // Clear the open list
-    openList.reserve(1600); // Preallocate 1600 slots
-    lastIndex = -1; // No elements in the open list initially
+    //openList.clear(); // Clear the open list
+    //openList.reserve(1600); // Preallocate 1600 slots
+    //lastIndex = -1; // No elements in the open list initially
+    clear_open_list();
 
     Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
     Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
@@ -48,18 +106,18 @@ void AStarPather::shutdown()
     clear_open_list();
 }
 
-PathResult AStarPather::compute_path(PathRequest &request)
+PathResult AStarPather::compute_path(PathRequest& request)
 {
     if (!terrain)
     {
         return PathResult::IMPOSSIBLE;
     }
 
-    if (request.newRequest) 
+    if (request.newRequest)
     {
         request.path.clear();
         clear_nodes();
-        clear_open_list();
+        clear_open_list();  // This now resets m_openList (bucket queue)
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
@@ -73,12 +131,12 @@ PathResult AStarPather::compute_path(PathRequest &request)
         startNode->givenCost = 0;
         startNode->finalCost = heuristic(start, goal, request);
         startNode->onList = ListStatus::Open;
-        open_list_push(startNode, request);
+        open_list_push(startNode, request);  // Uses m_openList.Push()
     }
 
-    while (lastIndex >= 0)
+    while (!m_openList.Empty())
     {
-        Node* parentNode = open_list_pop();
+        Node* parentNode = open_list_pop();  // Uses m_openList.Pop()
 
         if (parentNode->gridPos == goal)
         {
@@ -117,12 +175,12 @@ PathResult AStarPather::compute_path(PathRequest &request)
             Node* childNode = &nodes[neighbor.row][neighbor.col];
 
             float cost = (neighbor.row != parentNode->gridPos.row && neighbor.col != parentNode->gridPos.col) ? 1.414f : 1.0f;
-            float new_g = parentNode->givenCost + cost; // Assuming uniform cost
+            float new_g = parentNode->givenCost + cost;
             float new_f = new_g + heuristic(neighbor, goal, request);
 
             if (childNode->onList == ListStatus::None)
             {
-                // If child node isn’t on Open or Closed list, put it on Open List
+                // Node not yet encountered; add it to the open list.
                 childNode->parent = parentNode;
                 childNode->givenCost = new_g;
                 childNode->finalCost = new_f;
@@ -131,17 +189,21 @@ PathResult AStarPather::compute_path(PathRequest &request)
             }
             else if (childNode->onList == ListStatus::Open || childNode->onList == ListStatus::Closed)
             {
-                // If child node is on Open or Closed List, AND this new one is cheaper,
-                // then update the node
                 if (new_g < childNode->givenCost)
                 {
+                    float old_f = childNode->finalCost; // Store previous final cost.
                     childNode->parent = parentNode;
                     childNode->givenCost = new_g;
                     childNode->finalCost = new_f;
 
-                    if (childNode->onList == ListStatus::Closed)
+                    if (childNode->onList == ListStatus::Open)
                     {
-                        // Reopen the node if it was closed
+                        // The node is already in the open list; update its bucket location.
+                        m_openList.DecreaseKey(childNode, old_f);
+                    }
+                    else if (childNode->onList == ListStatus::Closed)
+                    {
+                        // If the node was closed, reopen it.
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
@@ -150,11 +212,12 @@ PathResult AStarPather::compute_path(PathRequest &request)
         }
 
         if (request.settings.singleStep)
-            return PathResult::PROCESSING; 
+            return PathResult::PROCESSING;
     }
 
     return PathResult::IMPOSSIBLE;
 }
+
 
 void AStarPather::clear_nodes()
 {
@@ -356,45 +419,17 @@ void AStarPather::open_list_push(Node* node, PathRequest& request)
     if (request.settings.debugColoring) {
         terrain->set_color(node->gridPos, Colors::Blue);
     }
-
-    // Increment lastIndex and add the node to the open list
-    lastIndex++;
-    if (lastIndex < openList.size()) {
-        openList[lastIndex] = node; // Overwrite existing slot
-    }
-    else {
-        openList.push_back(node); // Add new slot
-    }
+    m_openList.Push(node);
 }
 
 Node* AStarPather::open_list_pop()
 {
-    if (lastIndex < 0) {
-        return nullptr; // No nodes in the open list
-    }
-
-    // Find the node with the smallest finalCost
-    int cheapestIndex = 0;
-    float cheapestCost = openList[0]->finalCost;
-    for (int i = 1; i <= lastIndex; ++i) {
-        if (openList[i]->finalCost < cheapestCost) {
-            cheapestCost = openList[i]->finalCost;
-            cheapestIndex = i;
-        }
-    }
-
-    // Replace the cheapest node with the last node
-    Node* cheapestNode = openList[cheapestIndex];
-    openList[cheapestIndex] = openList[lastIndex];
-    lastIndex--; // Decrement lastIndex
-
-    return cheapestNode;
+    return m_openList.Pop();
 }
 
 void AStarPather::clear_open_list()
 {
-    openList.clear();
-    lastIndex = -1;
+    m_openList.Reset();
 }
 
 void AStarPather::precompute_valid_neighbors() {

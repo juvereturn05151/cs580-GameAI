@@ -34,6 +34,57 @@ struct Neighbors {
     int count = 0; // Number of valid neighbors
 };
 
+class BucketPriorityQueue {
+public:
+    // numBuckets: number of buckets (should be small)
+    // division: the cost range covered per bucket (choose so that all f_costs fall into one of these few buckets)
+    BucketPriorityQueue(int numBuckets, float division);
+    ~BucketPriorityQueue();
+
+    // Set the base cost (optional, default is zero)
+    inline void SetBaseCost(float baseCost) { m_baseCost = baseCost; }
+
+    // Reset clears all buckets and resets bookkeeping.
+    inline void Reset() {
+        for (auto& bucket : m_buckets) {
+            bucket.clear();
+        }
+        m_numNodesTracked = 0;
+        m_lowestNonEmptyBin = m_numBuckets;
+        m_baseCost = 0.0f;
+    }
+
+    // Returns true if there are no nodes in any bucket.
+    inline bool Empty() const { return m_numNodesTracked == 0; }
+
+    // Inserts a node into the appropriate bucket based on node->finalCost.
+    void Push(Node* node);
+
+    // Pops and returns a node from the lowest non-empty bucket.
+    Node* Pop();
+
+    // Removes a node from its old bucket (based on oldCost) and reinserts it.
+    void DecreaseKey(Node* node, float oldCost);
+
+private:
+    int m_numBuckets;         // Total number of buckets.
+    int m_lowestNonEmptyBin;  // Index of the lowest bucket that is not empty.
+    int m_numNodesTracked;    // Total number of nodes in the queue.
+    float m_division;         // Cost range covered per bucket.
+    float m_baseCost;         // Base cost offset.
+
+    // The buckets – each bucket is a vector of Node pointers.
+    std::vector<std::vector<Node*>> m_buckets;
+
+    // Computes the bucket index for a given cost.
+    inline int GetBinIndex(float cost) const {
+        int index = static_cast<int>((cost - m_baseCost) / m_division);
+        if (index < 0) index = 0;
+        if (index >= m_numBuckets) index = m_numBuckets - 1;
+        return index;
+    }
+};
+
 class AStarPather {
 public:
     AStarPather();
@@ -65,9 +116,8 @@ private:
 
     Node nodes[MAP_HEIGHT][MAP_WIDTH];  // 51200 bytes
     Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; // Fixed-size array for neighbors
-    std::vector<Node*> openList;  // 24 bytes (8-byte aligned)
+    BucketPriorityQueue m_openList;
     std::vector<Vec3> finalPath;
-    int lastIndex;                // 4 bytes (placing it here may reduce padding)
 
     GridPos start, goal;  // 16 bytes (8-byte aligned)
 };
