@@ -49,12 +49,23 @@ Node* BucketPriorityQueue::Pop() {
     if (m_lowestNonEmptyBin >= m_numBuckets) {
         return nullptr;
     }
-    // Remove a node from the back of the bucket.
-    Node* node = m_buckets[m_lowestNonEmptyBin].back();
-    m_buckets[m_lowestNonEmptyBin].pop_back();
+    // Scan the bucket to find the node with the lowest finalCost.
+    auto& bucket = m_buckets[m_lowestNonEmptyBin];
+    int bestIndex = 0;
+    float bestCost = bucket[0]->finalCost;
+    for (size_t i = 1; i < bucket.size(); ++i) {
+        if (bucket[i]->finalCost < bestCost) {
+            bestCost = bucket[i]->finalCost;
+            bestIndex = i;
+        }
+    }
+    Node* bestNode = bucket[bestIndex];
+    // Remove the best node from the bucket.
+    bucket.erase(bucket.begin() + bestIndex);
     m_numNodesTracked--;
-    return node;
+    return bestNode;
 }
+
 
 void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     // Find the bucket corresponding to the old cost.
