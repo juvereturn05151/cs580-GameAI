@@ -15,54 +15,54 @@ bool ProjectTwo::implemented_goal_bounding()
 #pragma endregion
 
 BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
-    : m_numBuckets(numBuckets),
-    m_division(division),
-    m_baseCost(0.0f),
-    m_lowestNonEmptyBin(numBuckets),
+    : numBuckets(numBuckets),
+    division(division),
+    baseCost(0.0f),
+    lowestNonEmptyBin(numBuckets),
     m_numNodesTracked(0)
 {
-    // Resize the bucket vector so that we have numBuckets buckets.
-    m_buckets.resize(m_numBuckets);
+    //resize the bucket vector so that we have numBuckets buckets.
+    buckets.resize(numBuckets);
 }
 
 BucketPriorityQueue::~BucketPriorityQueue() {
-    // Nothing to do because std::vector cleans up automatically.
+    //nothing to do because std::vector cleans up automatically.
 }
 
 void BucketPriorityQueue::Push(Node* node) {
     int index = GetBinIndex(node->finalCost);
-    m_buckets[index].push_back(node);
+    buckets[index].push_back(node);
     m_numNodesTracked++;
-    if (index < m_lowestNonEmptyBin) {
-        m_lowestNonEmptyBin = index;
+    if (index < lowestNonEmptyBin) {
+        lowestNonEmptyBin = index;
     }
 }
 
-//Since it is not working much better than optimized unsorted array, I'm going back to use unsorted array
 Node* BucketPriorityQueue::Pop() {
-    //Faster Version
     if (Empty()) {
         return nullptr;
     }
-    // Make sure m_lowestNonEmptyBin points to a non-empty bucket.
-    while (m_lowestNonEmptyBin < m_numBuckets && m_buckets[m_lowestNonEmptyBin].empty()) {
-        m_lowestNonEmptyBin++;
+
+    //make sure m_lowestNonEmptyBin points to a non-empty bucket.
+    while (lowestNonEmptyBin < numBuckets && buckets[lowestNonEmptyBin].empty()) {
+        lowestNonEmptyBin++;
     }
-    if (m_lowestNonEmptyBin >= m_numBuckets) {
+    if (lowestNonEmptyBin >= numBuckets) {
         return nullptr;
     }
-    // Remove a node from the back of the bucket.
-    Node* node = m_buckets[m_lowestNonEmptyBin].back();
-    m_buckets[m_lowestNonEmptyBin].pop_back();
+
+    //remove a node from the back of the bucket.
+    Node* node = buckets[lowestNonEmptyBin].back();
+    buckets[lowestNonEmptyBin].pop_back();
     m_numNodesTracked--;
     return node;
 }
 
 
 void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
-    // Find the bucket corresponding to the old cost.
+    //find the bucket corresponding to the old cost.
     int oldIndex = GetBinIndex(oldCost);
-    auto& bucket = m_buckets[oldIndex];
+    auto& bucket = buckets[oldIndex];
     for (auto it = bucket.begin(); it != bucket.end(); ++it) {
         if (*it == node) {
             bucket.erase(it);
@@ -70,7 +70,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
             break;
         }
     }
-    // Reinsert the node with its updated cost.
+    //reinsert the node with its updated cost.
     Push(node);
 }
 
@@ -87,9 +87,6 @@ AStarPather::AStarPather() : m_openList(600, 0.25f)
 
 bool AStarPather::initialize()
 {
-    //openList.clear(); // Clear the open list
-    //openList.reserve(1600); // Preallocate 1600 slots
-    //lastIndex = -1; // No elements in the open list initially
     clear_open_list();
 
     Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
@@ -134,12 +131,12 @@ PathResult AStarPather::compute_path(PathRequest& request)
         startNode->givenCost = 0;
         startNode->finalCost = heuristic(start, goal, request);
         startNode->onList = ListStatus::Open;
-        open_list_push(startNode, request);  // Uses m_openList.Push()
+        open_list_push(startNode, request);  
     }
 
     while (!m_openList.Empty())
     {
-        Node* parentNode = open_list_pop();  // Uses m_openList.Pop()
+        Node* parentNode = open_list_pop();  
 
         if (parentNode->gridPos == goal)
         {
@@ -172,7 +169,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
             const GridPos& neighbor = neighbors.positions[i];
             if (terrain->is_wall(neighbor))
             {
-                continue; // Skip walls
+                continue; 
             }
 
             Node* childNode = &nodes[neighbor.row][neighbor.col];
@@ -183,7 +180,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
             if (childNode->onList == ListStatus::None)
             {
-                // Node not yet encountered; add it to the open list.
+                //node not yet encountered; add it to the open list.
                 childNode->parent = parentNode;
                 childNode->givenCost = new_g;
                 childNode->finalCost = new_f;
@@ -194,19 +191,20 @@ PathResult AStarPather::compute_path(PathRequest& request)
             {
                 if (new_g < childNode->givenCost)
                 {
-                    float old_f = childNode->finalCost; // Store previous final cost.
+                    //store previous final cost.
+                    float old_f = childNode->finalCost; 
                     childNode->parent = parentNode;
                     childNode->givenCost = new_g;
                     childNode->finalCost = new_f;
 
                     if (childNode->onList == ListStatus::Open)
                     {
-                        // The node is already in the open list; update its bucket location.
+                        //the node is already in the open list; update its bucket location.
                         m_openList.DecreaseKey(childNode, old_f);
                     }
                     else if (childNode->onList == ListStatus::Closed)
                     {
-                        // If the node was closed, reopen it.
+                        //if the node was closed, reopen it.
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
@@ -255,11 +253,11 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     {
         if ((a.row + a.col) % 2 > 0)
         {
-            h = std::sqrt(dx * dx + dy * dy); // Euclidean distance for odd-sum coordinates
+            h = std::sqrt(dx * dx + dy * dy); 
         }
         else
         {
-            h = 0.0f; // Artificially setting heuristic to zero for even-sum coordinates
+            h = 0.0f; 
         }
     }
     else if (request.settings.heuristic == Heuristic::MANHATTAN)
@@ -299,9 +297,6 @@ void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
 {
-    //if (path.size() < 3) // No need to process if the path is too short
-    //    return;
-
     for (size_t i = path.size() - 1; i >= 2; --i)
     {
         Vec3 endPos = path[i];
@@ -320,25 +315,27 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     GridPos startGrid = terrain->get_grid_position(start);
     GridPos endGrid = terrain->get_grid_position(end);
 
-    // Determine the bounding box for the square area
+    //determine the bounding box for the square area
     int minRow = std::min(startGrid.row, endGrid.row);
     int maxRow = std::max(startGrid.row, endGrid.row);
     int minCol = std::min(startGrid.col, endGrid.col);
     int maxCol = std::max(startGrid.col, endGrid.col);
 
-    // Iterate over the square area
+    //iterate over the square area
     for (int row = minRow; row <= maxRow; ++row)
     {
         for (int col = minCol; col <= maxCol; ++col)
         {
             if (terrain->is_wall(row, col))
             {
-                return false; // If any wall is found, the middle node cannot be eliminated
+                //if any wall is found, the middle node cannot be eliminated
+                return false;
             }
         }
     }
 
-    return true; // No walls found, the middle node can be eliminated
+    //no walls found, the middle node can be eliminated
+    return true; 
 }
 
 Vec3 AStarPather::catmull_rom_interpolate(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3, float t)
@@ -384,11 +381,13 @@ void AStarPather::apply_catmull_rom_smoothing(std::vector<Vec3>& path)
 
 void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDistance)
 {
-    if (path.size() < 2) // No need to process if the path is too short
+    //no need to process if the path is too short
+    if (path.size() < 2) 
         return;
 
     std::vector<Vec3> newPath;
-    newPath.push_back(path[0]); // Add the first point
+    //add the first point
+    newPath.push_back(path[0]);
 
     for (size_t i = 1; i < path.size(); ++i)
     {
@@ -399,10 +398,10 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDist
 
         if (distance > maxDistance)
         {
-            // Calculate the direction vector
+            //calculate the direction vector
             Vec3 direction = (currentPoint - prevPoint) / distance;
 
-            // Add intermediate points spaced by maxDistance
+            //add intermediate points spaced by maxDistance
             int numPoints = static_cast<int>(distance / maxDistance);
             for (int j = 1; j <= numPoints; ++j)
             {
@@ -410,11 +409,11 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path, float maxDist
                 newPath.push_back(intermediatePoint);
             }
         }
-
-        newPath.push_back(currentPoint); // Add the current point
+        //add the current point
+        newPath.push_back(currentPoint); 
     }
-
-    path = newPath; // Replace the original path with the new path
+    //replace the original path with the new path
+    path = newPath; 
 }
 
 void AStarPather::open_list_push(Node* node, PathRequest& request)

@@ -31,56 +31,61 @@ static const int MAX_NEIGHBORS = 8;
 
 struct Neighbors {
     GridPos positions[MAX_NEIGHBORS];
-    int count = 0; // Number of valid neighbors
+    //amount of valid neighbors
+    int count = 0; 
 };
 
 class BucketPriorityQueue {
 public:
-    // numBuckets: number of buckets (should be small)
-    // division: the cost range covered per bucket (choose so that all f_costs fall into one of these few buckets)
+    //numBuckets: number of buckets (should be small)
+    //division: the cost range covered per bucket (choose so that all f_costs fall into one of these few buckets)
     BucketPriorityQueue(int numBuckets, float division);
     ~BucketPriorityQueue();
 
-    // Set the base cost (optional, default is zero)
-    inline void SetBaseCost(float baseCost) { m_baseCost = baseCost; }
+    //set the base cost (optional, default is zero)
+    inline void SetBaseCost(float baseCost) { baseCost = baseCost; }
 
-    // Reset clears all buckets and resets bookkeeping.
+    //reset clears all buckets and resets bookkeeping.
     inline void Reset() {
-        for (auto& bucket : m_buckets) {
+        for (auto& bucket : buckets) {
             bucket.clear();
         }
         m_numNodesTracked = 0;
-        m_lowestNonEmptyBin = m_numBuckets;
-        m_baseCost = 0.0f;
+        lowestNonEmptyBin = numBuckets;
+        baseCost = 0.0f;
     }
 
-    // Returns true if there are no nodes in any bucket.
+    //returns true if there are no nodes in any bucket.
     inline bool Empty() const { return m_numNodesTracked == 0; }
 
-    // Inserts a node into the appropriate bucket based on node->finalCost.
+    //inserts a node into the appropriate bucket based on node->finalCost.
     void Push(Node* node);
 
-    // Pops and returns a node from the lowest non-empty bucket.
+    //pops and returns a node from the lowest non-empty bucket.
     Node* Pop();
 
-    // Removes a node from its old bucket (based on oldCost) and reinserts it.
+    //removes a node from its old bucket (based on oldCost) and reinserts it.
     void DecreaseKey(Node* node, float oldCost);
 
 private:
-    int m_numBuckets;         // Total number of buckets.
-    int m_lowestNonEmptyBin;  // Index of the lowest bucket that is not empty.
-    int m_numNodesTracked;    // Total number of nodes in the queue.
-    float m_division;         // Cost range covered per bucket.
-    float m_baseCost;         // Base cost offset.
+    //total number of buckets.
+    int numBuckets;     
+    //index of the lowest bucket that is not empty.
+    int lowestNonEmptyBin;  
+    //total number of nodes in the queue.
+    int m_numNodesTracked;    
+    //cost range covered per bucket.
+    float division;   
+    //base cost offset.
+    float baseCost;         
 
-    // The buckets – each bucket is a vector of Node pointers.
-    std::vector<std::vector<Node*>> m_buckets;
+    //buckets – each bucket is an unsorted vector of Node pointers.
+    std::vector<std::vector<Node*>> buckets;
 
-    // Computes the bucket index for a given cost.
     inline int GetBinIndex(float cost) const {
-        int index = static_cast<int>((cost - m_baseCost) / m_division);
+        int index = static_cast<int>((cost - baseCost) / division);
         if (index < 0) index = 0;
-        if (index >= m_numBuckets) index = m_numBuckets - 1;
+        if (index >= numBuckets) index = numBuckets - 1;
         return index;
     }
 };
@@ -102,7 +107,7 @@ public:
     void apply_catmull_rom_smoothing(std::vector<Vec3>& path);
     void add_intermediate_points(std::vector<Vec3>& path, float maxDistance);
 
-    // Open list operations
+    //open list operations
     void open_list_push(Node* node, PathRequest& request);
     Node* open_list_pop();
     void clear_open_list();
@@ -110,14 +115,14 @@ public:
     void compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors);
 
 private:
+    //maximum number of neighbors for any cell
     static const int MAP_WIDTH = 40;
     static const int MAP_HEIGHT = 40;
-    // Maximum number of neighbors for any cell
 
-    Node nodes[MAP_HEIGHT][MAP_WIDTH];  // 51200 bytes
-    Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; // Fixed-size array for neighbors
+    Node nodes[MAP_HEIGHT][MAP_WIDTH];  
+    Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; 
     BucketPriorityQueue m_openList;
     std::vector<Vec3> finalPath;
 
-    GridPos start, goal;  // 16 bytes (8-byte aligned)
+    GridPos start, goal;
 };
