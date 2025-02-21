@@ -83,8 +83,7 @@ bool AStarPather::initialize()
 
     Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
     Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
-
-
+    
     return true;
 }
 
@@ -151,7 +150,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
             int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
             GridPos neighbor = { parentNode->gridPos.row + dRow, parentNode->gridPos.col + dCol };
 
-            if (terrain->is_wall(neighbor)) continue;
+            if (isWall[neighbor.row * MAP_WIDTH + neighbor.col]) continue;
 
             Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
 
@@ -246,7 +245,8 @@ void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
 
     // Traverse from the goal node to the start node
     while (current) {
-        path.push_back(terrain->get_world_position(current->gridPos));
+        GridPos currentGridPos = current->gridPos;
+        path.push_back(worldPositions[currentGridPos.row * MAP_WIDTH + currentGridPos.col]);
         current = current->parent;
     }
 }
@@ -282,7 +282,7 @@ bool AStarPather::can_eliminate_middle_node(const Vec3& start, const Vec3& middl
     {
         for (int col = minCol; col <= maxCol; ++col)
         {
-            if (terrain->is_wall(row, col))
+            if (isWall[row * MAP_WIDTH + col])
             {
                 //if any wall is found, the middle node cannot be eliminated
                 return false;
@@ -388,6 +388,8 @@ void AStarPather::precompute_valid_neighbors() {
             nodes[row * MAP_WIDTH + col].neighbors = compute_valid_neighbors(pos);
         }
     }
+
+    precompute_terrain_data();
 }
 
 uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
@@ -416,4 +418,14 @@ uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
     }
 
     return neighbors;
+}
+
+void AStarPather::precompute_terrain_data()
+{
+    for (int row = 0; row < MAP_HEIGHT; ++row) {
+        for (int col = 0; col < MAP_WIDTH; ++col) {
+            worldPositions[row * MAP_WIDTH + col] = terrain->get_world_position({ row, col });
+            isWall[row * MAP_WIDTH + col] = terrain->is_wall({ row, col });
+        }
+    }
 }

@@ -108,6 +108,7 @@ public:
     }
     void precompute_valid_neighbors();
     uint8_t compute_valid_neighbors(const GridPos& pos);
+    void precompute_terrain_data();
 
 private:
     //maximum number of neighbors for any cell
@@ -115,6 +116,8 @@ private:
     static const int MAP_HEIGHT = 40;
 
     Node nodes[MAP_HEIGHT * MAP_WIDTH];  
+    bool isWall[MAP_HEIGHT * MAP_WIDTH];
+    Vec3 worldPositions[MAP_HEIGHT * MAP_WIDTH];
     BucketPriorityQueue openList;
     std::vector<Vec3> finalPath;
 
