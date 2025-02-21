@@ -77,7 +77,7 @@ AStarPather::AStarPather() : openList(600, 0.25f)
     {
         for (int col = 0; col < MAP_WIDTH; ++col)
         {
-            nodes[row][col].gridPos = { row, col };
+            nodes[row * MAP_WIDTH + col].gridPos = { row, col };
         }
     }
 }
@@ -124,7 +124,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
             terrain->set_color(goal, Colors::Orange);
         }
 
-        Node* startNode = &nodes[start.row][start.col];
+        Node* startNode = &nodes[start.row * MAP_WIDTH + start.col];
         startNode->givenCost = 0;
         startNode->finalCost = heuristic(start, goal, request);
         startNode->onList = ListStatus::Open;
@@ -169,7 +169,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
                 continue; 
             }
 
-            Node* childNode = &nodes[neighbor.row][neighbor.col];
+            Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
 
             float cost = (neighbor.row != parentNode->gridPos.row && neighbor.col != parentNode->gridPos.col) ? 1.414f : 1.0f;
             float new_g = parentNode->givenCost + cost;
@@ -223,10 +223,10 @@ void AStarPather::clear_nodes()
     {
         for (int col = 0; col < MAP_WIDTH; ++col)
         {
-            nodes[row][col].parent = nullptr;
-            nodes[row][col].finalCost = 0;
-            nodes[row][col].givenCost = 0;
-            nodes[row][col].onList = ListStatus::None;
+            nodes[row * MAP_WIDTH + col].parent = nullptr;
+            nodes[row * MAP_WIDTH + col].finalCost = 0;
+            nodes[row * MAP_WIDTH + col].givenCost = 0;
+            nodes[row * MAP_WIDTH + col].onList = ListStatus::None;
         }
     }
 }
@@ -275,7 +275,7 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 }
 
 const Neighbors& AStarPather::get_neighbors(const GridPos& pos) {
-    return validNeighbors[pos.row][pos.col];
+    return validNeighbors[pos.row * MAP_WIDTH + pos.col];
 }
 
 void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
@@ -436,7 +436,7 @@ void AStarPather::precompute_valid_neighbors() {
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
             GridPos pos = { row, col };
-            compute_valid_neighbors(pos, validNeighbors[row][col]);
+            compute_valid_neighbors(pos, validNeighbors[row * MAP_WIDTH + col]);
         }
     }
 }

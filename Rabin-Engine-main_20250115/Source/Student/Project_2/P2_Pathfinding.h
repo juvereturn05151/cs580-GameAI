@@ -119,8 +119,8 @@ private:
     static const int MAP_WIDTH = 40;
     static const int MAP_HEIGHT = 40;
 
-    Node nodes[MAP_HEIGHT][MAP_WIDTH];  
-    Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; 
+    Node nodes[MAP_HEIGHT * MAP_WIDTH];  
+    Neighbors validNeighbors[MAP_HEIGHT * MAP_WIDTH]; 
     BucketPriorityQueue openList;
     std::vector<Vec3> finalPath;
 
