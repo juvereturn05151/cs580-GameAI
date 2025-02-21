@@ -219,7 +219,7 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     int dx = std::abs(a.col - b.col);
     int dy = std::abs(a.row - b.row);
 
-    float h = 0.0;
+    float h = 0.0f;
 
     switch (request.settings.heuristic)
     {
