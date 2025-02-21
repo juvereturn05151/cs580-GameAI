@@ -88,23 +88,8 @@ bool AStarPather::initialize()
     return true;
 }
 
-void AStarPather::shutdown()
-{
-    /*
-        Free any dynamically allocated memory or any other general house-
-        keeping you need to do during shutdown.
-    */
-
-    clear_open_list();
-}
-
 PathResult AStarPather::compute_path(PathRequest& request)
 {
-    if (!terrain)
-    {
-        return PathResult::IMPOSSIBLE;
-    }
-
     if (request.newRequest)
     {
         //request.path.clear();
@@ -393,16 +378,6 @@ void AStarPather::open_list_push(Node* node, PathRequest& request)
         terrain->set_color(node->gridPos, Colors::Blue);
     }
     openList.Push(node);
-}
-
-Node* AStarPather::open_list_pop()
-{
-    return openList.Pop();
-}
-
-void AStarPather::clear_open_list()
-{
-    openList.Reset();
 }
 
 void AStarPather::precompute_valid_neighbors() {

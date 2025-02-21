@@ -81,7 +81,10 @@ class AStarPather {
 public:
     AStarPather();
     bool initialize();
-    void shutdown();
+    inline void shutdown() 
+    {
+        clear_open_list();
+    }
     PathResult compute_path(PathRequest& request);
 
     void clear_nodes();
@@ -95,8 +98,14 @@ public:
 
     //open list operations
     void open_list_push(Node* node, PathRequest& request);
-    Node* open_list_pop();
-    void clear_open_list();
+    inline Node* open_list_pop() 
+    {
+        return openList.Pop();
+    }
+    inline void clear_open_list()
+    {
+        openList.Reset();
+    }
     void precompute_valid_neighbors();
     uint8_t compute_valid_neighbors(const GridPos& pos);
 
