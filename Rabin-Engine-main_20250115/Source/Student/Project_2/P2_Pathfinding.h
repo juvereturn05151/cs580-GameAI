@@ -11,12 +11,13 @@ struct Node {
     GridPos gridPos;       // Assuming GridPos is 2 integers (8 bytes)
     float finalCost;       // 4 bytes
     float givenCost;       // 4 bytes
+    size_t bucketPosition;
     uint16_t bucketIndex;  // 2 bytes (if buckets are fewer than 65536)
     ListStatus onList;        // 1 byte (if ListStatus has fewer than 256 values)
     uint8_t neighbors;     // 1 byte
     // Padding: 4 bytes (to align to 8 bytes)
 
-    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), bucketIndex(-1), onList(ListStatus::None), neighbors(0) {}
+    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), bucketPosition(0), bucketIndex(-1), onList(ListStatus::None), neighbors(0) {}
 };
 
 static const int8_t NEIGHBOR_OFFSETS[16] = {
