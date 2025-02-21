@@ -148,9 +148,10 @@ PathResult AStarPather::compute_path(PathRequest& request)
                 apply_catmull_rom_smoothing(finalPath);
             }
 
-            for (const auto& pos : finalPath)
+            while (!finalPath.empty())
             {
-                request.path.push_back(pos);
+                request.path.push_back(finalPath.back());
+                finalPath.pop_back();
             }
             return PathResult::COMPLETE;
         }
@@ -268,7 +269,6 @@ const Neighbors& AStarPather::get_neighbors(const GridPos& pos) {
 }
 
 void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
-    path.clear(); // Clear the path vector to ensure it's empty
     Node* current = goalNode;
 
     // Traverse from the goal node to the start node
@@ -276,9 +276,6 @@ void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
         path.push_back(terrain->get_world_position(current->gridPos));
         current = current->parent;
     }
-
-    // Reverse the path to get the correct order (start -> goal)
-    std::reverse(path.begin(), path.end());
 }
 
 void AStarPather::apply_rubberbanding(std::vector<Vec3>& path)
