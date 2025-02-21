@@ -35,7 +35,7 @@ class BucketPriorityQueue {
 public:
     //numBuckets: number of buckets (should be small)
     //division: the cost range covered per bucket (choose so that all f_costs fall into one of these few buckets)
-    BucketPriorityQueue(int numBuckets, float division);
+    BucketPriorityQueue(float division,int numBuckets);
     ~BucketPriorityQueue() = default;
 
     //reset clears all buckets and resets bookkeeping.
@@ -60,14 +60,14 @@ public:
     void DecreaseKey(Node* node, float oldCost);
 
 private:
+    //cost range covered per bucket.
+    float division;
     //total number of buckets.
     int numBuckets;     
     //index of the lowest bucket that is not empty.
     int lowestNonEmptyBin;  
     //total number of nodes in the queue.
     int numNodesTracked;    
-    //cost range covered per bucket.
-    float division;      
 
     //buckets – each bucket is an unsorted vector of Node pointers.
     std::vector<std::vector<Node*>> buckets;

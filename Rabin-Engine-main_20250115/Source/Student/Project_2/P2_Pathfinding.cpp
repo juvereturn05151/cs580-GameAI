@@ -14,9 +14,10 @@ bool ProjectTwo::implemented_goal_bounding()
 }
 #pragma endregion
 
-BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
-    : numBuckets(numBuckets),
-    division(division),
+BucketPriorityQueue::BucketPriorityQueue(float division,int numBuckets)
+    : 
+    division(division), 
+    numBuckets(numBuckets),
     lowestNonEmptyBin(numBuckets),
     numNodesTracked(0)
 {
@@ -76,7 +77,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     Push(node);
 }
 
-AStarPather::AStarPather() : openList(600, 0.25f), start({0,0}), goal({ 0,0 })
+AStarPather::AStarPather() : openList(0.25f, 600), start({0,0}), goal({ 0,0 })
 {
     for (int row = 0; row < MAP_HEIGHT; ++row)
     {
