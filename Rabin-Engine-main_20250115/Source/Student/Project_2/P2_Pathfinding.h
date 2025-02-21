@@ -46,9 +46,6 @@ public:
     BucketPriorityQueue(int numBuckets, float division);
     ~BucketPriorityQueue();
 
-    //set the base cost (optional, default is zero)
-    inline void SetBaseCost(float baseCost) { baseCost = baseCost; }
-
     //reset clears all buckets and resets bookkeeping.
     inline void Reset() {
         for (auto& bucket : buckets) {
@@ -56,7 +53,6 @@ public:
         }
         numNodesTracked = 0;
         lowestNonEmptyBin = numBuckets;
-        baseCost = 0.0f;
     }
 
     //returns true if there are no nodes in any bucket.
@@ -79,15 +75,13 @@ private:
     //total number of nodes in the queue.
     int numNodesTracked;    
     //cost range covered per bucket.
-    float division;   
-    //base cost offset.
-    float baseCost;         
+    float division;      
 
     //buckets – each bucket is an unsorted vector of Node pointers.
     std::vector<std::vector<Node*>> buckets;
 
     inline int GetBinIndex(float cost) const {
-        int index = static_cast<int>((cost - baseCost) / division);
+        int index = static_cast<int>((cost) / division);
         if (index < 0) index = 0;
         if (index >= numBuckets) index = numBuckets - 1;
         return index;

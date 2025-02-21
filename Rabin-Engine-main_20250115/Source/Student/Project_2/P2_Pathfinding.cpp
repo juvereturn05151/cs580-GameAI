@@ -17,7 +17,6 @@ bool ProjectTwo::implemented_goal_bounding()
 BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
     : numBuckets(numBuckets),
     division(division),
-    baseCost(0.0f),
     lowestNonEmptyBin(numBuckets),
     numNodesTracked(0)
 {
@@ -71,7 +70,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     Push(node);
 }
 
-AStarPather::AStarPather() : openList(600, 0.25f)
+AStarPather::AStarPather() : openList(600, 0.25f), start({0,0}), goal({ 0,0 })
 {
     for (int row = 0; row < MAP_HEIGHT; ++row)
     {
