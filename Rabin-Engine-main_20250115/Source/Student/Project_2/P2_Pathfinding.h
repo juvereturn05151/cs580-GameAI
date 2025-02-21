@@ -6,17 +6,6 @@ enum ListStatus {
     None, Open, Closed
 };
 
-enum NeighborDirection {
-    DOWN = 0,  // Bit 0
-    UP = 1,  // Bit 1
-    RIGHT = 2,  // Bit 2
-    LEFT = 3,  // Bit 3
-    DOWN_RIGHT = 4, // Bit 4
-    DOWN_LEFT = 5, // Bit 5
-    UP_RIGHT = 6, // Bit 6
-    UP_LEFT = 7  // Bit 7
-};
-
 struct Node {
     Node* parent;
     GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
@@ -81,7 +70,7 @@ private:
     std::vector<std::vector<Node*>> buckets;
 
     inline int GetBinIndex(float cost) const {
-        int index = static_cast<int>((cost) / division);
+        int index = static_cast<int>(cost / division);
         if (index < 0) index = 0;
         if (index >= numBuckets) index = numBuckets - 1;
         return index;
