@@ -172,8 +172,10 @@ PathResult AStarPather::compute_path(PathRequest& request)
                 float cost = (dRow != 0 && dCol != 0) ? 1.414f : 1.0f; // Diagonal cost
                 float new_g = parentNode->givenCost + cost;
                 float new_f = new_g + heuristic(neighbor, goal, request);
+                ListStatus listStatus = childNode->onList;
 
-                if (childNode->onList == ListStatus::None) {
+
+                if (listStatus == ListStatus::None) {
                     // Node not yet encountered; add it to the open list
                     childNode->parent = parentNode;
                     childNode->givenCost = new_g;
@@ -188,10 +190,10 @@ PathResult AStarPather::compute_path(PathRequest& request)
                     childNode->givenCost = new_g;
                     childNode->finalCost = new_f;
 
-                    if (childNode->onList == ListStatus::Open) {
+                    if (listStatus == ListStatus::Open) {
                         openList.DecreaseKey(childNode, old_f);
                     }
-                    else if (childNode->onList == ListStatus::Closed) {
+                    else if (listStatus == ListStatus::Closed) {
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
