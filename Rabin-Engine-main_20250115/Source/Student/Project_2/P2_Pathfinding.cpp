@@ -111,15 +111,12 @@ void AStarPather::shutdown()
     clear_open_list();
 }
 
-PathResult AStarPather::compute_path(PathRequest& request)
-{
-    if (!terrain)
-    {
+PathResult AStarPather::compute_path(PathRequest& request) {
+    if (!terrain) {
         return PathResult::IMPOSSIBLE;
     }
 
-    if (request.newRequest)
-    {
+    if (request.newRequest) {
         request.path.clear();
         clear_nodes();
         clear_open_list();
@@ -127,14 +124,12 @@ PathResult AStarPather::compute_path(PathRequest& request)
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);
 
-        if (request.settings.method == Method::GOAL_BOUNDING) 
-        {
+        if (request.settings.method == Method::GOAL_BOUNDING) {
             // Check if the goal is within the bounding box of the start node
             if (goal.row < goalBounds[start.row][start.col].minRow ||
                 goal.row > goalBounds[start.row][start.col].maxRow ||
                 goal.col < goalBounds[start.row][start.col].minCol ||
-                goal.col > goalBounds[start.row][start.col].maxCol) 
-            {
+                goal.col > goalBounds[start.row][start.col].maxCol) {
                 return PathResult::IMPOSSIBLE; // Goal is unreachable
             }
 
@@ -145,55 +140,23 @@ PathResult AStarPather::compute_path(PathRequest& request)
             startNode->onList = ListStatus::Open;
             open_list_push(startNode, request);
         }
-        else if (request.settings.method == Method::FLOYD_WARSHALL) 
-        {
-            std::vector<GridPos> path = reconstruct_floyd_warshall_path(start, goal);
-
-            if (path.empty()) {
-                return PathResult::IMPOSSIBLE;
-            }
-
-            for (const auto& pos : path) {
-                request.path.push_back(terrain->get_world_position(pos));
-            }
-
-            return PathResult::COMPLETE;
-        }
-        else if (request.settings.method == Method::ASTAR) {
-            Node* startNode = &nodes[start.row][start.col];
-            startNode->givenCost = 0;
-            startNode->finalCost = heuristic(start, goal, request);
-            startNode->onList = ListStatus::Open;
-            open_list_push(startNode, request);
-        }
-
-        if (request.settings.debugColoring) {
-            terrain->set_color(start, Colors::Orange);
-            terrain->set_color(goal, Colors::Orange);
-        }
-
-
+        // Other methods (e.g., A*, Floyd-Warshall) can be handled here
     }
 
-    while (!openList.Empty())
-    {
-        Node* parentNode = open_list_pop();  
+    while (!openList.Empty()) {
+        Node* parentNode = open_list_pop();
 
-        if (parentNode->gridPos == goal)
-        {
+        if (parentNode->gridPos == goal) {
             reconstruct_path(parentNode, finalPath);
-            if (request.settings.rubberBanding)
-            {
+            if (request.settings.rubberBanding) {
                 apply_rubberbanding(finalPath);
             }
-            if (request.settings.smoothing)
-            {
+            if (request.settings.smoothing) {
                 add_intermediate_points(finalPath);
                 apply_catmull_rom_smoothing(finalPath);
             }
 
-            for (const auto& pos : finalPath)
-            {
+            for (const auto& pos : finalPath) {
                 request.path.push_back(pos);
             }
             return PathResult::COMPLETE;
@@ -205,12 +168,10 @@ PathResult AStarPather::compute_path(PathRequest& request)
         }
 
         Neighbors neighbors = get_neighbors(parentNode->gridPos);
-        for (int i = 0; i < neighbors.count; ++i)
-        {
+        for (int i = 0; i < neighbors.count; ++i) {
             const GridPos& neighbor = neighbors.positions[i];
-            if (terrain->is_wall(neighbor))
-            {
-                continue; 
+            if (terrain->is_wall(neighbor)) {
+                continue;
             }
 
             // Goal Bounding pruning
@@ -229,33 +190,28 @@ PathResult AStarPather::compute_path(PathRequest& request)
             float new_g = parentNode->givenCost + cost;
             float new_f = new_g + heuristic(neighbor, goal, request);
 
-            if (childNode->onList == ListStatus::None)
-            {
-                //node not yet encountered; add it to the open list.
+            if (childNode->onList == ListStatus::None) {
+                // Node not yet encountered; add it to the open list
                 childNode->parent = parentNode;
                 childNode->givenCost = new_g;
                 childNode->finalCost = new_f;
                 childNode->onList = ListStatus::Open;
                 open_list_push(childNode, request);
             }
-            else if (childNode->onList == ListStatus::Open || childNode->onList == ListStatus::Closed)
-            {
-                if (new_g < childNode->givenCost)
-                {
-                    //store previous final cost.
-                    float old_f = childNode->finalCost; 
+            else if (childNode->onList == ListStatus::Open || childNode->onList == ListStatus::Closed) {
+                if (new_g < childNode->givenCost) {
+                    // Store previous final cost
+                    float old_f = childNode->finalCost;
                     childNode->parent = parentNode;
                     childNode->givenCost = new_g;
                     childNode->finalCost = new_f;
 
-                    if (childNode->onList == ListStatus::Open)
-                    {
-                        //the node is already in the open list; update its bucket location.
+                    if (childNode->onList == ListStatus::Open) {
+                        // The node is already in the open list; update its bucket location
                         openList.DecreaseKey(childNode, old_f);
                     }
-                    else if (childNode->onList == ListStatus::Closed)
-                    {
-                        //if the node was closed, reopen it.
+                    else if (childNode->onList == ListStatus::Closed) {
+                        // If the node was closed, reopen it
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
@@ -263,8 +219,9 @@ PathResult AStarPather::compute_path(PathRequest& request)
             }
         }
 
-        if (request.settings.singleStep)
+        if (request.settings.singleStep) {
             return PathResult::PROCESSING;
+        }
     }
 
     return PathResult::IMPOSSIBLE;
@@ -597,22 +554,18 @@ std::vector<GridPos> AStarPather::reconstruct_floyd_warshall_path(const GridPos&
 }
 
 void AStarPather::compute_goal_bounding_boxes() {
-    //init bounding boxes
-    for (int i = 0; i < MAP_HEIGHT; ++i) 
-    {
-        for (int j = 0; j < MAP_WIDTH; ++j) 
-        {
-            //init to invalid values
-            goalBounds[i][j] = { MAP_HEIGHT, 0, MAP_WIDTH, 0 }; 
+    // Initialize bounding boxes
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            // Initialize to invalid values
+            goalBounds[i][j] = { MAP_HEIGHT, 0, MAP_WIDTH, 0 };
         }
     }
 
-    //use BFS to compute bounding boxes
-    for (int i = 0; i < MAP_HEIGHT; ++i) 
-    {
-        for (int j = 0; j < MAP_WIDTH; ++j) 
-        {
-            if (terrain->is_wall(i, j)) continue; 
+    // Use BFS to compute bounding boxes
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            if (terrain->is_wall(i, j)) continue;
 
             std::queue<GridPos> queue;
             queue.push({ i, j });
@@ -621,21 +574,20 @@ void AStarPather::compute_goal_bounding_boxes() {
                 GridPos current = queue.front();
                 queue.pop();
 
-                //update bounding box for the current node
+                // Update bounding box for the current node
                 goalBounds[i][j].minRow = std::min(goalBounds[i][j].minRow, current.row);
                 goalBounds[i][j].maxRow = std::max(goalBounds[i][j].maxRow, current.row);
                 goalBounds[i][j].minCol = std::min(goalBounds[i][j].minCol, current.col);
                 goalBounds[i][j].maxCol = std::max(goalBounds[i][j].maxCol, current.col);
 
-                //explore neighbors
+                // Explore neighbors
                 Neighbors neighbors = get_neighbors(current);
                 for (int n = 0; n < neighbors.count; ++n) {
                     GridPos neighbor = neighbors.positions[n];
-                    //already within the bounding box
+                    // Skip if already within the bounding box
                     if (goalBounds[i][j].minRow <= neighbor.row && neighbor.row <= goalBounds[i][j].maxRow &&
-                        goalBounds[i][j].minCol <= neighbor.col && neighbor.col <= goalBounds[i][j].maxCol) 
-                    {
-                        continue; 
+                        goalBounds[i][j].minCol <= neighbor.col && neighbor.col <= goalBounds[i][j].maxCol) {
+                        continue;
                     }
 
                     queue.push(neighbor);
