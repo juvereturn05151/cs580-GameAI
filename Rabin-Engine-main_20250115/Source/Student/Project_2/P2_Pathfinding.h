@@ -6,14 +6,26 @@ enum ListStatus {
     None, Open, Closed
 };
 
+enum NeighborDirection {
+    DOWN = 0,  // Bit 0
+    UP = 1,  // Bit 1
+    RIGHT = 2,  // Bit 2
+    LEFT = 3,  // Bit 3
+    DOWN_RIGHT = 4, // Bit 4
+    DOWN_LEFT = 5, // Bit 5
+    UP_RIGHT = 6, // Bit 6
+    UP_LEFT = 7  // Bit 7
+};
+
 struct Node {
     Node* parent;
     GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
     float finalCost;    // f(x) = g(x) + h(x), total estimated cost
     float givenCost;    // g(x), cost from the start node to this node
     ListStatus onList;
+    uint8_t neighbors;
 
-    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None) {}
+    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None), neighbors(0){}
 };
 
 static const int8_t NEIGHBOR_OFFSETS[16] = {
@@ -25,14 +37,6 @@ static const int8_t NEIGHBOR_OFFSETS[16] = {
     1, -1,   // down-left
    -1,  1,   // up-right
    -1, -1    // up-left
-};
-
-static const int MAX_NEIGHBORS = 8;
-
-struct Neighbors {
-    GridPos positions[MAX_NEIGHBORS];
-    //amount of valid neighbors
-    int count = 0; 
 };
 
 class BucketPriorityQueue {
@@ -99,7 +103,6 @@ public:
 
     void clear_nodes();
     float heuristic(const GridPos& a, const GridPos& b, PathRequest& request);
-    const Neighbors& get_neighbors(const GridPos& pos);
     void reconstruct_path(Node* goalNode, std::vector<Vec3>& path);
     void apply_rubberbanding(std::vector<Vec3>& path);
     bool can_eliminate_middle_node(const Vec3& start, const Vec3& middle, const Vec3& end);
@@ -112,7 +115,7 @@ public:
     Node* open_list_pop();
     void clear_open_list();
     void precompute_valid_neighbors();
-    void compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors);
+    uint8_t compute_valid_neighbors(const GridPos& pos);
 
 private:
     //maximum number of neighbors for any cell
@@ -120,7 +123,6 @@ private:
     static const int MAP_HEIGHT = 40;
 
     Node nodes[MAP_HEIGHT * MAP_WIDTH];  
-    Neighbors validNeighbors[MAP_HEIGHT * MAP_WIDTH]; 
     BucketPriorityQueue openList;
     std::vector<Vec3> finalPath;
 

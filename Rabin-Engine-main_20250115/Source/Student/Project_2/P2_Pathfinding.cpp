@@ -161,48 +161,42 @@ PathResult AStarPather::compute_path(PathRequest& request)
             terrain->set_color(parentNode->gridPos, Colors::Yellow);
         }
 
-        Neighbors neighbors = get_neighbors(parentNode->gridPos);
-        for (int i = 0; i < neighbors.count; ++i)
-        {
-            const GridPos& neighbor = neighbors.positions[i];
-            if (terrain->is_wall(neighbor))
-            {
-                continue; 
-            }
+        uint8_t neighborBits = nodes[parentNode->gridPos.row * MAP_WIDTH + parentNode->gridPos.col].neighbors;
 
-            Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
+        // Iterate over valid neighbors using bitwise operations
+        for (int i = 0; i < 8; ++i) {
+            if (neighborBits & (1 << i)) {
+                int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
+                int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
+                GridPos neighbor = { parentNode->gridPos.row + dRow, parentNode->gridPos.col + dCol };
 
-            float cost = (neighbor.row != parentNode->gridPos.row && neighbor.col != parentNode->gridPos.col) ? 1.414f : 1.0f;
-            float new_g = parentNode->givenCost + cost;
-            float new_f = new_g + heuristic(neighbor, goal, request);
+                if (terrain->is_wall(neighbor)) continue;
 
-            if (childNode->onList == ListStatus::None)
-            {
-                //node not yet encountered; add it to the open list.
-                childNode->parent = parentNode;
-                childNode->givenCost = new_g;
-                childNode->finalCost = new_f;
-                childNode->onList = ListStatus::Open;
-                open_list_push(childNode, request);
-            }
-            else if (childNode->onList == ListStatus::Open || childNode->onList == ListStatus::Closed)
-            {
-                if (new_g < childNode->givenCost)
-                {
-                    //store previous final cost.
-                    float old_f = childNode->finalCost; 
+                Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
+
+                float cost = (dRow != 0 && dCol != 0) ? 1.414f : 1.0f; // Diagonal cost
+                float new_g = parentNode->givenCost + cost;
+                float new_f = new_g + heuristic(neighbor, goal, request);
+
+                if (childNode->onList == ListStatus::None) {
+                    // Node not yet encountered; add it to the open list
+                    childNode->parent = parentNode;
+                    childNode->givenCost = new_g;
+                    childNode->finalCost = new_f;
+                    childNode->onList = ListStatus::Open;
+                    open_list_push(childNode, request);
+                }
+                else if (new_g < childNode->givenCost) {
+                    // Update the node's cost and position in the open list
+                    float old_f = childNode->finalCost;
                     childNode->parent = parentNode;
                     childNode->givenCost = new_g;
                     childNode->finalCost = new_f;
 
-                    if (childNode->onList == ListStatus::Open)
-                    {
-                        //the node is already in the open list; update its bucket location.
+                    if (childNode->onList == ListStatus::Open) {
                         openList.DecreaseKey(childNode, old_f);
                     }
-                    else if (childNode->onList == ListStatus::Closed)
-                    {
-                        //if the node was closed, reopen it.
+                    else if (childNode->onList == ListStatus::Closed) {
                         childNode->onList = ListStatus::Open;
                         open_list_push(childNode, request);
                     }
@@ -262,10 +256,6 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     }
 
     return h * request.settings.weight;
-}
-
-const Neighbors& AStarPather::get_neighbors(const GridPos& pos) {
-    return validNeighbors[pos.row * MAP_WIDTH + pos.col];
 }
 
 void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
@@ -422,13 +412,13 @@ void AStarPather::precompute_valid_neighbors() {
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
             GridPos pos = { row, col };
-            compute_valid_neighbors(pos, validNeighbors[row * MAP_WIDTH + col]);
+            nodes[row * MAP_WIDTH + col].neighbors = compute_valid_neighbors(pos);
         }
     }
 }
 
-void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors) {
-    neighbors.count = 0; 
+uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
+    uint8_t neighbors = 0; // Initialize all bits to 0 (invalid)
 
     for (int i = 0; i < 8; ++i) {
         int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
@@ -439,8 +429,8 @@ void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbo
         if (!terrain->is_valid_grid_position(newPos)) continue;
         if (terrain->is_wall(newPos)) continue;
 
-        bool isDiagonal = (dRow != 0) && (dCol != 0);
-        if (isDiagonal) {
+        // Diagonal movement: check adjacent cells
+        if (dRow != 0 && dCol != 0) {
             GridPos adjacent1 = { pos.row, pos.col + dCol };
             GridPos adjacent2 = { pos.row + dRow, pos.col };
 
@@ -448,6 +438,9 @@ void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbo
             if (terrain->is_wall(adjacent2)) continue;
         }
 
-        neighbors.positions[neighbors.count++] = newPos;
+        // Set the corresponding bit to 1 (valid neighbor)
+        neighbors |= (1 << i);
     }
+
+    return neighbors;
 }
