@@ -252,7 +252,7 @@ void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
     // Traverse from the goal node to the start node
     while (current) {
         GridPos currentGridPos = current->gridPos;
-        path.push_back(worldPositions[currentGridPos.row * MAP_WIDTH + currentGridPos.col]);
+        path.push_back(terrain->get_world_position(current->gridPos));
         current = current->parent;
     }
 }
@@ -430,7 +430,6 @@ void AStarPather::precompute_terrain_data()
 {
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
-            worldPositions[row * MAP_WIDTH + col] = terrain->get_world_position({ row, col });
             isWall[row * MAP_WIDTH + col] = terrain->is_wall({ row, col });
         }
     }

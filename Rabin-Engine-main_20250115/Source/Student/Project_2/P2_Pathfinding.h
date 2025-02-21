@@ -118,7 +118,6 @@ private:
 
     Node nodes[MAP_HEIGHT * MAP_WIDTH];  
     bool isWall[MAP_HEIGHT * MAP_WIDTH];
-    Vec3 worldPositions[MAP_HEIGHT * MAP_WIDTH];
     BucketPriorityQueue openList;
     std::vector<Vec3> finalPath;
 
