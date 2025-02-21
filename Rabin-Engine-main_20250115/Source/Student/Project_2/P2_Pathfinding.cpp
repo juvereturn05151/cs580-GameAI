@@ -83,6 +83,7 @@ AStarPather::AStarPather() : openList(600, 0.25f), start({0,0}), goal({ 0,0 })
         for (int col = 0; col < MAP_WIDTH; ++col)
         {
             nodes[row * MAP_WIDTH + col].gridPos = { row, col };
+            isWall[row * MAP_WIDTH + col] = false;
         }
     }
 }
