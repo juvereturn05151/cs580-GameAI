@@ -238,37 +238,26 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 
     float h = 0.0;
 
-    if (request.settings.heuristic == Heuristic::OCTILE)
+    switch (request.settings.heuristic)
     {
-        h = (std::min(dx, dy) * 1.414) + std::max(dx, dy) -  std::min(dx, dy);
-    }
-    else if (request.settings.heuristic == Heuristic::CHEBYSHEV)
-    {
-        h =  std::max(dx, dy);
-    }
-    else if (request.settings.heuristic == Heuristic::INCONSISTENT)
-    {
-        if ((a.row + a.col) % 2 > 0)
-        {
-            h = std::sqrt(dx * dx + dy * dy); 
-        }
-        else
-        {
-            h = 0.0f; 
-        }
-    }
-    else if (request.settings.heuristic == Heuristic::MANHATTAN)
-    {
+    case Heuristic::OCTILE:
+        h = (std::min(dx, dy) * 1.414f) + std::max(dx, dy) - std::min(dx, dy);
+        break;
+    case Heuristic::CHEBYSHEV:
+        h = std::max(dx, dy);
+        break;
+    case Heuristic::INCONSISTENT:
+        h = ((a.row + a.col) % 2 > 0) ? std::sqrt(dx * dx + dy * dy) : 0.0f;
+        break;
+    case Heuristic::MANHATTAN:
         h = dx + dy;
-    }
-    else if (request.settings.heuristic == Heuristic::EUCLIDEAN)
-    {
+        break;
+    case Heuristic::EUCLIDEAN:
         h = std::sqrt(dx * dx + dy * dy);
-    }
-    else
-    {
-        //NUM_ENTRIES
-        h =  0.0f;
+        break;
+    default:
+        h = 0.0f;
+        break;
     }
 
     return h * request.settings.weight;
