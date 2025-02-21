@@ -33,7 +33,7 @@ public:
     //numBuckets: number of buckets (should be small)
     //division: the cost range covered per bucket (choose so that all f_costs fall into one of these few buckets)
     BucketPriorityQueue(int numBuckets, float division);
-    ~BucketPriorityQueue();
+    ~BucketPriorityQueue() = default;
 
     //reset clears all buckets and resets bookkeeping.
     inline void Reset() {

@@ -24,10 +24,6 @@ BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
     buckets.resize(numBuckets);
 }
 
-BucketPriorityQueue::~BucketPriorityQueue() {
-    //nothing to do because std::vector cleans up automatically.
-}
-
 void BucketPriorityQueue::Push(Node* node) {
     int index = GetBinIndex(node->finalCost);
     buckets[index].push_back(node);
@@ -111,7 +107,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
     if (request.newRequest)
     {
-        request.path.clear();
+        //request.path.clear();
         clear_nodes();
         clear_open_list();  // This now resets m_openList (bucket queue)
 
