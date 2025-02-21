@@ -7,15 +7,16 @@ enum ListStatus {
 };
 
 struct Node {
-    Node* parent;
-    GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
-    float finalCost;    // f(x) = g(x) + h(x), total estimated cost
-    float givenCost;    // g(x), cost from the start node to this node
-    ListStatus onList;
-    uint8_t neighbors;
-    int bucketIndex;
+    Node* parent;          // Pointer (8 bytes)
+    GridPos gridPos;       // Assuming GridPos is 2 integers (8 bytes)
+    float finalCost;       // 4 bytes
+    float givenCost;       // 4 bytes
+    uint16_t bucketIndex;  // 2 bytes (if buckets are fewer than 65536)
+    ListStatus onList;        // 1 byte (if ListStatus has fewer than 256 values)
+    uint8_t neighbors;     // 1 byte
+    // Padding: 4 bytes (to align to 8 bytes)
 
-    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None), neighbors(0), bucketIndex(-1) {}
+    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), bucketIndex(-1), onList(ListStatus::None), neighbors(0) {}
 };
 
 static const int8_t NEIGHBOR_OFFSETS[16] = {
