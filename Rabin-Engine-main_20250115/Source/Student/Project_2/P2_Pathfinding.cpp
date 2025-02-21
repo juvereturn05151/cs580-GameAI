@@ -86,6 +86,8 @@ AStarPather::AStarPather() : openList(600, 0.25f), start({0,0}), goal({ 0,0 })
             isWall[row * MAP_WIDTH + col] = false;
         }
     }
+
+    finalPath.reserve(1600);
 }
 
 bool AStarPather::initialize()
