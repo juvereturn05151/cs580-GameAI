@@ -60,17 +60,14 @@ Node* BucketPriorityQueue::Pop() {
 
 
 void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
-    //find the bucket corresponding to the old cost.
+    // Find the bucket corresponding to the old cost.
     int oldIndex = GetBinIndex(oldCost);
     auto& bucket = buckets[oldIndex];
-    for (auto it = bucket.begin(); it != bucket.end(); ++it) {
-        if (*it == node) {
-            bucket.erase(it);
-            numNodesTracked--;
-            break;
-        }
-    }
-    //reinsert the node with its updated cost.
+
+    // Erase the node directly (C++20)
+    numNodesTracked -= std::erase(bucket, node);
+
+    // Reinsert the node with its updated cost.
     Push(node);
 }
 
@@ -137,8 +134,8 @@ PathResult AStarPather::compute_path(PathRequest& request)
     while (!openList.Empty())
     {
         Node* parentNode = open_list_pop();  
-
-        if (parentNode->gridPos == goal)
+        
+        if (goal.row == parentNode->gridPos.row && goal.col == parentNode->gridPos.col)
         {
             reconstruct_path(parentNode, finalPath);
             if (request.settings.rubberBanding)
