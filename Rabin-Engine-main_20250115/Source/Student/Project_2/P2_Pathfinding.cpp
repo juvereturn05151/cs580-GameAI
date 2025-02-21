@@ -27,6 +27,7 @@ BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
 void BucketPriorityQueue::Push(Node* node) {
     int index = GetBinIndex(node->finalCost);
     buckets[index].push_back(node);
+    node->bucketIndex = index; // Update the node's bucket index
     numNodesTracked++;
     if (index < lowestNonEmptyBin) {
         lowestNonEmptyBin = index;
@@ -38,7 +39,7 @@ Node* BucketPriorityQueue::Pop() {
         return nullptr;
     }
 
-    //make sure m_lowestNonEmptyBin points to a non-empty bucket.
+    // Make sure lowestNonEmptyBin points to a non-empty bucket.
     while (lowestNonEmptyBin < numBuckets && buckets[lowestNonEmptyBin].empty()) {
         lowestNonEmptyBin++;
     }
@@ -46,21 +47,26 @@ Node* BucketPriorityQueue::Pop() {
         return nullptr;
     }
 
-    //remove a node from the back of the bucket.
+    // Remove a node from the back of the bucket.
     Node* node = buckets[lowestNonEmptyBin].back();
     buckets[lowestNonEmptyBin].pop_back();
+    node->bucketIndex = -1; // Reset the node's bucket index
     numNodesTracked--;
     return node;
 }
 
 
 void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
-    // Find the bucket corresponding to the old cost.
-    int oldIndex = GetBinIndex(oldCost);
-    auto& bucket = buckets[oldIndex];
+    // Get the old bucket index from the node.
+    int oldIndex = node->bucketIndex;
 
-    // Erase the node directly (C++20)
-    numNodesTracked -= std::erase(bucket, node);
+    // Remove the node from its old bucket.
+    auto& bucket = buckets[oldIndex];
+    auto it = std::find(bucket.begin(), bucket.end(), node);
+    if (it != bucket.end()) {
+        bucket.erase(it);
+        numNodesTracked--;
+    }
 
     // Reinsert the node with its updated cost.
     Push(node);

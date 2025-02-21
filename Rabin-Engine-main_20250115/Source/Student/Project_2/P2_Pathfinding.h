@@ -13,8 +13,9 @@ struct Node {
     float givenCost;    // g(x), cost from the start node to this node
     ListStatus onList;
     uint8_t neighbors;
+    int bucketIndex;
 
-    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None), neighbors(0){}
+    Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None), neighbors(0), bucketIndex(-1) {}
 };
 
 static const int8_t NEIGHBOR_OFFSETS[16] = {
