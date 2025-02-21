@@ -145,44 +145,45 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
         // Iterate over valid neighbors using bitwise operations
         for (int i = 0; i < 8; ++i) {
-            if (neighborBits & (1 << i)) {
-                int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
-                int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
-                GridPos neighbor = { parentNode->gridPos.row + dRow, parentNode->gridPos.col + dCol };
+            if (!(neighborBits & (1 << i))) continue;
 
-                if (terrain->is_wall(neighbor)) continue;
+            int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
+            int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
+            GridPos neighbor = { parentNode->gridPos.row + dRow, parentNode->gridPos.col + dCol };
 
-                Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
+            if (terrain->is_wall(neighbor)) continue;
 
-                float cost = (dRow != 0 && dCol != 0) ? 1.414f : 1.0f; // Diagonal cost
-                float new_g = parentNode->givenCost + cost;
-                float new_f = new_g + heuristic(neighbor, goal, request);
-                ListStatus listStatus = childNode->onList;
+            Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
 
+            float cost = (dRow != 0 && dCol != 0) ? 1.414f : 1.0f; // Diagonal cost
+            float new_g = parentNode->givenCost + cost;
+            float new_f = new_g + heuristic(neighbor, goal, request);
+            ListStatus listStatus = childNode->onList;
 
-                if (listStatus == ListStatus::None) {
-                    // Node not yet encountered; add it to the open list
-                    childNode->parent = parentNode;
-                    childNode->givenCost = new_g;
-                    childNode->finalCost = new_f;
-                    childNode->onList = ListStatus::Open;
-                    open_list_push(childNode, request);
-                }
-                else if (new_g < childNode->givenCost) {
-                    // Update the node's cost and position in the open list
-                    float old_f = childNode->finalCost;
-                    childNode->parent = parentNode;
-                    childNode->givenCost = new_g;
-                    childNode->finalCost = new_f;
+            if (listStatus == ListStatus::None) {
+                childNode->parent = parentNode;
+                childNode->givenCost = new_g;
+                childNode->finalCost = new_f;
+                childNode->onList = ListStatus::Open;
+                open_list_push(childNode, request);
+                continue;
+            }
 
-                    if (listStatus == ListStatus::Open) {
-                        openList.DecreaseKey(childNode, old_f);
-                    }
-                    else if (listStatus == ListStatus::Closed) {
-                        childNode->onList = ListStatus::Open;
-                        open_list_push(childNode, request);
-                    }
-                }
+            if (new_g >= childNode->givenCost) continue;
+
+            float old_f = childNode->finalCost;
+            childNode->parent = parentNode;
+            childNode->givenCost = new_g;
+            childNode->finalCost = new_f;
+
+            if (listStatus == ListStatus::Open) {
+                openList.DecreaseKey(childNode, old_f);
+                continue;
+            }
+
+            if (listStatus == ListStatus::Closed) {
+                childNode->onList = ListStatus::Open;
+                open_list_push(childNode, request);
             }
         }
 
