@@ -109,9 +109,8 @@ public:
     {
         openList.Reset();
     }
-    void precompute_valid_neighbors();
+    void precompute_data();
     uint8_t compute_valid_neighbors(const GridPos& pos);
-    void precompute_terrain_data();
 
 private:
     //maximum number of neighbors for any cell

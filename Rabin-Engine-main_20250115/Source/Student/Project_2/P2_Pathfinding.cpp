@@ -92,7 +92,7 @@ bool AStarPather::initialize()
 {
     clear_open_list();
 
-    Callback cb = std::bind(&AStarPather::precompute_valid_neighbors, this);
+    Callback cb = std::bind(&AStarPather::precompute_data, this);
     Messenger::listen_for_message(Messages::MAP_CHANGE, cb);
     
     return true;
@@ -392,15 +392,14 @@ void AStarPather::open_list_push(Node* node, PathRequest& request)
     openList.Push(node);
 }
 
-void AStarPather::precompute_valid_neighbors() {
+void AStarPather::precompute_data() {
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
             GridPos pos = { row, col };
             nodes[row * MAP_WIDTH + col].neighbors = compute_valid_neighbors(pos);
+            isWall[row * MAP_WIDTH + col] = terrain->is_wall({ row, col });
         }
     }
-
-    precompute_terrain_data();
 }
 
 uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
@@ -429,13 +428,4 @@ uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
     }
 
     return neighbors;
-}
-
-void AStarPather::precompute_terrain_data()
-{
-    for (int row = 0; row < MAP_HEIGHT; ++row) {
-        for (int col = 0; col < MAP_WIDTH; ++col) {
-            isWall[row * MAP_WIDTH + col] = terrain->is_wall({ row, col });
-        }
-    }
 }
