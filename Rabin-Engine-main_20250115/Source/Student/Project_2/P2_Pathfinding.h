@@ -10,23 +10,23 @@ enum ListStatus {
 
 struct Node {
     Node* parent;
-    GridPos gridPos;    // Node's location (assuming GridPos is a struct with x, y coordinates)
-    float finalCost;    // f(x) = g(x) + h(x), total estimated cost
-    float givenCost;    // g(x), cost from the start node to this node
+    GridPos gridPos;   
+    float finalCost;    
+    float givenCost;    
     ListStatus onList;
 
     Node() : parent(nullptr), gridPos({ 0, 0 }), finalCost(0), givenCost(0), onList(ListStatus::None) {}
 };
 
 static const int8_t NEIGHBOR_OFFSETS[16] = {
-    1,  0,   // down      (row +1, col +0)
-   -1,  0,   // up        (row -1, col +0)
-    0,  1,   // right     (row +0, col +1)
-    0, -1,   // left      (row +0, col -1)
-    1,  1,   // down-right
-    1, -1,   // down-left
-   -1,  1,   // up-right
-   -1, -1    // up-left
+    1,  0,   
+   -1,  0,  
+    0,  1,   
+    0, -1,   
+    1,  1,  
+    1, -1,  
+   -1,  1, 
+   -1, -1  
 };
 
 static const int MAX_NEIGHBORS = 8;
@@ -37,55 +37,40 @@ struct Neighbors {
     int count = 0; 
 };
 
-class BucketPriorityQueue {
+class BucketOpenList {
 public:
-    //numBuckets: number of buckets (should be small)
-    //division: the cost range covered per bucket (choose so that all f_costs fall into one of these few buckets)
-    BucketPriorityQueue(int numBuckets, float division);
-    ~BucketPriorityQueue();
+    BucketOpenList(int numBuckets, float division);
+    ~BucketOpenList();
 
-    //set the base cost (optional, default is zero)
-    inline void SetBaseCost(float baseCost) { baseCost = baseCost; }
-
-    //reset clears all buckets and resets bookkeeping.
-    inline void Reset() {
+    inline void reset() {
         for (auto& bucket : buckets) {
             bucket.clear();
         }
         numNodesTracked = 0;
         lowestNonEmptyBin = numBuckets;
-        baseCost = 0.0f;
     }
 
-    //returns true if there are no nodes in any bucket.
-    inline bool Empty() const { return numNodesTracked == 0; }
+    inline bool empty() const { return numNodesTracked == 0; }
 
-    //inserts a node into the appropriate bucket based on node->finalCost.
-    void Push(Node* node);
+    void push(Node* node);
 
-    //pops and returns a node from the lowest non-empty bucket.
-    Node* Pop();
+    Node* pop();
 
-    //removes a node from its old bucket (based on oldCost) and reinserts it.
-    void DecreaseKey(Node* node, float oldCost);
+    void update_fcost(Node* node, float oldCost);
 
 private:
-    //total number of buckets.
     int numBuckets;     
-    //index of the lowest bucket that is not empty.
-    int lowestNonEmptyBin;  
-    //total number of nodes in the queue.
-    int numNodesTracked;    
-    //cost range covered per bucket.
-    float division;   
-    //base cost offset.
-    float baseCost;         
 
-    //buckets – each bucket is an unsorted vector of Node pointers.
+    int lowestNonEmptyBin;  
+
+    int numNodesTracked;    
+
+    float division;      
+
     std::vector<std::vector<Node*>> buckets;
 
-    inline int GetBinIndex(float cost) const {
-        int index = static_cast<int>((cost - baseCost) / division);
+    inline int get_bucket_index(float cost) const {
+        int index = static_cast<int>(cost / division);
         if (index < 0) index = 0;
         if (index >= numBuckets) index = numBuckets - 1;
         return index;
@@ -127,7 +112,7 @@ private:
 
     Node nodes[MAP_HEIGHT][MAP_WIDTH];  
     Neighbors validNeighbors[MAP_HEIGHT][MAP_WIDTH]; 
-    BucketPriorityQueue openList;
+    BucketOpenList openList;
     std::vector<Vec3> finalPath;
 
     GridPos start, goal;

@@ -14,10 +14,9 @@ bool ProjectTwo::implemented_goal_bounding()
 }
 #pragma endregion
 
-BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
+BucketOpenList::BucketOpenList(int numBuckets, float division)
     : numBuckets(numBuckets),
     division(division),
-    baseCost(0.0f),
     lowestNonEmptyBin(numBuckets),
     numNodesTracked(0)
 {
@@ -25,29 +24,34 @@ BucketPriorityQueue::BucketPriorityQueue(int numBuckets, float division)
     buckets.resize(numBuckets);
 }
 
-BucketPriorityQueue::~BucketPriorityQueue() {
+BucketOpenList::~BucketOpenList() {
     //nothing to do because std::vector cleans up automatically.
 }
 
-void BucketPriorityQueue::Push(Node* node) {
-    int index = GetBinIndex(node->finalCost);
+void BucketOpenList::push(Node* node) 
+{
+    int index = get_bucket_index(node->finalCost);
     buckets[index].push_back(node);
     numNodesTracked++;
-    if (index < lowestNonEmptyBin) {
+    if (index < lowestNonEmptyBin) 
+    {
         lowestNonEmptyBin = index;
     }
 }
 
-Node* BucketPriorityQueue::Pop() {
-    if (Empty()) {
+Node* BucketOpenList::pop() 
+{
+    if (empty()) {
         return nullptr;
     }
 
     //make sure m_lowestNonEmptyBin points to a non-empty bucket.
-    while (lowestNonEmptyBin < numBuckets && buckets[lowestNonEmptyBin].empty()) {
+    while (lowestNonEmptyBin < numBuckets && buckets[lowestNonEmptyBin].empty()) 
+    {
         lowestNonEmptyBin++;
     }
-    if (lowestNonEmptyBin >= numBuckets) {
+    if (lowestNonEmptyBin >= numBuckets) 
+    {
         return nullptr;
     }
 
@@ -59,11 +63,13 @@ Node* BucketPriorityQueue::Pop() {
 }
 
 
-void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
+void BucketOpenList::update_fcost(Node* node, float oldCost) 
+{
     //find the bucket corresponding to the old cost.
-    int oldIndex = GetBinIndex(oldCost);
+    int oldIndex = get_bucket_index(oldCost);
     auto& bucket = buckets[oldIndex];
-    for (auto it = bucket.begin(); it != bucket.end(); ++it) {
+    for (auto it = bucket.begin(); it != bucket.end(); ++it) 
+    {
         if (*it == node) {
             bucket.erase(it);
             numNodesTracked--;
@@ -71,7 +77,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
         }
     }
     //reinsert the node with its updated cost.
-    Push(node);
+    push(node);
 }
 
 AStarPather::AStarPather() : openList(600, 0.25f)
@@ -153,7 +159,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
     }
 
-    while (!openList.Empty())
+    while (!openList.empty())
     {
         Node* parentNode = open_list_pop();  
 
@@ -219,7 +225,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
                     if (childNode->onList == ListStatus::Open)
                     {
                         //the node is already in the open list; update its bucket location.
-                        openList.DecreaseKey(childNode, old_f);
+                        openList.update_fcost(childNode, old_f);
                     }
                     else if (childNode->onList == ListStatus::Closed)
                     {
@@ -438,25 +444,28 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path)
 
 void AStarPather::open_list_push(Node* node, PathRequest& request)
 {
-    if (request.settings.debugColoring) {
+    if (request.settings.debugColoring) 
+    {
         terrain->set_color(node->gridPos, Colors::Blue);
     }
-    openList.Push(node);
+    openList.push(node);
 }
 
 Node* AStarPather::open_list_pop()
 {
-    return openList.Pop();
+    return openList.pop();
 }
 
 void AStarPather::clear_open_list()
 {
-    openList.Reset();
+    openList.reset();
 }
 
 void AStarPather::precompute_valid_neighbors() {
-    for (int row = 0; row < MAP_HEIGHT; ++row) {
-        for (int col = 0; col < MAP_WIDTH; ++col) {
+    for (int row = 0; row < MAP_HEIGHT; ++row) 
+    {
+        for (int col = 0; col < MAP_WIDTH; ++col) 
+        {
             GridPos pos = { row, col };
             compute_valid_neighbors(pos, validNeighbors[row][col]);
         }
@@ -466,7 +475,8 @@ void AStarPather::precompute_valid_neighbors() {
 void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbors) {
     neighbors.count = 0; 
 
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 8; ++i) 
+    {
         int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
         int8_t dCol = NEIGHBOR_OFFSETS[i * 2 + 1];
 
@@ -488,31 +498,38 @@ void AStarPather::compute_valid_neighbors(const GridPos& pos, Neighbors& neighbo
     }
 }
 
-void AStarPather::init_floyd_warshall() {
-    // Initialize distances and next nodes
-    for (int i = 0; i < MAP_HEIGHT; ++i) {
-        for (int j = 0; j < MAP_WIDTH; ++j) {
-            for (int k = 0; k < MAP_HEIGHT; ++k) {
-                for (int l = 0; l < MAP_WIDTH; ++l) {
+void AStarPather::init_floyd_warshall() 
+{
+
+    for (int i = 0; i < MAP_HEIGHT; ++i) 
+    {
+        for (int j = 0; j < MAP_WIDTH; ++j) 
+        {
+            for (int k = 0; k < MAP_HEIGHT; ++k) 
+            {
+                for (int l = 0; l < MAP_WIDTH; ++l) 
+                {
                     if (i == k && j == l) {
-                        fwDistances[i][j][k][l] = 0; // Distance to self is 0
+                        fwDistances[i][j][k][l] = 0; 
                     }
                     else {
                         fwDistances[i][j][k][l] = std::numeric_limits<float>::infinity(); // Initialize to infinity
                     }
-                    fwNext[i][j][k][l] = { -1, -1 }; // No next node initially
+                    fwNext[i][j][k][l] = { -1, -1 }; 
                 }
             }
         }
     }
 
-    // Set distances for direct neighbors
-    for (int i = 0; i < MAP_HEIGHT; ++i) {
-        for (int j = 0; j < MAP_WIDTH; ++j) {
-            if (terrain->is_wall(i, j)) continue; // Skip walls
+    for (int i = 0; i < MAP_HEIGHT; ++i) 
+    {
+        for (int j = 0; j < MAP_WIDTH; ++j) 
+        {
+            if (terrain->is_wall(i, j)) continue; 
 
             Neighbors neighbors = get_neighbors({ i, j });
-            for (int n = 0; n < neighbors.count; ++n) {
+            for (int n = 0; n < neighbors.count; ++n) 
+            {
                 GridPos neighbor = neighbors.positions[n];
                 float cost = (neighbor.row != i && neighbor.col != j) ? 1.414f : 1.0f; // Diagonal cost is sqrt(2)
                 fwDistances[i][j][neighbor.row][neighbor.col] = cost;
@@ -522,20 +539,27 @@ void AStarPather::init_floyd_warshall() {
     }
 
     // Floyd-Warshall algorithm
-    for (int kRow = 0; kRow < MAP_HEIGHT; ++kRow) {
-        for (int kCol = 0; kCol < MAP_WIDTH; ++kCol) {
-            if (terrain->is_wall(kRow, kCol)) continue; // Skip walls
+    for (int kRow = 0; kRow < MAP_HEIGHT; ++kRow) 
+    {
+        for (int kCol = 0; kCol < MAP_WIDTH; ++kCol) 
+        {
+            if (terrain->is_wall(kRow, kCol)) continue; 
 
-            for (int iRow = 0; iRow < MAP_HEIGHT; ++iRow) {
-                for (int iCol = 0; iCol < MAP_WIDTH; ++iCol) {
+            for (int iRow = 0; iRow < MAP_HEIGHT; ++iRow) 
+            {
+                for (int iCol = 0; iCol < MAP_WIDTH; ++iCol) 
+                {
                     if (terrain->is_wall(iRow, iCol)) continue; // Skip walls
 
-                    for (int jRow = 0; jRow < MAP_HEIGHT; ++jRow) {
-                        for (int jCol = 0; jCol < MAP_WIDTH; ++jCol) {
+                    for (int jRow = 0; jRow < MAP_HEIGHT; ++jRow) 
+                    {
+                        for (int jCol = 0; jCol < MAP_WIDTH; ++jCol) 
+                        {
                             if (terrain->is_wall(jRow, jCol)) continue; // Skip walls
 
                             float throughK = fwDistances[iRow][iCol][kRow][kCol] + fwDistances[kRow][kCol][jRow][jCol];
-                            if (throughK < fwDistances[iRow][iCol][jRow][jCol]) {
+                            if (throughK < fwDistances[iRow][iCol][jRow][jCol]) 
+                            {
                                 fwDistances[iRow][iCol][jRow][jCol] = throughK;
                                 fwNext[iRow][iCol][jRow][jCol] = fwNext[iRow][iCol][kRow][kCol];
                             }
@@ -551,7 +575,7 @@ std::vector<GridPos> AStarPather::reconstruct_floyd_warshall_path(const GridPos&
     std::vector<GridPos> path;
 
     if (fwNext[start.row][start.col][goal.row][goal.col].row == -1) {
-        return path; // No path exists
+        return path;
     }
 
     GridPos current = start;
