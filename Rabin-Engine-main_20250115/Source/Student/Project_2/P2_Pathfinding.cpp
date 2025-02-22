@@ -14,7 +14,7 @@ bool ProjectTwo::implemented_goal_bounding()
 }
 #pragma endregion
 
-BucketPriorityQueue::BucketPriorityQueue(float division,int numBuckets)
+BucketOpenList::BucketOpenList(float division,int numBuckets)
     : 
     division(division), 
     numBuckets(numBuckets),
@@ -29,23 +29,25 @@ BucketPriorityQueue::BucketPriorityQueue(float division,int numBuckets)
     }
 }
 
-void BucketPriorityQueue::Push(Node* node) {
-    int index = GetBinIndex(node->finalCost);
+void BucketOpenList::push(Node* node) {
+    int index = get_bucket_index(node->finalCost);
     buckets[index].push_back(node);
     node->bucketIndex = index;
-    node->bucketPosition = buckets[index].size() - 1; // Store position
+    //store position
+    node->bucketPosition = buckets[index].size() - 1; 
     numNodesTracked++;
-    if (index < lowestNonEmptyBin) {
+    if (index < lowestNonEmptyBin) 
+    {
         lowestNonEmptyBin = index;
     }
 }
 
-Node* BucketPriorityQueue::Pop() {
-    if (Empty()) {
+Node* BucketOpenList::pop() {
+    if (empty()) {
         return nullptr;
     }
 
-    // Make sure lowestNonEmptyBin points to a non-empty bucket.
+    //make sure lowestNonEmptyBin points to a non-empty bucket.
     while (lowestNonEmptyBin < numBuckets && buckets[lowestNonEmptyBin].empty()) {
         lowestNonEmptyBin++;
     }
@@ -53,32 +55,37 @@ Node* BucketPriorityQueue::Pop() {
         return nullptr;
     }
 
-    // Remove a node from the back of the bucket.
+    //remove a node from the back of the bucket.
     Node* node = buckets[lowestNonEmptyBin].back();
     buckets[lowestNonEmptyBin].pop_back();
-    node->bucketIndex = -1; // Reset the node's bucket index
+
+    //reset the node's bucket index
+    node->bucketIndex = -1; 
     numNodesTracked--;
     return node;
 }
 
 
-void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
+void BucketOpenList::update_f_cost(Node* node, float oldCost) 
+{
     int oldIndex = node->bucketIndex;
     auto& bucket = buckets[oldIndex];
 
-    // Remove the node using its stored position
-    if (node->bucketPosition < bucket.size()) {
-        bucket[node->bucketPosition] = bucket.back(); // Swap with last element
+    //remove the node using its stored position
+    if (node->bucketPosition < bucket.size()) 
+    {
+        bucket[node->bucketPosition] = bucket.back(); //swap with last element
         bucket.pop_back();
-        if (node->bucketPosition < bucket.size()) {
-            // Update the position of the swapped element
+        if (node->bucketPosition < bucket.size()) 
+        {
+            //update the position of the swapped element
             bucket[node->bucketPosition]->bucketPosition = node->bucketPosition;
         }
         numNodesTracked--;
     }
 
     // Reinsert the node with its updated cost
-    Push(node);
+    push(node);
 }
 
 AStarPather::AStarPather() : openList(0.25f, 600), start({0,0}), goal({ 0,0 }), isFirstRequest(false)
@@ -116,7 +123,8 @@ PathResult AStarPather::compute_path(PathRequest& request)
         else 
         {
             clear_nodes();
-            clear_open_list();  // This now resets m_openList (bucket queue)
+            //this now resets m_openList (bucket queue)
+            clear_open_list();  
         }
 
         start = terrain->get_grid_position(request.start);
@@ -134,7 +142,7 @@ PathResult AStarPather::compute_path(PathRequest& request)
         open_list_push(startNode, request);  
     }
 
-    while (!openList.Empty())
+    while (!openList.empty())
     {
         Node* parentNode = open_list_pop();  
         
@@ -160,14 +168,16 @@ PathResult AStarPather::compute_path(PathRequest& request)
         }
 
         parentNode->onList = ListStatus::Closed;
-        if (request.settings.debugColoring) {
+        if (request.settings.debugColoring) 
+        {
             terrain->set_color(parentNode->gridPos, Colors::Yellow);
         }
 
         uint8_t neighborBits = nodes[parentNode->gridPos.row * MAP_WIDTH + parentNode->gridPos.col].neighbors;
 
-        // Iterate over valid neighbors using bitwise operations
-        for (int i = 0; i < 8; ++i) {
+        //iterate over valid neighbors using bitwise operations
+        for (int i = 0; i < 8; ++i) 
+        {
             if (!(neighborBits & (1 << i))) continue;
 
             int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
@@ -183,7 +193,8 @@ PathResult AStarPather::compute_path(PathRequest& request)
             float new_f = new_g + (heuristic(neighbor, goal, request) * request.settings.weight);
             ListStatus listStatus = childNode->onList;
 
-            if (listStatus == ListStatus::None) {
+            if (listStatus == ListStatus::None) 
+            {
                 childNode->parent = parentNode;
                 childNode->givenCost = new_g;
                 childNode->finalCost = new_f;
@@ -199,12 +210,14 @@ PathResult AStarPather::compute_path(PathRequest& request)
             childNode->givenCost = new_g;
             childNode->finalCost = new_f;
 
-            if (listStatus == ListStatus::Open) {
-                openList.DecreaseKey(childNode, old_f);
+            if (listStatus == ListStatus::Open) 
+            {
+                openList.update_f_cost(childNode, old_f);
                 continue;
             }
 
-            if (listStatus == ListStatus::Closed) {
+            if (listStatus == ListStatus::Closed) 
+            {
                 childNode->onList = ListStatus::Open;
                 open_list_push(childNode, request);
             }
@@ -237,14 +250,16 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     int dx = std::abs(a.col - b.col);
     int dy = std::abs(a.row - b.row);
 
-    // Prioritize Octile heuristic (used in Speed Test)
-    if (request.settings.heuristic == Heuristic::OCTILE) {
+    //prioritize Octile heuristic (used in Speed Test)
+    if (request.settings.heuristic == Heuristic::OCTILE) 
+    {
         int dMin = std::min(dx, dy);
         return (dMin * DIAGONAL_COST) + std::max(dx, dy) - dMin;
     }
 
-    // Fallback to other heuristics
-    switch (request.settings.heuristic) {
+    //fallback to other heuristics
+    switch (request.settings.heuristic) 
+    {
     case Heuristic::CHEBYSHEV:
         return std::max(dx, dy);
     case Heuristic::INCONSISTENT:
@@ -261,8 +276,9 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {
     Node* current = goalNode;
 
-    // Traverse from the goal node to the start node
-    while (current) {
+    //traverse from the goal node to the start node
+    while (current) 
+    {
         GridPos currentGridPos = current->gridPos;
         path.push_back(terrain->get_world_position(current->gridPos));
         current = current->parent;
@@ -393,15 +409,19 @@ void AStarPather::add_intermediate_points(std::vector<Vec3>& path)
 
 void AStarPather::open_list_push(Node* node, PathRequest& request)
 {
-    if (request.settings.debugColoring) {
+    if (request.settings.debugColoring) 
+    {
         terrain->set_color(node->gridPos, Colors::Blue);
     }
-    openList.Push(node);
+    openList.push(node);
 }
 
-void AStarPather::precompute_data() {
-    for (int row = 0; row < MAP_HEIGHT; ++row) {
-        for (int col = 0; col < MAP_WIDTH; ++col) {
+void AStarPather::precompute_data() 
+{
+    for (int row = 0; row < MAP_HEIGHT; ++row) 
+    {
+        for (int col = 0; col < MAP_WIDTH; ++col) 
+        {
             GridPos pos = { row, col };
             nodes[row * MAP_WIDTH + col].neighbors = compute_valid_neighbors(pos);
             isWall[row * MAP_WIDTH + col] = terrain->is_wall({ row, col });
@@ -409,8 +429,10 @@ void AStarPather::precompute_data() {
     }
 }
 
-uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
-    uint8_t neighbors = 0; // Initialize all bits to 0 (invalid)
+uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) 
+{
+    //initialize all bits to 0 (invalid)
+    uint8_t neighbors = 0; 
 
     for (int i = 0; i < 8; ++i) {
         int8_t dRow = NEIGHBOR_OFFSETS[i * 2];
@@ -421,7 +443,7 @@ uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
         if (!terrain->is_valid_grid_position(newPos)) continue;
         if (terrain->is_wall(newPos)) continue;
 
-        // Diagonal movement: check adjacent cells
+        //diagonal movement: check adjacent cells
         if (dRow != 0 && dCol != 0) {
             GridPos adjacent1 = { pos.row, pos.col + dCol };
             GridPos adjacent2 = { pos.row + dRow, pos.col };
@@ -430,7 +452,7 @@ uint8_t AStarPather::compute_valid_neighbors(const GridPos& pos) {
             if (terrain->is_wall(adjacent2)) continue;
         }
 
-        // Set the corresponding bit to 1 (valid neighbor)
+        //set the corresponding bit to 1 (valid neighbor)
         neighbors |= (1 << i);
     }
 
