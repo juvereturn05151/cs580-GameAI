@@ -239,7 +239,8 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
 
     // Prioritize Octile heuristic (used in Speed Test)
     if (request.settings.heuristic == Heuristic::OCTILE) {
-        return (std::min(dx, dy) * DIAGONAL_COST) + std::max(dx, dy) - std::min(dx, dy);
+        int dMin = std::min(dx, dy);
+        return (dMin * DIAGONAL_COST) + std::max(dx, dy) - dMin;
     }
 
     // Fallback to other heuristics
