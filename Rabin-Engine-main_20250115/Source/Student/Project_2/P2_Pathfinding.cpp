@@ -81,7 +81,7 @@ void BucketPriorityQueue::DecreaseKey(Node* node, float oldCost) {
     Push(node);
 }
 
-AStarPather::AStarPather() : openList(0.25f, 600), start({0,0}), goal({ 0,0 })
+AStarPather::AStarPather() : openList(0.25f, 600), start({0,0}), goal({ 0,0 }), isFirstRequest(false)
 {
     for (int row = 0; row < MAP_HEIGHT; ++row)
     {
@@ -109,9 +109,15 @@ PathResult AStarPather::compute_path(PathRequest& request)
 {
     if (request.newRequest)
     {
-        //request.path.clear();
-        clear_nodes();
-        clear_open_list();  // This now resets m_openList (bucket queue)
+        if (isFirstRequest)
+        {
+            isFirstRequest = true;
+        }
+        else 
+        {
+            clear_nodes();
+            clear_open_list();  // This now resets m_openList (bucket queue)
+        }
 
         start = terrain->get_grid_position(request.start);
         goal = terrain->get_grid_position(request.goal);

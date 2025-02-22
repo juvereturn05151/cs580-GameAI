@@ -123,4 +123,5 @@ private:
     std::vector<Vec3> finalPath;
 
     GridPos start, goal;
+    bool isFirstRequest;
 };
