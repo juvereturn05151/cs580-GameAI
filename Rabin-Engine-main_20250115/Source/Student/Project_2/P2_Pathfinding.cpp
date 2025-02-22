@@ -178,9 +178,9 @@ PathResult AStarPather::compute_path(PathRequest& request)
 
             Node* childNode = &nodes[neighbor.row * MAP_WIDTH + neighbor.col];
 
-            float cost = (dRow != 0 && dCol != 0) ? 1.414f : 1.0f; // Diagonal cost
+            float cost = (dRow != 0 && dCol != 0) ? DIAGONAL_COST : 1.0f; // Diagonal cost
             float new_g = parentNode->givenCost + cost;
-            float new_f = new_g + heuristic(neighbor, goal, request);
+            float new_f = new_g + (heuristic(neighbor, goal, request) * request.settings.weight);
             ListStatus listStatus = childNode->onList;
 
             if (listStatus == ListStatus::None) {
@@ -237,31 +237,24 @@ float AStarPather::heuristic(const GridPos& a, const GridPos& b, PathRequest& re
     int dx = std::abs(a.col - b.col);
     int dy = std::abs(a.row - b.row);
 
-    float h = 0.0f;
-
-    switch (request.settings.heuristic)
-    {
-    case Heuristic::OCTILE:
-        h = (std::min(dx, dy) * 1.414f) + std::max(dx, dy) - std::min(dx, dy);
-        break;
-    case Heuristic::CHEBYSHEV:
-        h = std::max(dx, dy);
-        break;
-    case Heuristic::INCONSISTENT:
-        h = ((a.row + a.col) % 2 > 0) ? std::sqrt(dx * dx + dy * dy) : 0.0f;
-        break;
-    case Heuristic::MANHATTAN:
-        h = dx + dy;
-        break;
-    case Heuristic::EUCLIDEAN:
-        h = std::sqrt(dx * dx + dy * dy);
-        break;
-    default:
-        h = 0.0f;
-        break;
+    // Prioritize Octile heuristic (used in Speed Test)
+    if (request.settings.heuristic == Heuristic::OCTILE) {
+        return (std::min(dx, dy) * DIAGONAL_COST) + std::max(dx, dy) - std::min(dx, dy);
     }
 
-    return h * request.settings.weight;
+    // Fallback to other heuristics
+    switch (request.settings.heuristic) {
+    case Heuristic::CHEBYSHEV:
+        return std::max(dx, dy);
+    case Heuristic::INCONSISTENT:
+        return ((a.row + a.col) % 2 > 0) ? std::sqrt(dx * dx + dy * dy) : 0.0f;
+    case Heuristic::MANHATTAN:
+        return dx + dy;
+    case Heuristic::EUCLIDEAN:
+        return std::sqrt(dx * dx + dy * dy);
+    default:
+        return 0.0f;
+    }
 }
 
 void AStarPather::reconstruct_path(Node* goalNode, std::vector<Vec3>& path) {

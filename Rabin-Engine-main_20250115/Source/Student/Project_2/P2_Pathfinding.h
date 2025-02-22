@@ -2,6 +2,8 @@
 #include "Misc/PathfindingDetails.hpp"
 #include "../Terrain/Terrain.h"
 
+static const float DIAGONAL_COST = 1.414f;
+
 enum ListStatus {
     None, Open, Closed
 };
@@ -116,6 +118,7 @@ private:
     //maximum number of neighbors for any cell
     static const int MAP_WIDTH = 40;
     static const int MAP_HEIGHT = 40;
+
 
     Node nodes[MAP_HEIGHT * MAP_WIDTH];  
     bool isWall[MAP_HEIGHT * MAP_WIDTH];
