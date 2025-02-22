@@ -23,6 +23,10 @@ BucketPriorityQueue::BucketPriorityQueue(float division,int numBuckets)
 {
     //resize the bucket vector so that we have numBuckets buckets.
     buckets.resize(numBuckets);
+
+    for (auto& bucket : buckets) {
+        bucket.reserve(1600);
+    }
 }
 
 void BucketPriorityQueue::Push(Node* node) {
