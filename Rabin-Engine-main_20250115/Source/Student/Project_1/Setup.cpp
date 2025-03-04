@@ -48,8 +48,8 @@ void ProjectOne::setup()
     camera->set_pitch(0.610865); // 35 degrees
 
     // Sound control (these sound functions can be kicked off in a behavior tree node - see the example in L_PlaySound.cpp)
-    audioManager->SetVolume(0.5f);
-    audioManager->PlaySoundEffect(L"Assets\\Audio\\retro.wav");
+    audioManager->SetVolume(0.0f);
+   // audioManager->PlaySoundEffect(L"Assets\\Audio\\retro.wav");
     // Uncomment for example on playing music in the engine (must be .wav)
     // audioManager->PlayMusic(L"Assets\\Audio\\motivate.wav");
     // audioManager->PauseMusic(...);

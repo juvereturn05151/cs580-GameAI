@@ -58,6 +58,8 @@ bool ProjectTwo::initialize()
     pather = std::make_unique<AStarPather>();
     audioManager = std::make_unique<AudioManager>();
 
+
+
     return terrain->initialize() &&
         agents->initialize() &&
         ui->initialize() &&

@@ -72,6 +72,7 @@ struct GridPos
     }
 };
 
+
 struct WindowSize
 {
     int width;
