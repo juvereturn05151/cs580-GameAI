@@ -23,8 +23,55 @@ float distance_to_closest_wall(int row, int col)
     */
 
     // WRITE YOUR CODE HERE
-    
-    return 0.0f; // REPLACE THIS
+    float min_distance = std::numeric_limits<float>::max(); // Initialize with a large value
+
+    // Get the map dimensions
+    int map_height = terrain->get_map_height();
+    int map_width = terrain->get_map_width();
+
+    // Iterate over all possible cells in the grid
+    for (int i = 0; i < map_height; ++i) {
+        for (int j = 0; j < map_width; ++j) {
+            // Check if the cell is a wall
+            if (terrain->is_wall(i, j)) {
+                // Calculate Euclidean distance
+                float distance = std::sqrt((i - row) * (i - row) + (j - col) * (j - col));
+                if (distance < min_distance) {
+                    min_distance = distance;
+                }
+            }
+        }
+    }
+
+    // Handle cells outside the map bounds (treated as walls)
+    // Check the four borders of the map
+    for (int i = 0; i < map_height; ++i) {
+        // Left border (j = -1)
+        float distance = std::sqrt((i - row) * (i - row) + (-1 - col) * (-1 - col));
+        if (distance < min_distance) {
+            min_distance = distance;
+        }
+        // Right border (j = map_width)
+        distance = std::sqrt((i - row) * (i - row) + (map_width - col) * (map_width - col));
+        if (distance < min_distance) {
+            min_distance = distance;
+        }
+    }
+
+    for (int j = 0; j < map_width; ++j) {
+        // Top border (i = -1)
+        float distance = std::sqrt((-1 - row) * (-1 - row) + (j - col) * (j - col));
+        if (distance < min_distance) {
+            min_distance = distance;
+        }
+        // Bottom border (i = map_height)
+        distance = std::sqrt((map_height - row) * (map_height - row) + (j - col) * (j - col));
+        if (distance < min_distance) {
+            min_distance = distance;
+        }
+    }
+
+    return min_distance;
 }
 
 bool is_clear_path(int row0, int col0, int row1, int col1)
