@@ -535,24 +535,85 @@ void normalize_solo_occupancy(MapLayer<float> &layer)
     }
 }
 
+/*
+    First, clear out the old values in the map layer by setting any negative value to 0.
+    Then, for every cell in the layer that is within the field of view cone, from the
+    enemy agent, mark it with the occupancy value.  Take the dot product between the view
+    vector and the vector from the agent to the cell, both normalized, and compare the
+    cosines directly instead of taking the arccosine to avoid introducing floating-point
+    inaccuracy (larger cosine means smaller angle).
+
+    If the tile is close enough to the enemy (less than closeDistance),
+    you only check if it's visible to enemy.  Make use of the is_clear_path
+    helper function.  Otherwise, you must consider the direction the enemy is facing too.
+    This creates a radius around the enemy that the player can be detected within, as well
+    as a fov cone.
+*/
 void enemy_field_of_view(MapLayer<float> &layer, float fovAngle, float closeDistance, float occupancyValue, AStarAgent *enemy)
 {
-    /*
-        First, clear out the old values in the map layer by setting any negative value to 0.
-        Then, for every cell in the layer that is within the field of view cone, from the
-        enemy agent, mark it with the occupancy value.  Take the dot product between the view
-        vector and the vector from the agent to the cell, both normalized, and compare the
-        cosines directly instead of taking the arccosine to avoid introducing floating-point
-        inaccuracy (larger cosine means smaller angle).
+    // Step 1: Clear out old values in the layer by setting any negative value to 0
+    for (int i = 0; i < terrain->get_map_height(); ++i) {
+        for (int j = 0; j < terrain->get_map_width(); ++j) {
+            if (layer.get_value(i, j) < 0.0f) {
+                layer.set_value(i, j, 0.0f);
+            }
+        }
+    }
 
-        If the tile is close enough to the enemy (less than closeDistance),
-        you only check if it's visible to enemy.  Make use of the is_clear_path
-        helper function.  Otherwise, you must consider the direction the enemy is facing too.
-        This creates a radius around the enemy that the player can be detected within, as well
-        as a fov cone.
-    */
+    // Get the enemy's position and direction in the XZ plane
+    Vec3 enemy_pos = enemy->get_position();
+    Vec3 enemy_dir = enemy->get_forward_vector();
 
-    // WRITE YOUR CODE HERE
+    // Normalize the enemy's direction vector
+    float enemy_dir_length = std::sqrt(enemy_dir.x * enemy_dir.x + enemy_dir.z * enemy_dir.z);
+    Vec2 enemy_dir_xz = { enemy_dir.x / enemy_dir_length, enemy_dir.z / enemy_dir_length };
+
+    // Calculate the cosine of the FOV angle (convert degrees to radians)
+    float fov_cosine = std::cos(fovAngle * M_PI / 180.0f);
+
+    // Iterate over all cells in the grid
+    for (int i = 0; i < terrain->get_map_height(); ++i) {
+        for (int j = 0; j < terrain->get_map_width(); ++j) {
+            // Skip wall cells
+            if (terrain->is_wall(i, j)) {
+                continue;
+            }
+
+            // Get the center position of the current cell in the XZ plane
+            Vec3 cell_world_pos = terrain->get_world_position(i, j);
+            Vec2 cell_pos_xz = { cell_world_pos.x, cell_world_pos.z };
+
+            // Calculate the vector from the enemy to the cell in the XZ plane
+            Vec2 enemy_to_cell = { cell_pos_xz.x - enemy_pos.x, cell_pos_xz.y - enemy_pos.z };
+
+            // Calculate the distance from the enemy to the cell
+            float distance = std::sqrt(enemy_to_cell.x * enemy_to_cell.x + enemy_to_cell.y * enemy_to_cell.y);
+
+            // Normalize the enemy-to-cell vector
+            if (distance < 0.0001f) {
+                continue; // Skip if the cell is too close to the enemy
+            }
+            enemy_to_cell.x /= distance;
+            enemy_to_cell.y /= distance;
+
+            // Calculate the dot product between the enemy's direction and the enemy-to-cell vector
+            float dot_product = enemy_dir_xz.x * enemy_to_cell.x + enemy_dir_xz.y * enemy_to_cell.y;
+
+            // Check if the cell is within the FOV cone or close enough
+            if (distance <= closeDistance) {
+                // If the cell is within closeDistance, only check visibility
+                if (is_clear_path(static_cast<int>(enemy_pos.z), static_cast<int>(enemy_pos.x), i, j)) {
+                    layer.set_value(i, j, occupancyValue);
+                }
+            }
+            else {
+                // If the cell is outside closeDistance, check both visibility and FOV
+                if (dot_product >= fov_cosine && is_clear_path(static_cast<int>(enemy_pos.z), static_cast<int>(enemy_pos.x), i, j)) {
+                    layer.set_value(i, j, occupancyValue);
+                }
+            }
+        }
+    }
 }
 
 bool enemy_find_player(MapLayer<float> &layer, AStarAgent *enemy, Agent *player)
@@ -579,20 +640,71 @@ bool enemy_find_player(MapLayer<float> &layer, AStarAgent *enemy, Agent *player)
     return false;
 }
 
+
+/*
+    Attempt to find a cell with the highest nonzero value (normalization may
+    not produce exactly 1.0 due to floating point error), and then set it as
+    the new target, using enemy->path_to.
+
+    If there are multiple cells with the same highest value, then pick the
+    cell closest to the enemy.
+
+    Return whether a target cell was found.
+*/
 bool enemy_seek_player(MapLayer<float> &layer, AStarAgent *enemy)
 {
-    /*
-        Attempt to find a cell with the highest nonzero value (normalization may
-        not produce exactly 1.0 due to floating point error), and then set it as
-        the new target, using enemy->path_to.
 
-        If there are multiple cells with the same highest value, then pick the
-        cell closest to the enemy.
 
-        Return whether a target cell was found.
-    */
+    // Get the map dimensions
+    int map_height = terrain->get_map_height();
+    int map_width = terrain->get_map_width();
 
-    // WRITE YOUR CODE HERE
+    // Initialize variables to track the highest value and closest cell
+    float max_value = 0.0f;
+    int target_row = -1;
+    int target_col = -1;
+    float min_distance = std::numeric_limits<float>::max();
 
-    return false; // REPLACE THIS
+    // Get the enemy's current position
+    Vec3 enemy_pos = enemy->get_position();
+    int enemy_row = static_cast<int>(enemy_pos.z); // Assuming Z corresponds to row
+    int enemy_col = static_cast<int>(enemy_pos.x); // Assuming X corresponds to column
+
+    // Iterate over all cells in the grid
+    for (int i = 0; i < map_height; ++i) {
+        for (int j = 0; j < map_width; ++j) {
+            float cell_value = layer.get_value(i, j);
+
+            // Skip cells with zero or negative values
+            if (cell_value <= 0.0f) {
+                continue;
+            }
+
+            // Check if this cell has a higher value than the current max
+            if (cell_value > max_value) {
+                max_value = cell_value;
+                target_row = i;
+                target_col = j;
+                min_distance = std::sqrt((i - enemy_row) * (i - enemy_row) + (j - enemy_col) * (j - enemy_col));
+            }
+            // If the cell has the same value as the current max, check if it's closer
+            else if (cell_value == max_value) {
+                float distance = std::sqrt((i - enemy_row) * (i - enemy_row) + (j - enemy_col) * (j - enemy_col));
+                if (distance < min_distance) {
+                    target_row = i;
+                    target_col = j;
+                    min_distance = distance;
+                }
+            }
+        }
+    }
+
+    // If a target cell was found, set it as the enemy's new target
+    if (target_row != -1 && target_col != -1) {
+        enemy->path_to(Vec3(target_row, target_col,0));
+        return true;
+    }
+
+    // No target cell found
+    return false;
 }
