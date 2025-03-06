@@ -569,7 +569,7 @@ void normalize_solo_occupancy(MapLayer<float> &layer)
     This creates a radius around the enemy that the player can be detected within, as well
     as a fov cone.
 */
-void enemy_field_of_view(MapLayer<float> &layer, float fovAngle, float closeDistance, float occupancyValue, AStarAgent *enemy)
+void enemy_field_of_view(MapLayer<float>& layer, float fovAngle, float closeDistance, float occupancyValue, AStarAgent* enemy)
 {
     // Step 1: Clear out old values in the layer by setting any negative value to 0
     for (int i = 0; i < terrain->get_map_height(); ++i) {
@@ -590,6 +590,11 @@ void enemy_field_of_view(MapLayer<float> &layer, float fovAngle, float closeDist
 
     // Calculate the cosine of the FOV angle (convert degrees to radians)
     float fov_cosine = std::cos(fovAngle * M_PI / 180.0f);
+
+    // Convert the enemy's world position to grid coordinates
+    GridPos enemy_grid_pos = terrain->get_grid_position(enemy_pos);
+    int enemy_row = enemy_grid_pos.row;
+    int enemy_col = enemy_grid_pos.col;
 
     // Iterate over all cells in the grid
     for (int i = 0; i < terrain->get_map_height(); ++i) {
@@ -622,13 +627,13 @@ void enemy_field_of_view(MapLayer<float> &layer, float fovAngle, float closeDist
             // Check if the cell is within the FOV cone or close enough
             if (distance <= closeDistance) {
                 // If the cell is within closeDistance, only check visibility
-                if (is_clear_path(static_cast<int>(enemy_pos.z), static_cast<int>(enemy_pos.x), i, j)) {
+                if (is_clear_path(enemy_row, enemy_col, i, j)) {
                     layer.set_value(i, j, occupancyValue);
                 }
             }
             else {
                 // If the cell is outside closeDistance, check both visibility and FOV
-                if (dot_product >= fov_cosine && is_clear_path(static_cast<int>(enemy_pos.z), static_cast<int>(enemy_pos.x), i, j)) {
+                if (dot_product >= fov_cosine && is_clear_path(enemy_row, enemy_col, i, j)) {
                     layer.set_value(i, j, occupancyValue);
                 }
             }
@@ -636,27 +641,26 @@ void enemy_field_of_view(MapLayer<float> &layer, float fovAngle, float closeDist
     }
 }
 
-bool enemy_find_player(MapLayer<float> &layer, AStarAgent *enemy, Agent *player)
+bool enemy_find_player(MapLayer<float>& layer, AStarAgent* enemy, Agent* player)
 {
     /*
         Check if the player's current tile has a negative value, ie in the fov cone
         or within a detection radius.
     */
 
-    const auto &playerWorldPos = player->get_position();
+    const auto& playerWorldPos = player->get_position();
 
+    // Convert the player's world position to grid coordinates
     const auto playerGridPos = terrain->get_grid_position(playerWorldPos);
 
-    // verify a valid position was returned
-    if (terrain->is_valid_grid_position(playerGridPos) == true)
-    {
-        if (layer.get_value(playerGridPos) < 0.0f)
-        {
+    // Verify a valid position was returned
+    if (terrain->is_valid_grid_position(playerGridPos)) {
+        if (layer.get_value(playerGridPos.row, playerGridPos.col) < 0.0f) {
             return true;
         }
     }
 
-    // player isn't in the detection radius or fov cone, OR somehow off the map
+    // Player isn't in the detection radius or fov cone, OR somehow off the map
     return false;
 }
 
@@ -671,10 +675,8 @@ bool enemy_find_player(MapLayer<float> &layer, AStarAgent *enemy, Agent *player)
 
     Return whether a target cell was found.
 */
-bool enemy_seek_player(MapLayer<float> &layer, AStarAgent *enemy)
+bool enemy_seek_player(MapLayer<float>& layer, AStarAgent* enemy)
 {
-
-
     // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
@@ -685,10 +687,11 @@ bool enemy_seek_player(MapLayer<float> &layer, AStarAgent *enemy)
     int target_col = -1;
     float min_distance = std::numeric_limits<float>::max();
 
-    // Get the enemy's current position
+    // Get the enemy's current position and convert it to grid coordinates
     Vec3 enemy_pos = enemy->get_position();
-    int enemy_row = static_cast<int>(enemy_pos.z); // Assuming Z corresponds to row
-    int enemy_col = static_cast<int>(enemy_pos.x); // Assuming X corresponds to column
+    GridPos enemy_grid_pos = terrain->get_grid_position(enemy_pos);
+    int enemy_row = enemy_grid_pos.row;
+    int enemy_col = enemy_grid_pos.col;
 
     // Iterate over all cells in the grid
     for (int i = 0; i < map_height; ++i) {
@@ -721,7 +724,7 @@ bool enemy_seek_player(MapLayer<float> &layer, AStarAgent *enemy)
 
     // If a target cell was found, set it as the enemy's new target
     if (target_row != -1 && target_col != -1) {
-        enemy->path_to(Vec3(target_row, target_col,0));
+        enemy->path_to(Vec3(target_row, target_col, 0));
         return true;
     }
 
