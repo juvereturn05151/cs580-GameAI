@@ -67,6 +67,7 @@ float distance_to_closest_wall(int row, int col)
         {
             min_distance = distance;
         }
+
         //bottom border where i = map_height
         distance = std::sqrt((map_height - row) * (map_height - row) + (j - col) * (j - col));
         if (distance < min_distance) 
@@ -125,8 +126,6 @@ bool line_intersect(float x1, float y1, float x2, float y2, float x3, float y3, 
 */
 bool is_clear_path(int row0, int col0, int row1, int col1)
 {
-    //get the center points of the two cells
-    
     //center of cell (row0, col0)
     float x0 = col0 + 0.5f; 
     float y0 = row0 + 0.5f;
@@ -181,28 +180,30 @@ bool is_clear_path(int row0, int col0, int row1, int col1)
 */
 void analyze_openness(MapLayer<float> &layer)
 {
-   // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Iterate over all cells in the grid
+    //iterate over all cells in the grid
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells
-            if (terrain->is_wall(i, j)) {
-                layer.set_value(i, j, 0.0f); // Walls have openness 0
+            //skip wall cells
+            //walls have openness 0
+            if (terrain->is_wall(i, j)) 
+            {
+                layer.set_value(i, j, 0.0f); 
                 continue;
             }
 
-            // Calculate the distance to the closest wall or edge
+            //calculate the distance to the closest wall or edge
             float d = distance_to_closest_wall(i, j);
 
-            // Avoid division by zero (in case d is 0, which shouldn't happen for non-wall cells)
+            //avoid division by zero
             if (d < 0.0001f) {
                 layer.set_value(i, j, 0.0f);
             }
-            else {
-                // Calculate openness as 1 / (d * d)
+            //calculate openness as 1 / (d * d)
+            else 
+            {
                 float openness = 1.0f / (d * d);
                 layer.set_value(i, j, openness);
             }
@@ -221,33 +222,30 @@ void analyze_openness(MapLayer<float> &layer)
 */
 void analyze_visibility(MapLayer<float> &layer)
 {
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Iterate over all cells in the grid
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells
+            //skip wall cells
+            //walls have visibility 0
             if (terrain->is_wall(i, j)) 
             {
-                layer.set_value(i, j, 0.0f); // Walls have visibility 0
+                layer.set_value(i, j, 0.0f);
                 continue;
             }
 
-            // Count the number of visible cells
             int visible_count = 0;
 
-            // Iterate over all other cells in the grid
-            for (int x = 0; x < map_height; ++x) {
-                for (int y = 0; y < map_width; ++y) {
-                    // Skip the current cell and wall cells
+            for (int x = 0; x < map_height; ++x) 
+            {
+                for (int y = 0; y < map_width; ++y) 
+                {
                     if ((x == i && y == j) || terrain->is_wall(x, y)) 
                     {
                         continue;
                     }
 
-                    // Check if there is a clear path between the two cells
                     if (is_clear_path(i, j, x, y)) 
                     {
                         visible_count++;
@@ -255,11 +253,11 @@ void analyze_visibility(MapLayer<float> &layer)
                 }
             }
 
-            // Calculate visibility as visible_count / 160, capped at 1.0
+            //calculate visibility as visible_count / 160, capped at 1.0
             float visibility = static_cast<float>(visible_count) / 160.0f;
-            visibility = std::min(visibility, 1.0f); // Cap at 1.0
+            visibility = std::min(visibility, 1.0f);
 
-            // Set the visibility value in the layer
+            //set the visibility value in the layer
             layer.set_value(i, j, visibility);
         }
     }
@@ -276,67 +274,75 @@ void analyze_visibility(MapLayer<float> &layer)
 */
 void analyze_visible_to_cell(MapLayer<float> &layer, int row, int col)
 {
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Initialize a temporary grid to store visibility and adjacency information
     std::vector<std::vector<float>> visibility_grid(map_height, std::vector<float>(map_width, 0.0f));
 
-    // Iterate over all cells in the grid
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells
-            if (terrain->is_wall(i, j)) {
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
+            if (terrain->is_wall(i, j)) 
+            {
                 continue;
             }
 
-            // Check if the cell is visible to (row, col)
-            if (is_clear_path(row, col, i, j)) {
-                visibility_grid[i][j] = 1.0f; // Mark as visible
+            if (is_clear_path(row, col, i, j)) 
+            {
+                visibility_grid[i][j] = 1.0f;
             }
         }
     }
 
-    // Iterate over all cells again to mark cells adjacent to visible cells
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells and cells already marked as visible
-            if (terrain->is_wall(i, j) || visibility_grid[i][j] == 1.0f) {
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
+            if (terrain->is_wall(i, j) || visibility_grid[i][j] == 1.0f) 
+            {
                 continue;
             }
 
-            // Check the 8 neighboring cells for visibility
+            //check all neighbors for visibility
             bool is_adjacent_to_visible = false;
             for (int dx = -1; dx <= 1; ++dx) 
             {
                 for (int dy = -1; dy <= 1; ++dy) 
                 {
-                    //skip the current cell
-                    if (dx == 0 && dy == 0) continue; 
+                    if (dx == 0 && dy == 0) 
+                    {
+                        continue;
+                    } 
 
                     int x = i + dx;
                     int y = j + dy;
 
-                    // Check if the neighboring cell is within bounds and visible
-                    if (x >= 0 && x < map_height && y >= 0 && y < map_width && visibility_grid[x][y] == 1.0f) {
+                    //check if the neighboring cell is within bounds and visible
+                    if (x >= 0 && x < map_height && y >= 0 && y < map_width && visibility_grid[x][y] == 1.0f) 
+                    {
                         is_adjacent_to_visible = true;
                         break;
                     }
                 }
-                if (is_adjacent_to_visible) break;
+                if (is_adjacent_to_visible) 
+                {
+                    break;
+                } 
             }
 
-            // Mark the cell as 0.5 if it is adjacent to a visible cell
-            if (is_adjacent_to_visible) {
+            //mark the cell as 0.5 if it is adjacent to a visible cell
+            if (is_adjacent_to_visible) 
+            {
                 visibility_grid[i][j] = 0.5f;
             }
         }
     }
 
-    // Copy the results to the output layer
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
             layer.set_value(i, j, visibility_grid[i][j]);
         }
     }
@@ -364,53 +370,53 @@ void analyze_agent_vision(MapLayer<float>& layer, const Agent* agent)
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Get the agent's position and direction in the XZ plane
     Vec3 agent_pos = agent->get_position();
     Vec3 agent_dir = agent->get_forward_vector();
 
-    // Normalize the agent's direction vector in the XZ plane
+    //normalize the agent's direction vector in the XZ plane
     float agent_dir_length = std::sqrt(agent_dir.x * agent_dir.x + agent_dir.z * agent_dir.z);
     Vec2 agent_dir_xz = { agent_dir.x / agent_dir_length, agent_dir.z / agent_dir_length };
 
-    // Define the field of view (FOV) cosine threshold (slightly larger than 180 degrees)
-    const float fov_cosine_threshold = -0.1f;
+    //define the field of view (FOV) cosine threshold (slightly larger than 180 degrees)
+    const float fov_degrees = 190.0f;
+    const float fov_cosine_threshold = std::cos((fov_degrees / 2.0f) * (M_PI / 180.0f));
 
-    // Convert the agent's world position to grid coordinates
     GridPos agent_grid_pos = terrain->get_grid_position(agent_pos);
     int agent_row = agent_grid_pos.row;
     int agent_col = agent_grid_pos.col;
 
-    // Iterate over all cells in the grid
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells
-            if (terrain->is_wall(i, j)) {
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
+            if (terrain->is_wall(i, j)) 
+            {
                 continue;
             }
 
-            // Get the center position of the current cell in the XZ plane
             Vec3 cell_world_pos = terrain->get_world_position(i, j);
             Vec2 cell_pos_xz = { cell_world_pos.x, cell_world_pos.z };
 
-            // Calculate the vector from the agent to the cell in the XZ plane
+            //vector from the agent to cell
             Vec2 agent_to_cell = { cell_pos_xz.x - agent_pos.x, cell_pos_xz.y - agent_pos.z };
-
-            // Normalize the agent-to-cell vector
             float agent_to_cell_length = std::sqrt(agent_to_cell.x * agent_to_cell.x + agent_to_cell.y * agent_to_cell.y);
-            if (agent_to_cell_length < 0.0001f) {
-                continue; // Skip if the cell is too close to the agent
+            
+            //skip if the cell is too close to the agent
+            if (agent_to_cell_length < 0.0001f) 
+            {
+                continue; 
             }
+
             agent_to_cell.x /= agent_to_cell_length;
             agent_to_cell.y /= agent_to_cell_length;
 
-            // Calculate the dot product between the agent's direction and the agent-to-cell vector
             float dot_product = agent_dir_xz.x * agent_to_cell.x + agent_dir_xz.y * agent_to_cell.y;
 
             // Check if the cell is within the agent's FOV
-            if (dot_product >= fov_cosine_threshold) {
-                // Check if there is a clear path from the agent to the cell using grid coordinates
-                if (is_clear_path(agent_row, agent_col, i, j)) {
-                    // Mark the cell as 1.0 if it is visible
+            if (dot_product >= fov_cosine_threshold) 
+            {
+                if (is_clear_path(agent_row, agent_col, i, j)) 
+                {
                     layer.set_value(i, j, 1.0f);
                 }
             }
@@ -433,63 +439,72 @@ void analyze_agent_vision(MapLayer<float>& layer, const Agent* agent)
 */
 void propagate_solo_occupancy(MapLayer<float>& layer, float decay, float growth)
 {
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Create a temporary layer to store the updated values
     float temp_layer[40][40] = { 0.0f };
 
-    // Iterate over all cells in the grid
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells
-            if (terrain->is_wall(i, j)) {
-                temp_layer[i][j] = 0.0f; // Walls remain 0
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
+            if (terrain->is_wall(i, j)) 
+            {
+                temp_layer[i][j] = 0.0f;
                 continue;
             }
 
-            // Step 1: Get the value of each neighbor and apply exponential decay based on distance
+            //step 1: get the value of each neighbor and apply exponential decay based on distance
             float max_decayed_value = 0.0f;
 
             // Check all 8 neighbors (including diagonals)
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
-                    if (dx == 0 && dy == 0) continue; // Skip the current cell
+            for (int dx = -1; dx <= 1; ++dx) 
+            {
+                for (int dy = -1; dy <= 1; ++dy) 
+                {
+                    if (dx == 0 && dy == 0) 
+                    {
+                        continue; 
+                    } 
 
                     int x = i + dx;
                     int y = j + dy;
 
-                    // Ensure the neighbor is within bounds
-                    if (x >= 0 && x < map_height && y >= 0 && y < map_width) {
-                        // Calculate the distance between the current cell and the neighbor
-                        float distance = std::sqrt(dx * dx + dy * dy); // Euclidean distance
+                    //ensure the neighbor is within bounds
+                    if (x >= 0 && x < map_height && y >= 0 && y < map_width) 
+                    {
+                        //calculate the distance between the current cell and the neighbor
+                        float distance = std::sqrt(dx * dx + dy * dy);
 
                         // Apply exponential decay to the neighbor's value
                         float neighbor_value = layer.get_value(x, y);
                         float decayed_value = neighbor_value * exp(-distance * decay);
 
                         // Keep the maximum decayed value
-                        if (decayed_value > max_decayed_value) {
+                        if (decayed_value > max_decayed_value) 
+                        {
                             max_decayed_value = decayed_value;
                         }
                     }
                 }
             }
 
-            // Step 2: Keep the highest value from step 1
-            // Step 3: Linearly interpolate from the cell's current value to the value from step 2
+            //step 2: keep the highest value from step 1
             float current_value = layer.get_value(i, j);
+
+            //step 3: linearly interpolate from current_value to max_decayed_value
             float new_value = lerp(current_value, max_decayed_value, growth);
 
-            // Step 4: Store the value in the temporary layer
+            //step 4: store it in temporary layer
             temp_layer[i][j] = new_value;
         }
     }
 
     // Write the temporary layer back into the given layer
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
             layer.set_value(i, j, temp_layer[i][j]);
         }
     }
@@ -501,7 +516,6 @@ void propagate_solo_occupancy(MapLayer<float>& layer, float decay, float growth)
 */
 void normalize_solo_occupancy(MapLayer<float>& layer)
 {
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
@@ -545,36 +559,35 @@ void normalize_solo_occupancy(MapLayer<float>& layer)
 */
 void enemy_field_of_view(MapLayer<float>& layer, float fovAngle, float closeDistance, float occupancyValue, AStarAgent* enemy)
 {
-    // Step 1: Clear out old values in the layer by setting any negative value to 0
-    for (int i = 0; i < terrain->get_map_height(); ++i) {
-        for (int j = 0; j < terrain->get_map_width(); ++j) {
-            if (layer.get_value(i, j) < 0.0f) {
+    //step 1: clear out old values in the layer by setting any negative value to 0
+    for (int i = 0; i < terrain->get_map_height(); ++i) 
+    {
+        for (int j = 0; j < terrain->get_map_width(); ++j) 
+        {
+            if (layer.get_value(i, j) < 0.0f) 
+            {
                 layer.set_value(i, j, 0.0f);
             }
         }
     }
 
-    // Get the enemy's position and direction in the XZ plane
     Vec3 enemy_pos = enemy->get_position();
     Vec3 enemy_dir = enemy->get_forward_vector();
-
-    // Normalize the enemy's direction vector
     float enemy_dir_length = std::sqrt(enemy_dir.x * enemy_dir.x + enemy_dir.z * enemy_dir.z);
     Vec2 enemy_dir_xz = { enemy_dir.x / enemy_dir_length, enemy_dir.z / enemy_dir_length };
 
-    // Calculate the cosine of the FOV angle (convert degrees to radians)
-    float fov_cosine = std::cos(fovAngle * M_PI / 180.0f);
-
-    // Convert the enemy's world position to grid coordinates
     GridPos enemy_grid_pos = terrain->get_grid_position(enemy_pos);
     int enemy_row = enemy_grid_pos.row;
     int enemy_col = enemy_grid_pos.col;
 
-    // Iterate over all cells in the grid
-    for (int i = 0; i < terrain->get_map_height(); ++i) {
-        for (int j = 0; j < terrain->get_map_width(); ++j) {
-            // Skip wall cells
-            if (terrain->is_wall(i, j)) {
+    float fov_cosine = std::cos(fovAngle * M_PI / 180.0f);
+
+    for (int i = 0; i < terrain->get_map_height(); ++i) 
+    {
+        for (int j = 0; j < terrain->get_map_width(); ++j) 
+        {
+            if (terrain->is_wall(i, j)) 
+            {
                 continue;
             }
 
@@ -607,7 +620,8 @@ void enemy_field_of_view(MapLayer<float>& layer, float fovAngle, float closeDist
             }
             else {
                 // If the cell is outside closeDistance, check both visibility and FOV
-                if (dot_product >= fov_cosine && is_clear_path(enemy_row, enemy_col, i, j)) {
+                if (dot_product >= fov_cosine && is_clear_path(enemy_row, enemy_col, i, j)) 
+                {
                     layer.set_value(i, j, occupancyValue);
                 }
             }
@@ -615,26 +629,23 @@ void enemy_field_of_view(MapLayer<float>& layer, float fovAngle, float closeDist
     }
 }
 
+/*
+    Check if the player's current tile has a negative value, ie in the fov cone
+    or within a detection radius.
+*/
 bool enemy_find_player(MapLayer<float>& layer, AStarAgent* enemy, Agent* player)
 {
-    /*
-        Check if the player's current tile has a negative value, ie in the fov cone
-        or within a detection radius.
-    */
+    const auto playerGridPos = terrain->get_grid_position(player->get_position());
 
-    const auto& playerWorldPos = player->get_position();
-
-    // Convert the player's world position to grid coordinates
-    const auto playerGridPos = terrain->get_grid_position(playerWorldPos);
-
-    // Verify a valid position was returned
-    if (terrain->is_valid_grid_position(playerGridPos)) {
-        if (layer.get_value(playerGridPos.row, playerGridPos.col) < 0.0f) {
+    if (terrain->is_valid_grid_position(playerGridPos)) 
+    {
+        if (layer.get_value(playerGridPos.row, playerGridPos.col) < 0.0f) 
+        {
             return true;
         }
     }
 
-    // Player isn't in the detection radius or fov cone, OR somehow off the map
+    //player isn't in the fov coneor within a detection radius.
     return false;
 }
 
@@ -651,7 +662,6 @@ bool enemy_find_player(MapLayer<float>& layer, AStarAgent* enemy, Agent* player)
 */
 bool enemy_seek_player(MapLayer<float>& layer, AStarAgent* enemy)
 {
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
@@ -667,27 +677,33 @@ bool enemy_seek_player(MapLayer<float>& layer, AStarAgent* enemy)
     int enemy_row = enemy_grid_pos.row;
     int enemy_col = enemy_grid_pos.col;
 
-    // Iterate over all cells in the grid
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
+    for (int i = 0; i < map_height; ++i) 
+    {
+        for (int j = 0; j < map_width; ++j) 
+        {
             float cell_value = layer.get_value(i, j);
 
-            // Skip cells with zero or negative values
-            if (cell_value <= 0.0f) {
+            //skip cells with zero or negative values
+            if (cell_value <= 0.0f) 
+            {
                 continue;
             }
 
-            // Check if this cell has a higher value than the current max
-            if (cell_value > max_value) {
+            //check if this cell has a higher value than the current max
+            if (cell_value > max_value) 
+            {
                 max_value = cell_value;
                 target_row = i;
                 target_col = j;
                 min_distance = std::sqrt((i - enemy_row) * (i - enemy_row) + (j - enemy_col) * (j - enemy_col));
             }
-            // If the cell has the same value as the current max, check if it's closer
-            else if (cell_value == max_value) {
+
+            //if the cell has the same value as the current max, check if it's closer
+            else if (cell_value == max_value) 
+            {
                 float distance = std::sqrt((i - enemy_row) * (i - enemy_row) + (j - enemy_col) * (j - enemy_col));
-                if (distance < min_distance) {
+                if (distance < min_distance) 
+                {
                     target_row = i;
                     target_col = j;
                     min_distance = distance;
@@ -697,7 +713,8 @@ bool enemy_seek_player(MapLayer<float>& layer, AStarAgent* enemy)
     }
 
     // If a target cell was found, set it as the enemy's new target
-    if (target_row != -1 && target_col != -1) {
+    if (target_row != -1 && target_col != -1) 
+    {
         enemy->path_to(Vec3(target_row, target_col, 0));
         return true;
     }
