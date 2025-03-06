@@ -79,42 +79,6 @@ float distance_to_closest_wall(int row, int col)
     return min_distance;
 }
 
-//check if two line segments intersect
-bool line_intersect(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
-{
-    //calculate the orientation of the triplet (p1, p2, p3)
-    auto orientation = [](float x1, float y1, float x2, float y2, float x3, float y3) -> float 
-    {
-        return (y2 - y1) * (x3 - x2) - (x2 - x1) * (y3 - y2);
-    };
-
-    //calculate the orientations
-    float o1 = orientation(x1, y1, x2, y2, x3, y3);
-    float o2 = orientation(x1, y1, x2, y2, x4, y4);
-    float o3 = orientation(x3, y3, x4, y4, x1, y1);
-    float o4 = orientation(x3, y3, x4, y4, x2, y2);
-
-    //general case: Check if the line segments intersect
-    if ((o1 * o2 < 0) && (o3 * o4 < 0)) 
-    {
-        return true;
-    }
-
-    //special case: check if any endpoint lies on the other line segment
-    auto on_segment = [](float x1, float y1, float x2, float y2, float x, float y) -> bool 
-    {
-        return x >= std::min(x1, x2) && x <= std::max(x1, x2) && y >= std::min(y1, y2) && y <= std::max(y1, y2);
-    };
-
-    if (o1 == 0 && on_segment(x1, y1, x2, y2, x3, y3)) return true;
-    if (o2 == 0 && on_segment(x1, y1, x2, y2, x4, y4)) return true;
-    if (o3 == 0 && on_segment(x3, y3, x4, y4, x1, y1)) return true;
-    if (o4 == 0 && on_segment(x3, y3, x4, y4, x2, y2)) return true;
-
-    return false;
-}
-
-
 /*
     Two cells (row0, col0) and (row1, col1) are visible to each other if a line
     between their centerpoints doesn't intersect the four boundary lines of every
@@ -126,50 +90,41 @@ bool line_intersect(float x1, float y1, float x2, float y2, float x3, float y3, 
 */
 bool is_clear_path(int row0, int col0, int row1, int col1)
 {
-    //center of cell (row0, col0)
-    float x0 = col0 + 0.5f; 
-    float y0 = row0 + 0.5f;
+    Vec2 start(col0 + 0.5f, row0 + 0.5f);
+    Vec2 end(col1 + 0.5f, row1 + 0.5f);
 
-    //center of cell (row1, col1)
-    float x1 = col1 + 0.5f; 
-    float y1 = row1 + 0.5f;
-
-    //iterate over all cells in the grid
-    for (int i = 0; i < terrain->get_map_height(); ++i) 
+    for (int i = 0; i < terrain->get_map_height(); ++i)
     {
-        for (int j = 0; j < terrain->get_map_width(); ++j) 
+        for (int j = 0; j < terrain->get_map_width(); ++j)
         {
-            //check if the cell is a wall
-            if (terrain->is_wall(i, j)) 
+            if (terrain->is_wall(i, j))
             {
-                //get the four boundary lines of the wall cell, puffed out by a tiny amount
-                //tiny offset to ensure diagonal lines intersect corners
-                float epsilon = 0.0001f; 
-                float left = j - epsilon;
-                float right = j + 1 + epsilon;
-                float bottom = i - epsilon;
-                float top = i + 1 + epsilon;
+                float left = j;
+                float right = j + 1;
+                float bottom = i;
+                float top = i + 1;
 
-                //check intersection with the four boundary lines
-                if (
-                    //left boundary
-                    line_intersect(x0, y0, x1, y1, left, bottom, left, top) || 
-                    //right boundary
-                    line_intersect(x0, y0, x1, y1, right, bottom, right, top) || 
-                    //bottom boundary
-                    line_intersect(x0, y0, x1, y1, left, bottom, right, bottom) || 
-                    //top boundary
-                    line_intersect(x0, y0, x1, y1, left, top, right, top)
-                    ) 
-                { 
+                Vec2 topLeft(left, top);
+                Vec2 topRight(right, top);
+                Vec2 bottomLeft(left, bottom);
+                Vec2 bottomRight(right, bottom);
+
+                bool isIntersectLeftBoundary = line_intersect(start, end, bottomLeft, topLeft);
+                bool isIntersectRightBoundary = line_intersect(start, end, bottomRight, topRight);
+                bool isIntersectBottomBoundary = line_intersect(start, end, bottomLeft, bottomRight);
+                bool isIntersectTopBoundary = line_intersect(start, end, topLeft, topRight);
+
+                // Check intersection with the four boundary lines
+                if (isIntersectLeftBoundary || isIntersectRightBoundary || isIntersectBottomBoundary || isIntersectTopBoundary)
+                {
                     //path is blocked by a wall
-                    return false; 
+                    return false;
                 }
             }
         }
     }
 
-    //no walls block the path
+    //no walls
     return true;
 }
 
@@ -665,15 +620,13 @@ bool enemy_seek_player(MapLayer<float>& layer, AStarAgent* enemy)
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Initialize variables to track the highest value and closest cell
+    //initialize variables to track the highest value and closest cell
     float max_value = 0.0f;
+    float min_distance = std::numeric_limits<float>::max();
     int target_row = -1;
     int target_col = -1;
-    float min_distance = std::numeric_limits<float>::max();
 
-    // Get the enemy's current position and convert it to grid coordinates
-    Vec3 enemy_pos = enemy->get_position();
-    GridPos enemy_grid_pos = terrain->get_grid_position(enemy_pos);
+    GridPos enemy_grid_pos = terrain->get_grid_position(enemy->get_position());
     int enemy_row = enemy_grid_pos.row;
     int enemy_col = enemy_grid_pos.col;
 
@@ -712,13 +665,13 @@ bool enemy_seek_player(MapLayer<float>& layer, AStarAgent* enemy)
         }
     }
 
-    // If a target cell was found, set it as the enemy's new target
+    //if a target cell was found, add to the path
     if (target_row != -1 && target_col != -1) 
     {
         enemy->path_to(Vec3(target_row, target_col, 0));
         return true;
     }
 
-    // No target cell found
+    //nothing is found
     return false;
 }
