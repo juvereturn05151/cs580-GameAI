@@ -444,13 +444,12 @@ void propagate_solo_occupancy(MapLayer<float>& layer, float decay, float growth)
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
             // Skip wall cells
-            if (terrain->is_wall(i, j)) 
-            {
+            if (terrain->is_wall(i, j)) {
                 temp_layer[i][j] = 0.0f; // Walls remain 0
                 continue;
             }
 
-            // Step 1: Get the value of each neighbor and apply decay factor
+            // Step 1: Get the value of each neighbor and apply exponential decay based on distance
             float max_decayed_value = 0.0f;
 
             // Check all 8 neighbors (including diagonals)
@@ -463,8 +462,14 @@ void propagate_solo_occupancy(MapLayer<float>& layer, float decay, float growth)
 
                     // Ensure the neighbor is within bounds
                     if (x >= 0 && x < map_height && y >= 0 && y < map_width) {
+                        // Calculate the distance between the current cell and the neighbor
+                        float distance = std::sqrt(dx * dx + dy * dy); // Euclidean distance
+
+                        // Apply exponential decay to the neighbor's value
                         float neighbor_value = layer.get_value(x, y);
-                        float decayed_value = neighbor_value * decay;
+                        float decayed_value = neighbor_value * exp(-distance * decay);
+
+                        // Keep the maximum decayed value
                         if (decayed_value > max_decayed_value) {
                             max_decayed_value = decayed_value;
                         }
