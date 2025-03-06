@@ -41,17 +41,16 @@ float distance_to_closest_wall(int row, int col)
         }
     }
 
-    //check the four borders of the map
     for (int i = 0; i < map_height; ++i) 
     {
-        //left border where j = -1
+        //left border
         float distance = std::sqrt((i - row) * (i - row) + (-1 - col) * (-1 - col));
         if (distance < min_distance) 
         {
             min_distance = distance;
         }
 
-        //right border where j = map_width
+        //right border
         distance = std::sqrt((i - row) * (i - row) + (map_width - col) * (map_width - col));
         if (distance < min_distance) 
         {
@@ -61,14 +60,14 @@ float distance_to_closest_wall(int row, int col)
 
     for (int j = 0; j < map_width; ++j) 
     {
-        //top border where i = -1
+        //top border
         float distance = std::sqrt((-1 - row) * (-1 - row) + (j - col) * (j - col));
         if (distance < min_distance) 
         {
             min_distance = distance;
         }
 
-        //bottom border where i = map_height
+        //bottom border
         distance = std::sqrt((map_height - row) * (map_height - row) + (j - col) * (j - col));
         if (distance < min_distance) 
         {
@@ -114,7 +113,6 @@ bool is_clear_path(int row0, int col0, int row1, int col1)
                 bool isIntersectBottomBoundary = line_intersect(start, end, bottomLeft, bottomRight);
                 bool isIntersectTopBoundary = line_intersect(start, end, topLeft, topRight);
 
-                // Check intersection with the four boundary lines
                 if (isIntersectLeftBoundary || isIntersectRightBoundary || isIntersectBottomBoundary || isIntersectTopBoundary)
                 {
                     //path is blocked by a wall
@@ -138,7 +136,6 @@ void analyze_openness(MapLayer<float> &layer)
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    //iterate over all cells in the grid
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
             //skip wall cells
