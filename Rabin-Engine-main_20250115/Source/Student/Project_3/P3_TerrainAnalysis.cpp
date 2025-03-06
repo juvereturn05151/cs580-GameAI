@@ -431,7 +431,7 @@ void analyze_agent_vision(MapLayer<float>& layer, const Agent* agent)
     After every cell has been processed into the temporary layer, write the temporary layer into
     the given layer;
 */
-void propagate_solo_occupancy(MapLayer<float> &layer, float decay, float growth)
+void propagate_solo_occupancy(MapLayer<float>& layer, float decay, float growth)
 {
     // Get the map dimensions
     int map_height = terrain->get_map_height();
@@ -444,7 +444,8 @@ void propagate_solo_occupancy(MapLayer<float> &layer, float decay, float growth)
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
             // Skip wall cells
-            if (terrain->is_wall(i, j)) {
+            if (terrain->is_wall(i, j)) 
+            {
                 temp_layer[i][j] = 0.0f; // Walls remain 0
                 continue;
             }
@@ -452,7 +453,7 @@ void propagate_solo_occupancy(MapLayer<float> &layer, float decay, float growth)
             // Step 1: Get the value of each neighbor and apply decay factor
             float max_decayed_value = 0.0f;
 
-            // Check all 8 neighbors
+            // Check all 8 neighbors (including diagonals)
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
                     if (dx == 0 && dy == 0) continue; // Skip the current cell
@@ -488,69 +489,37 @@ void propagate_solo_occupancy(MapLayer<float> &layer, float decay, float growth)
         }
     }
 }
-
 /*
     Determine the maximum value in the given layer, and then divide the value
     for every cell in the layer by that amount.  This will keep the values in the
     range of [0, 1].  Negative values should be left unmodified.
 */
-void normalize_solo_occupancy(MapLayer<float> &layer)
+void normalize_solo_occupancy(MapLayer<float>& layer)
 {
-    const float decay = 0.9f; // Example decay factor
-    const float growth = 0.5f; // Example growth factor
-
     // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Create a temporary layer to store the updated values
-    float temp_layer[40][40] = { 0.0f };
-
-    // Iterate over all cells in the grid
+    // Step 1: Find the maximum value in the layer
+    float max_value = 0.0f;
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
-            // Skip wall cells
-            if (terrain->is_wall(i, j)) {
-                temp_layer[i][j] = 0.0f; // Walls remain 0
-                continue;
+            float cell_value = layer.get_value(i, j);
+            if (cell_value > max_value) {
+                max_value = cell_value;
             }
-
-            // Step 1: Get the value of each neighbor and apply decay factor
-            float max_decayed_value = 0.0f;
-
-            // Check all 8 neighbors
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
-                    if (dx == 0 && dy == 0) continue; // Skip the current cell
-
-                    int x = i + dx;
-                    int y = j + dy;
-
-                    // Ensure the neighbor is within bounds
-                    if (x >= 0 && x < map_height && y >= 0 && y < map_width) {
-                        float neighbor_value = layer.get_value(x, y);
-                        float decayed_value = neighbor_value * decay;
-                        if (decayed_value > max_decayed_value) {
-                            max_decayed_value = decayed_value;
-                        }
-                    }
-                }
-            }
-
-            // Step 2: Keep the highest value from step 1
-            // Step 3: Linearly interpolate from the cell's current value to the value from step 2
-            float current_value = layer.get_value(i, j);
-            float new_value = lerp(current_value, max_decayed_value, growth);
-
-            // Step 4: Store the value in the temporary layer
-            temp_layer[i][j] = new_value;
         }
     }
 
-    // Write the temporary layer back into the given layer
-    for (int i = 0; i < map_height; ++i) {
-        for (int j = 0; j < map_width; ++j) {
-            layer.set_value(i, j, temp_layer[i][j]);
+    // Step 2: Normalize the values in the layer (skip negative values)
+    if (max_value > 0.0f) { // Avoid division by zero
+        for (int i = 0; i < map_height; ++i) {
+            for (int j = 0; j < map_width; ++j) {
+                float cell_value = layer.get_value(i, j);
+                if (cell_value >= 0.0f) { // Skip negative values
+                    layer.set_value(i, j, cell_value / max_value);
+                }
+            }
         }
     }
 }
