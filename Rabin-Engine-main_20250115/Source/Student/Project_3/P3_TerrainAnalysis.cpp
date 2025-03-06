@@ -359,20 +359,26 @@ void analyze_visible_to_cell(MapLayer<float> &layer, int row, int col)
     intersect the four boundary lines of every wall cell.  Make use of the is_clear_path
     helper function.
 */
-void analyze_agent_vision(MapLayer<float> &layer, const Agent *agent)
+void analyze_agent_vision(MapLayer<float>& layer, const Agent* agent)
 {
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    //get the agent's position and direction in the XZ plane
+    // Get the agent's position and direction in the XZ plane
     Vec3 agent_pos = agent->get_position();
     Vec3 agent_dir = agent->get_forward_vector();
 
+    // Normalize the agent's direction vector in the XZ plane
     float agent_dir_length = std::sqrt(agent_dir.x * agent_dir.x + agent_dir.z * agent_dir.z);
     Vec2 agent_dir_xz = { agent_dir.x / agent_dir_length, agent_dir.z / agent_dir_length };
 
     // Define the field of view (FOV) cosine threshold (slightly larger than 180 degrees)
     const float fov_cosine_threshold = -0.1f;
+
+    // Convert the agent's world position to grid coordinates
+    GridPos agent_grid_pos = terrain->get_grid_position(agent_pos);
+    int agent_row = agent_grid_pos.row;
+    int agent_col = agent_grid_pos.col;
 
     // Iterate over all cells in the grid
     for (int i = 0; i < map_height; ++i) {
@@ -402,15 +408,14 @@ void analyze_agent_vision(MapLayer<float> &layer, const Agent *agent)
 
             // Check if the cell is within the agent's FOV
             if (dot_product >= fov_cosine_threshold) {
-                // Check if there is a clear path from the agent to the cell
-                if (is_clear_path(static_cast<int>(agent_pos.z), static_cast<int>(agent_pos.x), i, j)) {
+                // Check if there is a clear path from the agent to the cell using grid coordinates
+                if (is_clear_path(agent_row, agent_col, i, j)) {
                     // Mark the cell as 1.0 if it is visible
                     layer.set_value(i, j, 1.0f);
                 }
             }
         }
     }
-    // WRITE YOUR CODE HERE
 }
 
 /*
