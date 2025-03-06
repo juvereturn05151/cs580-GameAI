@@ -21,22 +21,17 @@ bool ProjectThree::implemented_fog_of_war() const // extra credit
 */
 float distance_to_closest_wall(int row, int col)
 {
-    // WRITE YOUR CODE HERE
-    float min_distance = std::numeric_limits<float>::max(); // Initialize with a large value
+    float min_distance = std::numeric_limits<float>::max();
 
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Iterate over all possible cells in the grid
     for (int i = 0; i < map_height; ++i) 
     {
         for (int j = 0; j < map_width; ++j) 
         {
-            // Check if the cell is a wall
             if (terrain->is_wall(i, j)) 
             {
-                // Calculate Euclidean distance
                 float distance = std::sqrt((i - row) * (i - row) + (j - col) * (j - col));
                 if (distance < min_distance) 
                 {
@@ -46,17 +41,17 @@ float distance_to_closest_wall(int row, int col)
         }
     }
 
-    // Handle cells outside the map bounds (treated as walls)
-    // Check the four borders of the map
+    //check the four borders of the map
     for (int i = 0; i < map_height; ++i) 
     {
-        // Left border (j = -1)
+        //left border where j = -1
         float distance = std::sqrt((i - row) * (i - row) + (-1 - col) * (-1 - col));
         if (distance < min_distance) 
         {
             min_distance = distance;
         }
-        // Right border (j = map_width)
+
+        //right border where j = map_width
         distance = std::sqrt((i - row) * (i - row) + (map_width - col) * (map_width - col));
         if (distance < min_distance) 
         {
@@ -66,13 +61,13 @@ float distance_to_closest_wall(int row, int col)
 
     for (int j = 0; j < map_width; ++j) 
     {
-        // Top border (i = -1)
+        //top border where i = -1
         float distance = std::sqrt((-1 - row) * (-1 - row) + (j - col) * (j - col));
         if (distance < min_distance) 
         {
             min_distance = distance;
         }
-        // Bottom border (i = map_height)
+        //bottom border where i = map_height
         distance = std::sqrt((map_height - row) * (map_height - row) + (j - col) * (j - col));
         if (distance < min_distance) 
         {
@@ -83,31 +78,32 @@ float distance_to_closest_wall(int row, int col)
     return min_distance;
 }
 
-// Helper function to check if two line segments intersect
+//check if two line segments intersect
 bool line_intersect(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
-    // Calculate the orientation of the triplet (p1, p2, p3)
+    //calculate the orientation of the triplet (p1, p2, p3)
     auto orientation = [](float x1, float y1, float x2, float y2, float x3, float y3) -> float 
     {
         return (y2 - y1) * (x3 - x2) - (x2 - x1) * (y3 - y2);
     };
 
-    // Calculate the orientations
+    //calculate the orientations
     float o1 = orientation(x1, y1, x2, y2, x3, y3);
     float o2 = orientation(x1, y1, x2, y2, x4, y4);
     float o3 = orientation(x3, y3, x4, y4, x1, y1);
     float o4 = orientation(x3, y3, x4, y4, x2, y2);
 
-    // General case: Check if the line segments intersect
-    if ((o1 * o2 < 0) && (o3 * o4 < 0)) {
+    //general case: Check if the line segments intersect
+    if ((o1 * o2 < 0) && (o3 * o4 < 0)) 
+    {
         return true;
     }
 
-    // Special case: Check if any endpoint lies on the other line segment
-    auto on_segment = [](float x1, float y1, float x2, float y2, float x, float y) -> bool {
-        return x >= std::min(x1, x2) && x <= std::max(x1, x2) &&
-            y >= std::min(y1, y2) && y <= std::max(y1, y2);
-        };
+    //special case: check if any endpoint lies on the other line segment
+    auto on_segment = [](float x1, float y1, float x2, float y2, float x, float y) -> bool 
+    {
+        return x >= std::min(x1, x2) && x <= std::max(x1, x2) && y >= std::min(y1, y2) && y <= std::max(y1, y2);
+    };
 
     if (o1 == 0 && on_segment(x1, y1, x2, y2, x3, y3)) return true;
     if (o2 == 0 && on_segment(x1, y1, x2, y2, x4, y4)) return true;
@@ -121,47 +117,61 @@ bool line_intersect(float x1, float y1, float x2, float y2, float x3, float y3, 
 /*
     Two cells (row0, col0) and (row1, col1) are visible to each other if a line
     between their centerpoints doesn't intersect the four boundary lines of every
-    wall cell.  You should puff out the four boundary lines by a very tiny amount
+    wall cell.  
+    You should puff out the four boundary lines by a very tiny amount
     so that a diagonal line passing by the corner will intersect it.  Make use of the
     line_intersect helper function for the intersection test and the is_wall member
     function in the global terrain to determine if a cell is a wall or not.
 */
 bool is_clear_path(int row0, int col0, int row1, int col1)
 {
-    // Get the center points of the two cells
-    float x0 = col0 + 0.5f; // Center of cell (row0, col0)
+    //get the center points of the two cells
+    
+    //center of cell (row0, col0)
+    float x0 = col0 + 0.5f; 
     float y0 = row0 + 0.5f;
-    float x1 = col1 + 0.5f; // Center of cell (row1, col1)
+
+    //center of cell (row1, col1)
+    float x1 = col1 + 0.5f; 
     float y1 = row1 + 0.5f;
 
-    // Iterate over all cells in the grid
+    //iterate over all cells in the grid
     for (int i = 0; i < terrain->get_map_height(); ++i) 
     {
         for (int j = 0; j < terrain->get_map_width(); ++j) 
         {
-            // Check if the cell is a wall
+            //check if the cell is a wall
             if (terrain->is_wall(i, j)) 
             {
-                // Get the four boundary lines of the wall cell, puffed out by a tiny amount
-                float epsilon = 0.0001f; // Tiny offset to ensure diagonal lines intersect corners
+                //get the four boundary lines of the wall cell, puffed out by a tiny amount
+                //tiny offset to ensure diagonal lines intersect corners
+                float epsilon = 0.0001f; 
                 float left = j - epsilon;
                 float right = j + 1 + epsilon;
                 float bottom = i - epsilon;
                 float top = i + 1 + epsilon;
 
-                // Check intersection with the four boundary lines
-                if (line_intersect(x0, y0, x1, y1, left, bottom, left, top) || // Left boundary
-                    line_intersect(x0, y0, x1, y1, right, bottom, right, top) || // Right boundary
-                    line_intersect(x0, y0, x1, y1, left, bottom, right, bottom) || // Bottom boundary
-                    line_intersect(x0, y0, x1, y1, left, top, right, top)) 
-                { // Top boundary
-                    return false; // Path is blocked by a wall
+                //check intersection with the four boundary lines
+                if (
+                    //left boundary
+                    line_intersect(x0, y0, x1, y1, left, bottom, left, top) || 
+                    //right boundary
+                    line_intersect(x0, y0, x1, y1, right, bottom, right, top) || 
+                    //bottom boundary
+                    line_intersect(x0, y0, x1, y1, left, bottom, right, bottom) || 
+                    //top boundary
+                    line_intersect(x0, y0, x1, y1, left, top, right, top)
+                    ) 
+                { 
+                    //path is blocked by a wall
+                    return false; 
                 }
             }
         }
     }
 
-    return true; // No walls block the path
+    //no walls block the path
+    return true;
 }
 
 /*
@@ -219,7 +229,8 @@ void analyze_visibility(MapLayer<float> &layer)
     for (int i = 0; i < map_height; ++i) {
         for (int j = 0; j < map_width; ++j) {
             // Skip wall cells
-            if (terrain->is_wall(i, j)) {
+            if (terrain->is_wall(i, j)) 
+            {
                 layer.set_value(i, j, 0.0f); // Walls have visibility 0
                 continue;
             }
@@ -231,12 +242,14 @@ void analyze_visibility(MapLayer<float> &layer)
             for (int x = 0; x < map_height; ++x) {
                 for (int y = 0; y < map_width; ++y) {
                     // Skip the current cell and wall cells
-                    if ((x == i && y == j) || terrain->is_wall(x, y)) {
+                    if ((x == i && y == j) || terrain->is_wall(x, y)) 
+                    {
                         continue;
                     }
 
                     // Check if there is a clear path between the two cells
-                    if (is_clear_path(i, j, x, y)) {
+                    if (is_clear_path(i, j, x, y)) 
+                    {
                         visible_count++;
                     }
                 }
@@ -295,9 +308,12 @@ void analyze_visible_to_cell(MapLayer<float> &layer, int row, int col)
 
             // Check the 8 neighboring cells for visibility
             bool is_adjacent_to_visible = false;
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
-                    if (dx == 0 && dy == 0) continue; // Skip the current cell
+            for (int dx = -1; dx <= 1; ++dx) 
+            {
+                for (int dy = -1; dy <= 1; ++dy) 
+                {
+                    //skip the current cell
+                    if (dx == 0 && dy == 0) continue; 
 
                     int x = i + dx;
                     int y = j + dy;
@@ -345,11 +361,10 @@ void analyze_visible_to_cell(MapLayer<float> &layer, int row, int col)
 */
 void analyze_agent_vision(MapLayer<float> &layer, const Agent *agent)
 {
-    // Get the map dimensions
     int map_height = terrain->get_map_height();
     int map_width = terrain->get_map_width();
 
-    // Get the agent's position and direction in the XZ plane
+    //get the agent's position and direction in the XZ plane
     Vec3 agent_pos = agent->get_position();
     Vec3 agent_dir = agent->get_forward_vector();
 
