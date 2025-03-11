@@ -260,8 +260,11 @@ void analyze_visible_to_cell(MapLayer<float> &layer, int row, int col)
                     //check if the neighboring cell is in the bounds and visible
                     if (x >= 0 && x < map_height && y >= 0 && y < map_width && visibility_grid[x][y] == 1.0f) 
                     {
-                        is_adjacent_to_visible = true;
-                        break;
+                        if (is_clear_path(i, j, x, y))
+                        {
+                            is_adjacent_to_visible = true;
+                            break;
+                        }
                     }
                 }
                 if (is_adjacent_to_visible) 
