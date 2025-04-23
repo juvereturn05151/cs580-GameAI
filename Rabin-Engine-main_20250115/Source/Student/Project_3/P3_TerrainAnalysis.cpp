@@ -568,18 +568,17 @@ bool enemy_find_player(MapLayer<float>& layer, AStarAgent* enemy, Agent* player)
 {
     const auto playerGridPos = terrain->get_grid_position(player->get_position());
 
-    if (terrain->is_valid_grid_position(playerGridPos)) 
+    if (!terrain->is_valid_grid_position(playerGridPos) || terrain->is_wall(playerGridPos.row, playerGridPos.col))
+        return false; // Player is out of bounds or inside a wall
+
+    // Check if player's cell has ANY non-zero value (either positive or negative)
+    if (layer.get_value(playerGridPos.row, playerGridPos.col) != 0.0f)
     {
-        if (layer.get_value(playerGridPos.row, playerGridPos.col) < 0.0f) 
-        {
-            return true;
-        }
+        return true;
     }
 
-    //player isn't in the fov coneor within a detection radius.
     return false;
 }
-
 
 /*
     Attempt to find a cell with the highest nonzero value (normalization may
