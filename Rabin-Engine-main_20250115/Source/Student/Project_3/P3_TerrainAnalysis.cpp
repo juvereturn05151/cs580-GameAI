@@ -384,63 +384,49 @@ void propagate_solo_occupancy(MapLayer<float>& layer, float decay, float growth)
 
     float temp_layer[40][40] = { 0.0f };
 
-    for (int i = 0; i < map_height; ++i) 
+    for (int i = 0; i < map_height; ++i)
     {
-        for (int j = 0; j < map_width; ++j) 
+        for (int j = 0; j < map_width; ++j)
         {
-            if (terrain->is_wall(i, j)) 
+            if (terrain->is_wall(i, j))
             {
-                temp_layer[i][j] = 0.0f;
+                temp_layer[i][j] = 0.0f; // Walls stay at 0
                 continue;
             }
 
-            //#1: get the value of each neighbor and apply exponential decay based on distance
             float max_decayed_value = 0.0f;
 
-            //check all neighbors
-            for (int dx = -1; dx <= 1; ++dx) 
+            // Check 4-directional neighbors (up, down, left, right)
+            const int dx[] = { -1, 1,  0, 0 };
+            const int dy[] = { 0, 0, -1, 1 };
+
+            for (int k = 0; k < 4; ++k)
             {
-                for (int dy = -1; dy <= 1; ++dy) 
+                int x = i + dx[k];
+                int y = j + dy[k];
+
+                // Skip out-of-bounds and walls
+                if (x < 0 || x >= map_height || y < 0 || y >= map_width || terrain->is_wall(x, y))
+                    continue;
+
+                float neighbor_value = layer.get_value(x, y);
+                float decayed_value = neighbor_value * exp(-1.0f * decay); // Distance=1 for adjacent cells
+
+                if (decayed_value > max_decayed_value)
                 {
-                    if (dx == 0 && dy == 0) 
-                    {
-                        continue; 
-                    } 
-
-                    int x = i + dx;
-                    int y = j + dy;
-
-                    //ensure the neighbor is within bounds
-                    if (x >= 0 && x < map_height && y >= 0 && y < map_width) 
-                    {
-                        //calculate exponential decay and apply to the neighbor's value
-                        float distance_cell_to_neighbor = std::sqrt(dx * dx + dy * dy);
-                        float neighbor_value = layer.get_value(x, y);
-                        float decayed_value = neighbor_value * exp(-distance_cell_to_neighbor * decay);
-
-                        if (decayed_value > max_decayed_value) 
-                        {
-                            max_decayed_value = decayed_value;
-                        }
-                    }
+                    max_decayed_value = decayed_value;
                 }
             }
 
-            //#2: keep the highest value from #1
             float current_value = layer.get_value(i, j);
-
-            //#3: linearly interpolate from current_value to max_decayed_value
-            float new_value = lerp(current_value, max_decayed_value, growth);
-
-            //#4: store it in temporary layer
-            temp_layer[i][j] = new_value;
+            temp_layer[i][j] = lerp(current_value, max_decayed_value, growth);
         }
     }
 
-    //assign the temporary values to the given layers
-    for (int i = 0; i < map_height; ++i) 
+    // Update the original layer
+    for (int i = 0; i < map_height; ++i)
     {
-        for (int j = 0; j < map_width; ++j) 
+        for (int j = 0; j < map_width; ++j)
         {
             layer.set_value(i, j, temp_layer[i][j]);
         }
