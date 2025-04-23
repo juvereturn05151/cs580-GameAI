@@ -510,7 +510,7 @@ void enemy_field_of_view(MapLayer<float>& layer, float fovAngle, float closeDist
     int enemy_row = enemy_grid_pos.row;
     int enemy_col = enemy_grid_pos.col;
 
-    float fov_cosine = std::cos(fovAngle * M_PI / 180.0f);
+    float fov_cosine = std::cos((fovAngle / 2.0f) * M_PI / 180.0f);
 
     for (int i = 0; i < terrain->get_map_height(); ++i) 
     {
